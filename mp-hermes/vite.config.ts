@@ -16,6 +16,7 @@ export default defineConfig({
         }
     },
     server: {
+        port: 6000,
         proxy: {
             '/api': {
                 target: 'http://localhost:5000/mp-pegasos', // Replace with your API server URL
