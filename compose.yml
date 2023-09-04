@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  mp-scrlttr:
+    build: mp-pegasos
+    container_name: mp-pegasos
+    environment:
+      PYTHONUNBUFFERED: true
+    ports:
+      - "5000:5000"
+    network_mode: host # expose whole container to host networkip addr show
+    volumes:
+      - ./mp-pegasos/data:/app/data
+      - ./mp-pegasos/src:/app/src:ro
+#      - ./mp-pegasos/makefile:/app/makefile:ro
