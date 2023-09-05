@@ -190,7 +190,7 @@
         </div>
       </fieldset>
       <!-- Generate JSON Button -->
-      <button type="submit" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-blue-700">PDF erstellen</button>
+      <button type="submit" class="w-full px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-700">PDF erstellen</button>
     </form>
   </div>
   <pre v-if="invoiceData" class="text-white m-8 overflow-x-auto w-1/2">{{ JSON.stringify(invoiceData, null, 2) }}</pre>
