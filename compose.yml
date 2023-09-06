@@ -1,30 +1,36 @@
 version: "3.9"
 
 services:
-  mp-pegasos:
-    build: ./mp-pegasos
-    container_name: mp-pegasos
+  mp-inkasso:
+    build: ./mp-inkasso
+    container_name: mp-inkasso
     environment:
       PYTHONUNBUFFERED: true
     ports:
-      - "5000:5000"
+      - "1111:1111"
     networks:
       - net
-#    network_mode: host # expose whole container to host networkip addr show
     volumes:
-      - ./mp-pegasos/data:/app/data
-      - ./mp-pegasos/src:/app/src:ro
-#      - ./mp-pegasos/makefile:/app/makefile:ro
+      - ./mp-inkasso/data:/app/data
+      - ./mp-inkasso/src:/app/src:ro
+    env_file:
+      - .env
 
-  mp-hermes:
-    container_name: mp-hermes
-    build: ./mp-hermes
-    depends_on:
-      - mp-pegasos
+  mp-postamt:
+    build: ./mp-postamt
+    container_name: mp-postamt
     ports:
-      - "8080:8080"
+      - "2222:2222"
     networks:
       - net
+    env_file:
+      - .env
+    environment:
+      - PYTHONUNBUFFERED=true
+      - SMTP_RELAY_HOST=${SMTP_RELAY_HOST}
+      - SMTP_RELAY_PORT=${SMTP_RELAY_PORT}
+      - SMTP_RELAY_USERNAME=${SMTP_RELAY_USERNAME}
+      - SMTP_RELAY_PASSWORD=${SMTP_RELAY_PASSWORD}
 
 networks:
   net:
