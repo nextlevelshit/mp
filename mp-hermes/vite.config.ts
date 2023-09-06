@@ -16,10 +16,10 @@ export default defineConfig({
         }
     },
     server: {
-        port: 6000,
+        port: 3333,
         proxy: {
             '/api': {
-                target: 'http://localhost:1111/mp-inkasso', // Replace with your API server URL
+                target: 'http://localhost:1111/mp-inkasso',
                 changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },

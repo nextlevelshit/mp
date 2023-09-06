@@ -32,5 +32,16 @@ services:
       - SMTP_RELAY_USERNAME=${SMTP_RELAY_USERNAME}
       - SMTP_RELAY_PASSWORD=${SMTP_RELAY_PASSWORD}
 
+  mp-hermes:
+    container_name: mp-hermes
+    build: ./mp-hermes
+    depends_on:
+      - mp-inkasso
+    ports:
+      - "3333:3333"
+    networks:
+      - net
+
+
 networks:
   net:
