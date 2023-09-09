@@ -1,0 +1,43 @@
+{
+  "kind": "collectionType",
+  "collectionName": "carts",
+  "info": {
+    "singularName": "cart",
+    "pluralName": "carts",
+    "displayName": "Cart",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "fingerprint": {
+      "type": "uid"
+    },
+    "wishlist": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::notebook.notebook"
+    },
+    "products": {
+      "type": "json"
+    },
+    "order": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::order.order",
+      "mappedBy": "cart"
+    },
+    "totalGross": {
+      "type": "decimal",
+      "default": 0
+    },
+    "totalVat": {
+      "type": "decimal"
+    },
+    "total": {
+      "type": "decimal"
+    }
+  }
+}

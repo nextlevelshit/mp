@@ -1,0 +1,19 @@
+{
+  "collectionName": "components_content_websites",
+  "info": {
+    "displayName": "main",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "text": {
+      "type": "richtext"
+    },
+    "lastUpdated": {
+      "type": "date"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "texes",
+  "info": {
+    "singularName": "tex",
+    "pluralName": "texes",
+    "displayName": "Tax",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "amount": {
+      "type": "decimal"
+    },
+    "label": {
+      "type": "string"
+    },
+    "included": {
+      "type": "boolean"
+    }
+  }
+}

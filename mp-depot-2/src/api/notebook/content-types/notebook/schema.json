@@ -1,0 +1,91 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notebooks",
+  "info": {
+    "singularName": "notebook",
+    "pluralName": "notebooks",
+    "displayName": "Notebook",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "pattern": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::pattern.pattern",
+      "inversedBy": "notebooks"
+    },
+    "weight": {
+      "type": "integer",
+      "default": 0
+    },
+    "longTitle": {
+      "type": "text"
+    },
+    "description": {
+      "type": "richtext"
+    },
+    "meta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "page.seo"
+    },
+    "cover": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::cover.cover",
+      "inversedBy": "notebooks"
+    },
+    "bestSellers": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::notebook.notebook"
+    },
+    "images": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "price": {
+      "type": "decimal"
+    },
+    "isShippable": {
+      "type": "boolean",
+      "default": true
+    },
+    "productCode": {
+      "type": "string",
+      "unique": true
+    },
+    "pages": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notebook-page.notebook-page"
+    },
+    "paper": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::notebook-paper.notebook-paper"
+    },
+    "tax": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::tex.tex"
+    },
+    "deliverability": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::notebook-deliverability.notebook-deliverability",
+      "inversedBy": "notebooks"
+    }
+  }
+}

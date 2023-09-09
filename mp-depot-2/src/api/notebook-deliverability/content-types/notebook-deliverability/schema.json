@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notebook_deliverabilities",
+  "info": {
+    "singularName": "notebook-deliverability",
+    "pluralName": "notebook-deliverabilities",
+    "displayName": "NotebookDeliverability",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "notebooks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::notebook.notebook",
+      "mappedBy": "deliverability"
+    }
+  }
+}

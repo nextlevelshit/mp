@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_content_seos",
+  "info": {
+    "displayName": "meta",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "description": {
+      "type": "text"
+    },
+    "keywords": {
+      "type": "text"
+    }
+  }
+}

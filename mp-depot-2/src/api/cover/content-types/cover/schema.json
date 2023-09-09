@@ -1,0 +1,25 @@
+{
+  "kind": "collectionType",
+  "collectionName": "covers",
+  "info": {
+    "singularName": "cover",
+    "pluralName": "covers",
+    "displayName": "Cover",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "title": {
+      "type": "string"
+    },
+    "notebooks": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::notebook.notebook",
+      "mappedBy": "cover"
+    }
+  }
+}

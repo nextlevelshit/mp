@@ -1,0 +1,26 @@
+{
+  "kind": "singleType",
+  "collectionName": "terms_of_conditions",
+  "info": {
+    "singularName": "terms-of-condition",
+    "pluralName": "terms-of-conditions",
+    "displayName": "Terms of Condition",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "meta": {
+      "type": "component",
+      "repeatable": false,
+      "component": "page.seo"
+    },
+    "main": {
+      "type": "component",
+      "repeatable": false,
+      "component": "page.website"
+    }
+  }
+}

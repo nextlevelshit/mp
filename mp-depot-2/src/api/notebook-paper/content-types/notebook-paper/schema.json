@@ -1,0 +1,28 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notebook_papers",
+  "info": {
+    "singularName": "notebook-paper",
+    "pluralName": "notebook-papers",
+    "displayName": "NotebookPaper",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "cost": {
+      "type": "decimal",
+      "default": 0,
+      "min": 0
+    },
+    "multipliedCost": {
+      "type": "decimal",
+      "default": 0
+    }
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "kind": "collectionType",
+  "collectionName": "notebook_pages",
+  "info": {
+    "singularName": "notebook-page",
+    "pluralName": "notebook-pages",
+    "displayName": "NotebookPage",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "label": {
+      "type": "string"
+    },
+    "cost": {
+      "type": "decimal",
+      "default": 0,
+      "min": 0
+    }
+  }
+}

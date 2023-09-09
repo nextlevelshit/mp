@@ -9,6 +9,7 @@ import html
 
 app = Flask(__name__)
 
+
 @app.route('/mp-postamt/')
 def info():
     today = time.strftime("%Y-%m-%d")
