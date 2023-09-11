@@ -128,7 +128,7 @@ def generate_pdf(template_path: Template, details_json: Details):
         return str(e), 400
 
 
-@app.route('/mp-inkasso/')
+@app.route('/mp-inkasso/v1/')
 def info():
     today = time.strftime("%Y-%m-%d")
     url_map = app.url_map
@@ -137,7 +137,7 @@ def info():
            f"<pre>" + html.escape(str(url_map), False) + "</pre>"
 
 
-@app.route('/mp-inkasso/invoice', methods=['POST'])
+@app.route('/mp-inkasso/v1/invoice', methods=['POST'])
 def generate_invoice():
     try:
         details_json = request.json
@@ -153,7 +153,7 @@ def generate_invoice():
         return str(e), 400
 
 
-@app.route('/mp-inkasso/shipping', methods=['POST'])
+@app.route('/mp-inkasso/v1/shipping', methods=['POST'])
 def generate_shipping():
     try:
         details_json = request.json
@@ -167,7 +167,7 @@ def generate_shipping():
         return str(e), 400
 
 
-@app.route('/mp-inkasso/order-confirmation', methods=['POST'])
+@app.route('/mp-inkasso/v1/order-confirmation', methods=['POST'])
 def generate_order_confirmation():
     try:
         details_json: Details = request.json
@@ -181,7 +181,7 @@ def generate_order_confirmation():
         return str(e), 400
 
 
-@app.route('/mp-inkasso/delete/pdf', methods=['DELETE'])
+@app.route('/mp-inkasso/v1/delete/pdf', methods=['DELETE'])
 def delete_pdf():
     try:
         subprocess.run([
@@ -194,7 +194,7 @@ def delete_pdf():
         return f"Failed to clean PDF files: {str(e)}", 500
 
 
-@app.route('/mp-inkasso/delete/all', methods=['DELETE'])
+@app.route('/mp-inkasso/v1/delete/all', methods=['DELETE'])
 def delete_all():
     try:
         subprocess.run([

@@ -88,15 +88,18 @@ services:
     networks:
       - data
 
-#  mp-hermes:
-#    container_name: mp-hermes
-#    build: ./mp-hermes
-#    depends_on:
-#      - mp-inkasso
-#    ports:
-#      - "3333:3333"
-#    networks:
-#      - net
+  mp-konsole:
+    container_name: mp-konsole
+    build: ./mp-konsole
+    depends_on:
+      - mp-inkasso
+      - mp-depot
+    ports:
+      - "3333:3333"
+    networks:
+      - net
+    volumes:
+      - ./mp-konsole/src:/app/src:ro
 
 #volumes:
 #  silo-data:

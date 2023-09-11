@@ -1,0 +1,166 @@
+[
+  {
+    "id": "HARD",
+    "url": "hardcover",
+    "name": "Notizbuch",
+    "variety": "Hardcover",
+    "options": "blanko oder kariert",
+    "price": 24.50,
+    "image": "/assets/products/HARD-3D-01.png",
+    "icon": "/assets/logos/hard-new.svg",
+    "sice": "150 x 210 mm",
+    "description": "160 Seiten",
+    "pattern": "24 Muster",
+    "binding": "Fadenheftung",
+    "active": true,
+    "headerTitle": "Hardcover",
+    "headerSubtitle": "",
+    "panelTitle": "Produktbeschreibung",
+    "panelContent": {
+      "text": "Alle Hardcover sind von uns selbst gestaltet, gedruckt und in Handarbeit gebunden. Die Buchdecken für die Hardcover werden durch das rot durchgefärbte und von Hand aufkaschierte Vorsatzpapier mit dem Buchblock verbunden. Ausgesuchte Materialien verleihen dem Buch zusammen mit den aufeinander abgestimmten Farben von Vorsatzpapier, Zeichen- und Kapitalband ein modernes Aussehen. Das eingesetzte, matte Recyclingpapier mit feiner Textur sorgt für angenehmes Schreiben und Skizzieren. Das mit Fadenheftung gebundene Buch hat ein optimales Aufschageverhalten und ist sehr strapazierfähig, auch bei intensivem Gebrauch.",
+      "format": "150 x 210 mm",
+      "cover": "mit zahlreichen, individuell konfigurierbaren Mustern bedruckt",
+      "content": "160 Seiten, wahlweise kariert oder blanko erhältlich.",
+      "paper": "alterungsbeständiges Recyclingpapier mit 1,4 fachem Volumen, hergestellt aus 100% Altpapier, 90g/qm, sowie alterungsbeständiges, holzfreies Premiumpapier mit Volumen, 150g/qm Hardcover-Überzug.",
+      "banderole": "Recyclingpapier, hergestellt aus 100% Altpapier, 120g/qm",
+      "details": "Hardcover mit rotem Vorsatzpapier, Fadenheftung. Textiles Kapital- und Zeichenband. Hergestellt in Deutschland."
+    },
+    "slides": [{
+        "image": "/assets/images-landingpage/Hardcover-new.jpg",
+        "headline": "Hardcover",
+        "text": ""
+      },
+      {
+        "image": "/assets/images-landingpage/HARD_00303.jpg",
+        "headline": "Hardcover",
+        "text": "Rotes Vorsatzpapier und Kapitalband"
+      },
+      {
+        "image": "/assets/images-landingpage/HARD_9877.jpg",
+        "headline": "Hardcover",
+        "text": "Buchrücken"
+      },
+      {
+        "image": "/assets/images-landingpage/HARD_00313.jpg",
+        "headline": "Hardcover",
+        "text": "Rotes Lesezeichen · Inhalt kariert"
+      }
+    ]
+  },
+  {
+    "id": "SOFT",
+    "url": "softcover",
+    "name": "Notizbuch",
+    "variety": "Softcover",
+    "options": "blanko oder kariert",
+    "price": 17.80,
+    "image": "/assets/products/SOFT-3D-01.png",
+    "icon": "/assets/logos/soft-new.svg",
+    "sice": "150 x 210 mm",
+    "description": "160 Seiten",
+    "pattern": "44 Muster",
+    "binding": "Fadenheftung",
+    "active": true,
+    "headerTitle": "Softcover",
+    "headerSubtitle": "",
+    "panelTitle": "Produktbeschreibung",
+    "panelContent": {
+      "text": "Alle Softcover sind von uns selbst gestaltet, gedruckt und in Handarbeit gebunden. Das eingesetzte, matte Recyclingpapier mit feiner Textur sorgt für angenehmes Schreiben und Skizzieren. Vorne und hinten ist jeweils ein rotes Vorschaltblatt eingefügt, was einen dezenten, farbigen Kontrast zu dem ansonsten absichtlich, schwarz-weiß gehaltenen Design setzt. Das mit Fadenheftung gebundene Buch hat ein optimales Aufschageverhalten und ist sehr strapazierfähig, auch bei intensivem Gebrauch.",
+      "format": "150 x 210 mm",
+      "cover": "mit zahlreichen, individuell konfigurierbaren Mustern bedruckt",
+      "content": "160 Seiten, wahlweise kariert oder blanko erhältlich.",
+      "paper": "alterungsbeständiges Recyclingpapier mit 1,4 fachem Volumen, hergestellt aus 100% Altpapier, 90g/qm, sowie alterungsbeständiges, holzfreies Premiumpapier mit Volumen, 300g/qm Cover.",
+      "banderole": "Recyclingpapier, hergestellt aus 100% Altpapier, 120g/qm",
+      "details": "Softcover mit rotem Vorschaltblatt, Fadenheftung. Hergestellt in Deutschland.<br><br>"
+    },
+    "slides": [{
+        "image": "/assets/images-landingpage/Softcover-new.jpg",
+        "headline": "Softcover",
+        "text": ""
+      },
+      {
+        "image": "/assets/images-landingpage/SOFT_00310.jpg",
+        "headline": "Softcover",
+        "text": "Rotes Vorschaltblatt"
+      },
+      {
+        "image": "/assets/images-landingpage/SOFT_9879.jpg",
+        "headline": "Softcover",
+        "text": "Buchrücken"
+      },
+      {
+        "image": "/assets/images-landingpage/SOFT_00315.jpg",
+        "headline": "Softcover",
+        "text": "Inhalt kariert"
+      }
+    ]
+  },
+  {
+    "id": "HEFT",
+    "url": "notebook",
+    "name": "Steppstich",
+    "variety": "Hefte",
+    "options": "blanko, kariert oder dotted",
+    "price": 7.50,
+    "image": "/assets/products/HEFT-3D-01.png",
+    "icon": "/assets/logos/heft-new.svg",
+    "sice": "150 x 210 mm",
+    "description": "40/60/80 Seiten",
+    "pattern": "44 Muster",
+    "binding": "Steppstich",
+    "active": true,
+    "headerTitle": "Hefte",
+    "headerSubtitle": "",
+    "panelTitle": "Produktbeschreibung",
+    "panelContent": {
+      "text": "Alle Notizhefte sind von uns selbst gestaltet, gedruckt und in Handarbeit gebunden. Das eingesetzte, matte Recyclingpapier mit feiner Textur sorgt für angenehmes Schreiben und Skizzieren. Um den Inhalt liegt ein Matelbogen aus rot durchgefärbtem Papier, was einen dezenten, farbigen Kontrast zu dem ansonsten absichtlich, schwarz-weiß gehaltenen Design setzt. Das mit Singerstich-Heftung gebundene Heft ist sehr strapazierfähig, auch bei intensivem Gebrauch.",
+      "format": "150 x 210 mm",
+      "cover": "mit zahlreichen, individuell konfigurierbaren Mustern bedruckt",
+      "content": "40, 60, oder 80 Seiten, wahlweise kariert, blanko oder dotted erhältlich.",
+      "paper": "alterungsbeständiges Recyclingpapier mit 1,4 fachem Volumen, hergestellt aus 100% Altpapier, 90g/qm, sowie alterungsbeständiges, holzfreies Premiumpapier mit Volumen, 300g/qm Cover.",
+      "banderole": "Recyclingpapier, hergestellt aus 100% Altpapier, 120g/qm",
+      "details": "Steppstich-Heftung mit rotem Faden und Mantelbogen, Ecken abgerundet. Hergestellt in Deutschland.<br>"
+    },
+    "slides": [{
+        "image": "/assets/images-landingpage/Heft-new.jpg",
+        "headline": "Heft",
+        "text": ""
+      },
+      {
+        "image": "/assets/images-landingpage/HEFT_00293.jpg",
+        "headline": "Heft",
+        "text": "Roter Mantelbogen"
+      },
+      {
+        "image": "/assets/images-landingpage/HEFT_00318.jpg",
+        "headline": "Heft",
+        "text": "Heftrücken"
+      },
+      {
+        "image": "/assets/images-landingpage/HEFT_00292.jpg",
+        "headline": "Heft",
+        "text": "Inhalt blanko"
+      }
+    ]
+  },
+  {
+    "id": "HEFT",
+    "name": "Klammer",
+    "variety": "Notizheft",
+    "price": 7.50,
+    "image": "/",
+    "sice": "DIN A5",
+    "description": "",
+    "active": false
+  },
+  {
+    "id": "HEFT",
+    "name": "Fadenknoten",
+    "variety": "Notizheft",
+    "price": 7.50,
+    "image": "/",
+    "sice": "DIN A5",
+    "description": "",
+    "active": false
+  }
+]

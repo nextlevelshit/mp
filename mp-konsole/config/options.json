@@ -1,0 +1,63 @@
+[
+  {
+    "title": "Option",
+    "description": "Bitte wählen Sie das Design des Inhalts aus.",
+    "available": ["HARD", "SOFT", "HEFT"],
+    "list": [
+      {
+        "id": "option-01",
+        "icon": "/assets/logos/blanko.svg",
+        "name": "Blanko",
+        "price": 0,
+        "available": ["HARD", "SOFT", "HEFT"]
+      },
+      {
+        "id": "option-02",
+        "icon": "",
+        "name": "Liniert",
+        "price": 1.20,
+        "available": []
+      },
+      {
+        "id": "option-03",
+        "icon": "/assets/logos/kariert.svg",
+        "name": "Kariert",
+        "price": 1.20,
+        "available": ["HARD", "SOFT", "HEFT"]
+      },
+      {
+        "id": "option-04",
+        "icon": "/assets/logos/dotted.svg",
+        "name": "Dotted",
+        "price": 1.20,
+        "available": ["HEFT"]
+      }
+    ]
+  },
+  {
+    "title": "Seitenanzahl",
+    "description": "Bitte wählen Sie die Seitenanzahl aus.",
+    "available": ["HEFT"],
+    "list": [
+      {
+        "id": "pages-40",
+        "name": "40 Seiten",
+        "price": 0,
+        "available": ["HEFT"]
+      },
+      {
+        "id": "pages-60",
+        "name": "60 Seiten",
+        "price": 1.00,
+        "available": ["HEFT"]
+      },
+      {
+        "id": "pages-80",
+        "name": "80 Seiten",
+        "price": 2.00,
+        "available": ["HEFT"]
+      }
+    ]
+  }
+
+]
