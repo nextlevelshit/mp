@@ -3,12 +3,12 @@ WORKDIR /app
 COPY ./package.json ./
 RUN npm i --no-audit --no-fund --progress=false --no-warnings --log-level=error
 COPY ./ ./
-# Set enviruonment variables @todo not working
-ARG API_URL
+# Set environment variables @todo not working
+#ARG API_URL
 
 ENV NGINX_DEBUG="true" \
-    NODE_ENV="production" \
-    API_URL="$API_URL"
+    NODE_ENV="production"
+#    API_URL="$API_URL"
 
 EXPOSE 3333
 
