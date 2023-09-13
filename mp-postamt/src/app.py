@@ -10,7 +10,7 @@ import html
 app = Flask(__name__)
 
 
-@app.route('/mp-postamt/')
+@app.route('/v1')
 def info():
     today = time.strftime("%Y-%m-%d")
     url_map = app.url_map
@@ -19,7 +19,7 @@ def info():
            f"<pre>" + html.escape(str(url_map), False) + "</pre>"
 
 
-@app.route('/mp-postamt/send/message', methods=['POST'])
+@app.route('/v1/send/message', methods=['POST'])
 def send_message():
     data = request.json
     subject = data.get('subject')

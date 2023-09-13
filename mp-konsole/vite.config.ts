@@ -18,15 +18,15 @@ export default defineConfig({
     server: {
         port: 3333,
         proxy: {
-            '/api/mp-inkasso/v1': {
-                target: 'http://localhost:1111/',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, ''),
+            '/api/mp-inkasso': {
+                target: 'http://mp-inkasso:1111/',
+                // changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/mp-inkasso/, ''),
             },
             '/api/mp-depot/v1': {
-                target: 'http://localhost:5555/',
-                changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api\/mp-depot\/v1/, '/api'),
+                target: 'http://mp-depot:5555/api/',
+                // changeOrigin: true,
+                rewrite: (path) => path.replace(/^\/api\/mp-depot\/v1/, ''),
             },
         },
     }

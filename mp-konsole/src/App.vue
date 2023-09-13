@@ -33,10 +33,11 @@ export default {
   methods: {
     fetchCustomers() {
       console.log("Fetching customers");
-      fetch("/api/mp-depot/v1/invoices", {
+      console.log({Authorization: `Bearer ${import.meta.env.VITE_DEPOT_API_TOKEN}`});
+      fetch("/api/mp-depot/v1/customers", {
         method: "GET",
         headers: {
-          Authorziation: "Bearer ece27ebc929e5fe9a7186a420f17672fcd3e60a4b33182b294300c5e7001f01fbeebed3e7503610f4c29cb656f0ecd1caeddfb36e0aacedc9641268da3f3dc230d41e7dcb73be38bda2a2b03e08be1d87fe9960ef939659bd785c28fc99b8799f0220bebda93e2828a53faca6d8c53f68f8d639e18c4e84c78dc9e3726f0977b"
+          Authorization: `Bearer ${import.meta.env.VITE_DEPOT_API_TOKEN}`
         }
       }).then((response) => {
         if (response.ok) {
