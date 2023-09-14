@@ -1,5 +1,7 @@
 // import * as process from "process";
 
+import {depotApiBaseUrl, depotApiBearerToken} from "@/config/constants";
+
 class DepotApi {
     baseUrl: string;
     headers: Headers;
@@ -27,7 +29,24 @@ class DepotApi {
     }
 
     async invoices() {
-        return fetch(`${this.baseUrl}/invoices`, {
+        return fetch(`${this.baseUrl}/invoices?populate=*`, {
+            method: "GET",
+            headers: this.headers
+        }).then((response) => {
+            if (response.ok) {
+                return response.json();
+            }
+        })
+            .then(({data}) => {
+                return data
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+
+    async orders() {
+        return fetch(`${this.baseUrl}/orders?populate=*`, {
             method: "GET",
             headers: this.headers
         }).then((response) => {
@@ -47,6 +66,7 @@ class DepotApi {
         return new Map([
             ["customers", this.customers()],
             ["invoices", this.invoices()],
+            ["orders", this.orders()],
         ])
     }
 
@@ -56,7 +76,9 @@ class DepotApi {
 }
 
 export enum DepotApiRoutes {
-    CUSTOMERS =  "customers"
+    CUSTOMERS =  "customers",
+    ORDERS = "orders",
+    INVOICES = "invoices"
 }
 
 interface DepotApiOptions {
@@ -67,8 +89,8 @@ interface DepotApiOptions {
 type Headers = Record<string, string>
 
 export const depotApi = new DepotApi({
-    baseUrl: import.meta.env.VITE_DEPOT_API_RELATIVE_PATH,
+    baseUrl: depotApiBaseUrl,
     defaultHeaders: {
-        Authorization: `Bearer ${import.meta.env.VITE_DEPOT_API_TOKEN}`
+        Authorization: `Bearer ${depotApiBearerToken}`
     }
 })

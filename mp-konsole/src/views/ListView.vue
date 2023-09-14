@@ -1,22 +1,28 @@
 <script>
 import {depotApi} from "@/services/DepotApi";
 import {DepotApiRoutes} from "@/services/DepotApi";
+import {CustomerListDto} from "@/config/constants";
 
 export default {
   props: ["path"],
   data() {
     return {
       error: null,
-      items: []
+      items: [],
+      list: {}
     }
   },
   created() {
-    console.log("This path:", this.path);
-
-    console.log("Fetching data for list view");
+    console.log("Fetching data for list view", this.path);
 
     if (depotApi.routes.has(this.path)) {
-      depotApi.get(this.path).then(data => this.items = data);
+      depotApi.get(this.path).then(data => {
+        this.items = data;
+        // debugger;
+        this.list = new CustomerListDto(data);
+        // console.log(list.rows, list.title, list.header, list.length)
+        // debugger;
+      });
     } else {
       console.warn(`Path ${this.path} not included in available routes`)
     }
@@ -33,9 +39,9 @@ export default {
       <div class="sm:flex sm:items-center sm:justify-between">
         <div>
           <div class="flex items-center gap-x-3">
-            <h2 class="text-lg font-medium text-gray-800 dark:text-white">Kundenadressen</h2>
+            <h2 class="text-lg font-medium text-gray-800 dark:text-white">{{list.title}}</h2>
 
-            <span class="px-3 py-1 text-xs text-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400">{{items.length}} Einträge</span>
+            <span class="px-3 py-1 text-xs tfext-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400">{{items.length}} Einträge</span>
           </div>
 
 <!--          <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">These companies have purchased in the last 12-->
@@ -113,99 +119,101 @@ export default {
               <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                 <thead class="bg-gray-50 dark:bg-gray-800">
                 <tr>
-                  <th scope="col"
+                  <th v-for="header in list.header"
+                      scope="col"
                       class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    <button class="flex items-center gap-x-3 focus:outline-none">
-                      <span>Company</span>
+<!--                    <button class="flex items-center gap-x-3 focus:outline-none">-->
+<!--                      <span>Company</span>-->
 
-                      <svg class="h-3" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path
-                            d="M2.13347 0.0999756H2.98516L5.01902 4.79058H3.86226L3.45549 3.79907H1.63772L1.24366 4.79058H0.0996094L2.13347 0.0999756ZM2.54025 1.46012L1.96822 2.92196H3.11227L2.54025 1.46012Z"
-                            fill="currentColor" stroke="currentColor" stroke-width="0.1"/>
-                        <path
-                            d="M0.722656 9.60832L3.09974 6.78633H0.811638V5.87109H4.35819V6.78633L2.01925 9.60832H4.43446V10.5617H0.722656V9.60832Z"
-                            fill="currentColor" stroke="currentColor" stroke-width="0.1"/>
-                        <path
-                            d="M8.45558 7.25664V7.40664H8.60558H9.66065C9.72481 7.40664 9.74667 7.42274 9.75141 7.42691C9.75148 7.42808 9.75146 7.42993 9.75116 7.43262C9.75001 7.44265 9.74458 7.46304 9.72525 7.49314C9.72522 7.4932 9.72518 7.49326 9.72514 7.49332L7.86959 10.3529L7.86924 10.3534C7.83227 10.4109 7.79863 10.418 7.78568 10.418C7.77272 10.418 7.73908 10.4109 7.70211 10.3534L7.70177 10.3529L5.84621 7.49332C5.84617 7.49325 5.84612 7.49318 5.84608 7.49311C5.82677 7.46302 5.82135 7.44264 5.8202 7.43262C5.81989 7.42993 5.81987 7.42808 5.81994 7.42691C5.82469 7.42274 5.84655 7.40664 5.91071 7.40664H6.96578H7.11578V7.25664V0.633865C7.11578 0.42434 7.29014 0.249976 7.49967 0.249976H8.07169C8.28121 0.249976 8.45558 0.42434 8.45558 0.633865V7.25664Z"
-                            fill="currentColor" stroke="currentColor" stroke-width="0.3"/>
-                      </svg>
-                    </button>
+<!--&lt;!&ndash;                      <svg class="h-3" viewBox="0 0 10 11" fill="none" xmlns="http://www.w3.org/2000/svg">&ndash;&gt;-->
+<!--&lt;!&ndash;                        <path&ndash;&gt;-->
+<!--&lt;!&ndash;                            d="M2.13347 0.0999756H2.98516L5.01902 4.79058H3.86226L3.45549 3.79907H1.63772L1.24366 4.79058H0.0996094L2.13347 0.0999756ZM2.54025 1.46012L1.96822 2.92196H3.11227L2.54025 1.46012Z"&ndash;&gt;-->
+<!--&lt;!&ndash;                            fill="currentColor" stroke="currentColor" stroke-width="0.1"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <path&ndash;&gt;-->
+<!--&lt;!&ndash;                            d="M0.722656 9.60832L3.09974 6.78633H0.811638V5.87109H4.35819V6.78633L2.01925 9.60832H4.43446V10.5617H0.722656V9.60832Z"&ndash;&gt;-->
+<!--&lt;!&ndash;                            fill="currentColor" stroke="currentColor" stroke-width="0.1"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <path&ndash;&gt;-->
+<!--&lt;!&ndash;                            d="M8.45558 7.25664V7.40664H8.60558H9.66065C9.72481 7.40664 9.74667 7.42274 9.75141 7.42691C9.75148 7.42808 9.75146 7.42993 9.75116 7.43262C9.75001 7.44265 9.74458 7.46304 9.72525 7.49314C9.72522 7.4932 9.72518 7.49326 9.72514 7.49332L7.86959 10.3529L7.86924 10.3534C7.83227 10.4109 7.79863 10.418 7.78568 10.418C7.77272 10.418 7.73908 10.4109 7.70211 10.3534L7.70177 10.3529L5.84621 7.49332C5.84617 7.49325 5.84612 7.49318 5.84608 7.49311C5.82677 7.46302 5.82135 7.44264 5.8202 7.43262C5.81989 7.42993 5.81987 7.42808 5.81994 7.42691C5.82469 7.42274 5.84655 7.40664 5.91071 7.40664H6.96578H7.11578V7.25664V0.633865C7.11578 0.42434 7.29014 0.249976 7.49967 0.249976H8.07169C8.28121 0.249976 8.45558 0.42434 8.45558 0.633865V7.25664Z"&ndash;&gt;-->
+<!--&lt;!&ndash;                            fill="currentColor" stroke="currentColor" stroke-width="0.3"/>&ndash;&gt;-->
+<!--&lt;!&ndash;                      </svg>&ndash;&gt;-->
+<!--                    </button>-->
+                    {{header}}
                   </th>
 
-                  <th scope="col"
-                      class="px-12 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    Status
-                  </th>
+<!--                  <th scope="col"-->
+<!--                      class="px-12 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">-->
+<!--                    Status-->
+<!--                  </th>-->
 
-                  <th scope="col"
-                      class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    About
-                  </th>
+<!--                  <th scope="col"-->
+<!--                      class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">-->
+<!--                    About-->
+<!--                  </th>-->
 
-                  <th scope="col"
-                      class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    Users
-                  </th>
+<!--                  <th scope="col"-->
+<!--                      class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">-->
+<!--                    Users-->
+<!--                  </th>-->
 
-                  <th scope="col"
-                      class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                    License use
-                  </th>
+<!--                  <th scope="col"-->
+<!--                      class="px-4 py-3.5 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400">-->
+<!--                    License use-->
+<!--                  </th>-->
 
                   <th scope="col" class="relative py-3.5 px-4">
-                    <span class="sr-only">Edit</span>
+                    <span class="sr-only">Bearbeiten</span>
                   </th>
                 </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900">
 
-                <tr v-for="item in items">
-                  <td class="px-4 py-4 text-sm font-medium whitespace-nowrap">
+                <tr v-for="row in list.rows">
+                  <td v-for="cell in row" class="px-4 py-4 text-sm font-medium whitespace-nowrap">
                     <div>
-                      <h2 class="font-medium text-gray-800 dark:text-white ">{{item.attributes.Name}}</h2>
-                      <p class="text-sm font-normal text-gray-600 dark:text-gray-400">#{{item.id}}</p>
+                      <p class="font-medium text-gray-800 dark:text-white ">{{cell}}</p>
+<!--                      <p class="text-sm font-normal text-gray-600 dark:text-gray-400">#</p>-->
                     </div>
                   </td>
-                  <td class="px-12 py-4 text-sm font-medium whitespace-nowrap">
-                    <div
-                        class="inline px-3 py-1 text-sm font-normal rounded-full text-emerald-500 gap-x-2 bg-emerald-100/60 dark:bg-gray-800">
-                      Customer
-                    </div>
-                  </td>
-                  <td class="px-4 py-4 text-sm whitespace-nowrap">
-                    <div>
-                      <h4 class="text-gray-700 dark:text-gray-200">{{item.attributes.Address}}</h4>
-<!--                      <p class="text-gray-500 dark:text-gray-400">Brings all your news into one place</p>-->
-                    </div>
-                  </td>
-                  <td class="px-4 py-4 text-sm whitespace-nowrap">
-<!--                    <div class="flex items-center">-->
-<!--                      <img-->
-<!--                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"-->
-<!--                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80"-->
-<!--                          alt="">-->
-<!--                      <img-->
-<!--                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"-->
-<!--                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80"-->
-<!--                          alt="">-->
-<!--                      <img-->
-<!--                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"-->
-<!--                          src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1256&q=80"-->
-<!--                          alt="">-->
-<!--                      <img-->
-<!--                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"-->
-<!--                          src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80"-->
-<!--                          alt="">-->
-<!--                      <p class="flex items-center justify-center w-6 h-6 -mx-1 text-xs text-blue-600 bg-blue-100 border-2 border-white rounded-full">-->
-<!--                        +4</p>-->
+<!--                  <td class="px-12 py-4 text-sm font-medium whitespace-nowrap">-->
+<!--                    <div-->
+<!--                        class="inline px-3 py-1 text-sm font-normal rounded-full text-emerald-500 gap-x-2 bg-emerald-100/60 dark:bg-gray-800">-->
+<!--                      Customer-->
 <!--                    </div>-->
-                  </td>
+<!--                  </td>-->
+<!--                  <td class="px-4 py-4 text-sm whitespace-nowrap">-->
+<!--                    <div>-->
+<!--                      <h4 class="text-gray-700 dark:text-gray-200">{{item[2]}}</h4>-->
+<!--&lt;!&ndash;                      <p class="text-gray-500 dark:text-gray-400">Brings all your news into one place</p>&ndash;&gt;-->
+<!--                    </div>-->
+<!--                  </td>-->
+<!--                  <td class="px-4 py-4 text-sm whitespace-nowrap">-->
+<!--&lt;!&ndash;                    <div class="flex items-center">&ndash;&gt;-->
+<!--&lt;!&ndash;                      <img&ndash;&gt;-->
+<!--&lt;!&ndash;                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"&ndash;&gt;-->
+<!--&lt;!&ndash;                          src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80"&ndash;&gt;-->
+<!--&lt;!&ndash;                          alt="">&ndash;&gt;-->
+<!--&lt;!&ndash;                      <img&ndash;&gt;-->
+<!--&lt;!&ndash;                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"&ndash;&gt;-->
+<!--&lt;!&ndash;                          src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80"&ndash;&gt;-->
+<!--&lt;!&ndash;                          alt="">&ndash;&gt;-->
+<!--&lt;!&ndash;                      <img&ndash;&gt;-->
+<!--&lt;!&ndash;                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"&ndash;&gt;-->
+<!--&lt;!&ndash;                          src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1256&q=80"&ndash;&gt;-->
+<!--&lt;!&ndash;                          alt="">&ndash;&gt;-->
+<!--&lt;!&ndash;                      <img&ndash;&gt;-->
+<!--&lt;!&ndash;                          class="object-cover w-6 h-6 -mx-1 border-2 border-white rounded-full dark:border-gray-700 shrink-0"&ndash;&gt;-->
+<!--&lt;!&ndash;                          src="https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=256&q=80"&ndash;&gt;-->
+<!--&lt;!&ndash;                          alt="">&ndash;&gt;-->
+<!--&lt;!&ndash;                      <p class="flex items-center justify-center w-6 h-6 -mx-1 text-xs text-blue-600 bg-blue-100 border-2 border-white rounded-full">&ndash;&gt;-->
+<!--&lt;!&ndash;                        +4</p>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--                  </td>-->
 
-                  <td class="px-4 py-4 text-sm whitespace-nowrap">
-<!--                    <div class="w-48 h-1.5 bg-blue-200 overflow-hidden rounded-full">-->
-<!--                      <div class="bg-blue-500 w-2/3 h-1.5"></div>-->
-<!--                    </div>-->
-                  </td>
+<!--                  <td class="px-4 py-4 text-sm whitespace-nowrap">-->
+<!--&lt;!&ndash;                    <div class="w-48 h-1.5 bg-blue-200 overflow-hidden rounded-full">&ndash;&gt;-->
+<!--&lt;!&ndash;                      <div class="bg-blue-500 w-2/3 h-1.5"></div>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </div>&ndash;&gt;-->
+<!--                  </td>-->
 
                   <td class="px-4 py-4 text-sm whitespace-nowrap">
                     <button
