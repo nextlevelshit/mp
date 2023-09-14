@@ -18,21 +18,20 @@ export interface InvoiceListDtoOptions {
 }
 
 export class CustomerListDto {
-    list: CustomerListItem[];
     config = (item: CustomerListItem): string[] => (
         [item.attributes.Name, item.id, item.attributes.Address]
     );
+    header = ["Name", "ID", "Adresse"];
+    list: CustomerListItem[];
+    title = "Kundenadressen";
+    options = new Map([
+        ["Alle", {query: "all"}],
+        ["Bestandskunden", {query: ""}],
+        ["Neue", {query: "all "}]
+    ]);
 
     constructor(options: CustomerListItem[]) {
         this.list = options;
-    }
-
-    get title() {
-        return "Kundenadressen"
-    }
-
-    get header(): string[] {
-        return ["Name", "Adresse"]
     }
 
     get rows() {
