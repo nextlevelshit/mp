@@ -1,5 +1,5 @@
 export interface ListDto<T> {
-	transformer: (item: T) => string[] ;
+	transformer: (item: T) => string[];
 	header: string[];
 	list: T[];
 	title: string;

@@ -16,9 +16,7 @@ export default {
 
 		if (depotApi.routes.has(this.path)) {
 			depotApi.all(this.path).then((data) => {
-				// this.items = data;
 				this.list = depotApi.dto(this.path, data);
-				// this.list = new CustomerListDto(data);
 			});
 		} else {
 			console.warn(`Path ${this.path} not included in available routes`);

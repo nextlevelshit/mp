@@ -116,7 +116,7 @@
 											<p
 												class="font-medium text-gray-800 dark:text-white"
 											>
-												{{  cell }}
+												{{ cell }}
 											</p>
 										</div>
 									</td>

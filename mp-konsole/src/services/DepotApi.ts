@@ -6,6 +6,8 @@ import { InvoiceListDto } from "@/dto/InvoiceListDto";
 import type { InvoiceListItem } from "@/dto/InvoiceListDto";
 import { OrderListDto } from "@/dto/OrderListDto";
 import type { OrderListItem } from "@/dto/OrderListDto";
+import { ProductListDto } from "@/dto/ProductListDto";
+import type { ProductListItem } from "@/dto/ProductListDto";
 
 class DepotApi {
 	baseUrl: string;
@@ -70,6 +72,24 @@ class DepotApi {
 			});
 	}
 
+	async products() {
+		return fetch(`${this.baseUrl}/products?populate=*`, {
+			method: "GET",
+			headers: this.headers
+		})
+			.then((response) => {
+				if (response.ok) {
+					return response.json();
+				}
+			})
+			.then(({ data }) => {
+				return data;
+			})
+			.catch((error) => {
+				console.error(error);
+			});
+	}
+
 	get routes() {
 		return new Map([
 			[
@@ -92,6 +112,13 @@ class DepotApi {
 					dto: OrderListDto,
 					all: this.orders()
 				}
+			],
+			[
+				"products",
+				{
+					dto: ProductListDto,
+					all: this.products()
+				}
 			]
 		]);
 	}
@@ -110,11 +137,11 @@ class DepotApi {
 
 	dto(
 		path: DepotApiRoutes,
-		data: CustomerListItem[] & InvoiceListItem[] & OrderListItem[]
+		data: CustomerListItem[] & InvoiceListItem[] & OrderListItem[] & ProductListItem[]
 	) {
 		const route = this.routes.get(path);
 
-		if (!route) return null;
+ 		if (!route) return null;
 
 		if (route.dto) {
 			return new route.dto(data);
