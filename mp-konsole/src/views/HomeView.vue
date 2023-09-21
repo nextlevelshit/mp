@@ -12,7 +12,7 @@
 
 <script>
 import InvoiceForm from "@/components/InvoiceForm.vue";
-import { depotApi, DepotApiRoutes } from "@/services/DepotApi";
+import { depotApi } from "@/services/DepotApi";
 
 export default {
 	components: {
@@ -24,13 +24,14 @@ export default {
 			customerList: []
 		};
 	},
-	created() {
+	mounted() {
 		this.fetchCustomers();
 	},
 	methods: {
 		fetchCustomers() {
 			depotApi
-				.all(DepotApiRoutes.CUSTOMERS)
+				.customerFactory()
+				.all()
 				.then((data) => (this.customerList = data));
 		},
 		handleJsonGenerated(json) {

@@ -1,5 +1,5 @@
-import type { ListItem } from "@/dto/ListDto";
-import { BaseListDto } from "@/dto/ListDto";
+import type { BaseListItem } from "@/dto/Common";
+import { BaseListDto } from "@/dto/Common";
 
 export class CustomerListDto extends BaseListDto<CustomerListItem> {
 	transformer = (item: CustomerListItem): string[] => [
@@ -14,13 +14,14 @@ export class CustomerListDto extends BaseListDto<CustomerListItem> {
 		["Bestandskunden", { query: "" }],
 		["Neue", { query: "all " }]
 	]);
+	editLink = (id: number) => `/edit/customer/${id}`;
 
 	constructor(list: CustomerListItem[]) {
 		super(list);
 	}
 }
 
-export interface CustomerListItem extends ListItem {
+export interface CustomerListItem extends BaseListItem {
 	attributes: {
 		Name: string;
 		Address: string;

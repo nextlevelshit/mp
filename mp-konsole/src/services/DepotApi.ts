@@ -1,7 +1,6 @@
 import { depotApiBaseUrl, depotApiBearerToken } from "@/config/constants";
 import { CustomerListDto } from "@/dto/CustomerListDto";
 import type { CustomerListItem } from "@/dto/CustomerListDto";
-import type { ListItem } from "@/dto/ListDto";
 import { InvoiceListDto } from "@/dto/InvoiceListDto";
 import type { InvoiceListItem } from "@/dto/InvoiceListDto";
 import { OrderListDto } from "@/dto/OrderListDto";
@@ -18,121 +17,199 @@ class DepotApi {
 		this.headers = options.defaultHeaders ?? {};
 	}
 
-	async customers() {
-		return fetch(`${this.baseUrl}/customers`, {
-			method: "GET",
-			headers: this.headers
-		})
-			.then((response) => {
-				if (response.ok) {
-					return response.json();
-				}
-			})
-			.then(({ data }) => {
-				return data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+	private async handleResponse<T>(response: Response): Promise<T> {
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+		const { data } = await response.json();
+		return data;
 	}
 
-	async invoices() {
-		return fetch(`${this.baseUrl}/invoices?populate=*`, {
-			method: "GET",
-			headers: this.headers
-		})
-			.then((response) => {
-				if (response.ok) {
-					return response.json();
+	invoiceFactory(): Factory<InvoiceListItem> {
+		return {
+			create: async (data: InvoiceListItem): Promise<InvoiceListItem> => {
+				const response = await fetch(`${this.baseUrl}/invoices?populate=*`, {
+					method: "POST",
+					headers: this.headers,
+					body: JSON.stringify({ data })
+				});
+
+				return this.handleResponse<InvoiceListItem>(response);
+			},
+
+			one: async (id: string): Promise<InvoiceListItem | null> => {
+				const response = await fetch(
+					`${this.baseUrl}/invoices/${id}?populate=*`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				if (response.status === 404) {
+					return null;
 				}
-			})
-			.then(({ data }) => {
-				return data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+
+				return this.handleResponse<InvoiceListItem>(response);
+			},
+
+			all: async (): Promise<InvoiceListItem[]> => {
+				const response = await fetch(`${this.baseUrl}/invoices?populate=*`, {
+					method: "GET",
+					headers: this.headers
+				});
+
+				return this.handleResponse<InvoiceListItem[]>(response);
+			}
+		};
 	}
 
-	async orders() {
-		return fetch(`${this.baseUrl}/orders?populate=*`, {
-			method: "GET",
-			headers: this.headers
-		})
-			.then((response) => {
-				if (response.ok) {
-					return response.json();
+	customerFactory(): Factory<CustomerListItem> {
+		return {
+			create: async (): Promise<CustomerListItem> => {
+				const response = await fetch(`${this.baseUrl}/customers?populate=*`, {
+					method: "POST",
+					headers: this.headers
+				});
+
+				return this.handleResponse<CustomerListItem>(response);
+			},
+
+			one: async (id: string): Promise<CustomerListItem | null> => {
+				const response = await fetch(
+					`${this.baseUrl}/customers/${id}?populate=*`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				if (response.status === 404) {
+					return null;
 				}
-			})
-			.then(({ data }) => {
-				return data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+
+				return this.handleResponse<CustomerListItem>(response);
+			},
+
+			all: async (): Promise<CustomerListItem[]> => {
+				const response = await fetch(`${this.baseUrl}/customers?populate=*`, {
+					method: "GET",
+					headers: this.headers
+				});
+
+				return this.handleResponse<CustomerListItem[]>(response);
+			}
+		};
 	}
 
-	async products() {
-		return fetch(`${this.baseUrl}/products?populate=*`, {
-			method: "GET",
-			headers: this.headers
-		})
-			.then((response) => {
-				if (response.ok) {
-					return response.json();
+	orderFactory(): Factory<OrderListItem> {
+		return {
+			create: async (): Promise<OrderListItem> => {
+				const response = await fetch(`${this.baseUrl}/orders?populate=*`, {
+					method: "POST",
+					headers: this.headers
+				});
+
+				return this.handleResponse<OrderListItem>(response);
+			},
+
+			one: async (id: string): Promise<OrderListItem | null> => {
+				const response = await fetch(`${this.baseUrl}/orders/${id}?populate=*`, {
+					method: "GET",
+					headers: this.headers
+				});
+
+				if (response.status === 404) {
+					return null;
 				}
-			})
-			.then(({ data }) => {
-				return data;
-			})
-			.catch((error) => {
-				console.error(error);
-			});
+
+				return this.handleResponse<OrderListItem>(response);
+			},
+
+			all: async (): Promise<OrderListItem[]> => {
+				const response = await fetch(`${this.baseUrl}/orders?populate=*`, {
+					method: "GET",
+					headers: this.headers
+				});
+
+				return this.handleResponse<OrderListItem[]>(response);
+			}
+		};
 	}
 
-	get routes() {
+	productFactory(): Factory<ProductListItem> {
+		return {
+			create: async (data: ProductListItem): Promise<ProductListItem> => {
+				const response = await fetch(`${this.baseUrl}/products?populate=*`, {
+					method: "POST",
+					headers: this.headers,
+					body: JSON.stringify({ data })
+				});
+
+				return this.handleResponse<ProductListItem>(response);
+			},
+
+			one: async (id: string): Promise<ProductListItem | null> => {
+				const response = await fetch(
+					`${this.baseUrl}/products/${id}?populate=*`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				if (response.status === 404) {
+					return null;
+				}
+
+				return this.handleResponse<ProductListItem>(response);
+			},
+
+			all: async (): Promise<ProductListItem[]> => {
+				const response = await fetch(`${this.baseUrl}/products?populate=*`, {
+					method: "GET",
+					headers: this.headers
+				});
+
+				return this.handleResponse<ProductListItem[]>(response);
+			}
+		};
+	}
+
+	get routes(): Map<
+		string,
+		{ dto: any; factory: Factory<any> }
+	> {
 		return new Map([
 			[
 				"customers",
 				{
 					dto: CustomerListDto,
-					all: this.customers()
+					factory: this.customerFactory()
 				}
 			],
 			[
 				"invoices",
 				{
 					dto: InvoiceListDto,
-					all: this.invoices()
+					factory: this.invoiceFactory()
 				}
 			],
 			[
 				"orders",
 				{
 					dto: OrderListDto,
-					all: this.orders()
+					factory: this.orderFactory()
 				}
 			],
 			[
 				"products",
 				{
 					dto: ProductListDto,
-					all: this.products()
+					factory: this.productFactory()
 				}
 			]
 		]);
-	}
-
-	all(path: DepotApiRoutes): Promise<ListItem[]> {
-		const route = this.routes.get(path);
-
-		if (route) {
-			return route.all;
-		}
-
-		console.log("could not find path", path);
-
-		return new Promise((resolve) => resolve([]));
 	}
 
 	dto(
@@ -141,7 +218,7 @@ class DepotApi {
 	) {
 		const route = this.routes.get(path);
 
- 		if (!route) return null;
+		if (!route) return null;
 
 		if (route.dto) {
 			return new route.dto(data);
@@ -163,6 +240,13 @@ interface DepotApiOptions {
 }
 
 type Headers = Record<string, string>;
+
+interface Factory<T> {
+	create: (data: never) => Promise<T>;
+	one: (id: string) => Promise<T | null>;
+	all: () => Promise<T[]>;
+	update?: (id: string, data: T) => Promise<T | null>
+}
 
 export const depotApi = new DepotApi({
 	baseUrl: depotApiBaseUrl,

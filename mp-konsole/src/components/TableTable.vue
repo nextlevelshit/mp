@@ -1,21 +1,23 @@
 <template>
-	<section v-if="list" class="container mx-auto">
+	<section v-if="table" class="container mx-auto">
 		<div class="sm:flex sm:items-center sm:justify-between">
 			<div>
 				<div class="flex items-center gap-x-3">
 					<h2 class="text-lg font-medium text-gray-800 dark:text-white">
-						{{ list.title }}
+						{{ table.title }}
 					</h2>
 
 					<span
 						class="px-3 py-1 text-xs tfext-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400"
-						>{{ list.length }} Einträge</span
+						>{{ table.length }} Einträge</span
 					>
 				</div>
 			</div>
 
 			<div class="flex items-center mt-4 gap-x-3">
 				<button
+					v-if="table.createLink"
+					@click="navigate(table.createLink)"
 					class="flex items-center justify-center w-1/2 px-5 py-2 text-sm tracking-wide text-white transition-colors duration-200 bg-blue-500 rounded-lg shrink-0 sm:w-auto gap-x-2 hover:bg-blue-600 dark:hover:bg-blue-500 dark:bg-blue-600"
 				>
 					<svg
@@ -40,11 +42,11 @@
 
 		<div class="mt-6 md:flex md:items-center md:justify-between">
 			<div
-				v-if="list.options"
+				v-if="table.options"
 				class="inline-flex overflow-hidden bg-white border divide-x rounded-lg dark:bg-gray-900 rtl:flex-row-reverse dark:border-gray-700 dark:divide-gray-700"
 			>
 				<button
-					v-for="([label], i) in [...list.options]"
+					v-for="([label], i) in [...table.options]"
 					:class="{ 'bg-gray-100': i === 0 }"
 					:key="i"
 					class="px-5 py-2 text-xs font-medium text-gray-600 transition-colors duration-200 sm:text-sm dark:bg-gray-800 dark:text-gray-300"
@@ -91,7 +93,7 @@
 							<thead class="bg-gray-50 dark:bg-gray-800">
 								<tr>
 									<th
-										v-for="(header, i) in list.header"
+										v-for="(header, i) in table.header"
 										scope="col"
 										:key="i"
 										class="py-3.5 px-4 text-sm font-normal text-left rtl:text-right text-gray-500 dark:text-gray-400"
@@ -106,7 +108,7 @@
 							<tbody
 								class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900"
 							>
-								<tr v-for="(row, i) in list.rows" :key="i">
+								<tr v-for="(row, i) in table.rows" :key="i" @click="navigate(table.editLink(table.list[i].id))" class="hover:text-cyan-950 hover:cursor-pointer">
 									<td
 										v-for="(cell, i) in row"
 										:key="i"
@@ -149,19 +151,30 @@
 			</div>
 		</div>
 	</section>
-	<div v-else class="py-8">Loading data...</div>
+	<div v-else class="py-8"></div>
 </template>
 
 <script>
+import debug from "debug";
+
 export default {
-	props: ["list"],
+	props: ["table"],
 	data() {
 		return {
-			error: null
+			error: null,
+      logger: debug("app:i:table-table")
 		};
 	},
-	created() {
-		console.log("Table created with", this.list);
+	updated() {
+		this.logger(`Table updated:`);
+    this.logger(this.table);
+	},
+	methods: {
+		navigate(path) {
+			this.logger(`Navigating to "${path}"`);
+
+			this.$router.push(path);
+		}
 	}
 };
 </script>

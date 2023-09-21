@@ -1,34 +1,38 @@
 <script>
 import { depotApi } from "@/services/DepotApi";
 import TableTable from "@/components/TableTable.vue";
+import debug from "debug";
 
 export default {
 	components: { TableTable },
-	props: ["path"],
+	props: ["dto"],
 	data() {
 		return {
 			error: null,
-			list: []
+			table: null,
+      logger: debug("app:i:list-view")
 		};
 	},
-	created() {
-		console.log("path created", this.path);
+	mounted() {
+		this.logger(`Mounted component with dto ${this.dto}`);
 
-		if (depotApi.routes.has(this.path)) {
-			depotApi.all(this.path).then((data) => {
-				this.list = depotApi.dto(this.path, data);
+		if (depotApi.routes.has(this.dto)) {
+			const { factory } = depotApi.routes.get(this.dto);
+
+			factory.all().then((data) => {
+				this.table = depotApi.dto(this.dto, data);
 			});
 		} else {
-			console.warn(`Path ${this.path} not included in available routes`);
+			this.logger(`Path ${this.dto} not included in available routes`);
 			this.error = "Cannot find this page. Please, try another one.";
 		}
 	},
-	beforeUpdate() {
-		console.log("update with path", this.path);
+	created() {
+		this.logger(`Created component with path "${this.dto}"`);
 	}
 };
 </script>
 
 <template>
-	<TableTable :list="list" />
+	<TableTable :table="table" />
 </template>

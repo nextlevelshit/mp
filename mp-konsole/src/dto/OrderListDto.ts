@@ -1,7 +1,7 @@
-import { BaseListDto } from "@/dto/ListDto";
-import type { ListItem } from "@/dto/ListDto";
 import type { CustomerListItem } from "@/dto/CustomerListDto";
 import type { InvoiceListItem } from "@/dto/InvoiceListDto";
+import type { BaseListItem } from "@/dto/Common";
+import { BaseListDto } from "@/dto/Common";
 
 export class OrderListDto extends BaseListDto<OrderListItem> {
 	transformer = (item: OrderListItem) => {
@@ -19,13 +19,14 @@ export class OrderListDto extends BaseListDto<OrderListItem> {
 		["Geschlossen", { query: "" }],
 		["Offen", { query: "all " }]
 	]);
+	editLink = (id: number) => `/edit/order/${id}`;
 
 	constructor(list: OrderListItem[]) {
 		super(list);
 	}
 }
 
-export interface OrderListItem extends ListItem {
+export interface OrderListItem extends BaseListItem {
 	attributes: {
 		Date: string;
 		createdAt: string;

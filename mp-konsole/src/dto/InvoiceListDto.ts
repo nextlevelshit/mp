@@ -1,6 +1,7 @@
-import type { ListDto, ListItem } from "@/dto/ListDto";
+import type { BaseListItem } from "@/dto/Common";
+import { BaseListDto } from "@/dto/Common";
 
-export class InvoiceListDto implements ListDto<InvoiceListItem> {
+export class InvoiceListDto extends BaseListDto<InvoiceListItem> {
 	transformer = (item: InvoiceListItem): string[] => [
 		item.id,
 		item.attributes.Date,
@@ -9,28 +10,21 @@ export class InvoiceListDto implements ListDto<InvoiceListItem> {
 		item.attributes.customer.data.Address
 	];
 	header = ["ID", "Rechnungsdatum", "Bestelldatum", "Name", "Adresse"];
-	list: InvoiceListItem[];
 	title = "Rechnungen";
 	options = new Map([
 		["Alle", { query: "all" }],
 		["Bezahlt", { query: "" }],
 		["Offen", { query: "all " }]
 	]);
+	createLink = "/create/invoice";
+	editLink = (id: number) => `/edit/invoice/${id}`;
 
 	constructor(list: InvoiceListItem[]) {
-		this.list = list;
-	}
-
-	get rows(): string[][] {
-		return this.list.map(this.transformer);
-	}
-
-	get length() {
-		return this.list.length;
+		super(list);
 	}
 }
 
-export interface InvoiceListItem extends ListItem {
+export interface InvoiceListItem extends BaseListItem {
 	attributes: {
 		Subject: string;
 		Date: string;

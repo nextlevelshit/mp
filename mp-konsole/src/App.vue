@@ -21,7 +21,7 @@
 			</nav>
 		</div>
 	</header>
-	<main>
+	<main class="pt-4">
 		<router-view :key="$route.path"></router-view>
 	</main>
 </template>
