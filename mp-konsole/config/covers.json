@@ -26,10 +26,10 @@
       "details": "Hardcover mit rotem Vorsatzpapier, Fadenheftung. Textiles Kapital- und Zeichenband. Hergestellt in Deutschland."
     },
     "slides": [{
-        "image": "/assets/images-landingpage/Hardcover-new.jpg",
-        "headline": "Hardcover",
-        "text": ""
-      },
+      "image": "/assets/images-landingpage/Hardcover-new.jpg",
+      "headline": "Hardcover",
+      "text": ""
+    },
       {
         "image": "/assets/images-landingpage/HARD_00303.jpg",
         "headline": "Hardcover",
@@ -74,10 +74,10 @@
       "details": "Softcover mit rotem Vorschaltblatt, Fadenheftung. Hergestellt in Deutschland.<br><br>"
     },
     "slides": [{
-        "image": "/assets/images-landingpage/Softcover-new.jpg",
-        "headline": "Softcover",
-        "text": ""
-      },
+      "image": "/assets/images-landingpage/Softcover-new.jpg",
+      "headline": "Softcover",
+      "text": ""
+    },
       {
         "image": "/assets/images-landingpage/SOFT_00310.jpg",
         "headline": "Softcover",
@@ -122,10 +122,10 @@
       "details": "Steppstich-Heftung mit rotem Faden und Mantelbogen, Ecken abgerundet. Hergestellt in Deutschland.<br>"
     },
     "slides": [{
-        "image": "/assets/images-landingpage/Heft-new.jpg",
-        "headline": "Heft",
-        "text": ""
-      },
+      "image": "/assets/images-landingpage/Heft-new.jpg",
+      "headline": "Heft",
+      "text": ""
+    },
       {
         "image": "/assets/images-landingpage/HEFT_00293.jpg",
         "headline": "Heft",
@@ -142,25 +142,5 @@
         "text": "Inhalt blanko"
       }
     ]
-  },
-  {
-    "id": "HEFT",
-    "name": "Klammer",
-    "variety": "Notizheft",
-    "price": 7.50,
-    "image": "/",
-    "sice": "DIN A5",
-    "description": "",
-    "active": false
-  },
-  {
-    "id": "HEFT",
-    "name": "Fadenknoten",
-    "variety": "Notizheft",
-    "price": 7.50,
-    "image": "/",
-    "sice": "DIN A5",
-    "description": "",
-    "active": false
   }
 ]
