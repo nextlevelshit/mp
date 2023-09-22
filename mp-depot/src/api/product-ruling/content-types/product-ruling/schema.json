@@ -1,0 +1,22 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_rulings",
+  "info": {
+    "singularName": "product-ruling",
+    "pluralName": "product-rulings",
+    "displayName": "ProductRuling"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "price": {
+      "type": "decimal"
+    }
+  }
+}

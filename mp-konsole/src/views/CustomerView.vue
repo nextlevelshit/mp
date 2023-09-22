@@ -17,7 +17,7 @@ export default {
 		if (this.id) {
 			depotApi.customerFactory().one(this.id).then(this.fillForm);
 		} else {
-      console.log(`Id not provided, creating new customer`);
+      this.logger(`Id not provided, creating new customer`);
 		}
 	},
 	methods: {

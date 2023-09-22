@@ -14,7 +14,7 @@ export default {
 		};
 	},
 	mounted() {
-		this.logger(`Mounted component with dto ${this.dto}`);
+		this.logger(`Mounted component with dto "${this.dto}"`);
 
 		if (depotApi.routes.has(this.dto)) {
 			const { factory } = depotApi.routes.get(this.dto);

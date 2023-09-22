@@ -20,6 +20,26 @@
     },
     "price": {
       "type": "decimal"
+    },
+    "cover": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product-cover.product-cover"
+    },
+    "pattern": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product-pattern.product-pattern"
+    },
+    "pages": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product-page.product-page"
+    },
+    "ruling": {
+      "type": "relation",
+      "relation": "oneToOne",
+      "target": "api::product-ruling.product-ruling"
     }
   }
 }

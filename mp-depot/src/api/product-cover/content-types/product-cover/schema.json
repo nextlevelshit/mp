@@ -1,0 +1,57 @@
+{
+  "kind": "collectionType",
+  "collectionName": "product_covers",
+  "info": {
+    "singularName": "product-cover",
+    "pluralName": "product-covers",
+    "displayName": "ProductCovers",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string",
+      "required": true
+    },
+    "binding": {
+      "type": "enumeration",
+      "enum": [
+        "Fadenheftung",
+        "Steppstich"
+      ]
+    },
+    "slides": {
+      "type": "media",
+      "multiple": true,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "copyText": {
+      "type": "json"
+    },
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "icon": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images"
+      ]
+    },
+    "price": {
+      "type": "decimal"
+    }
+  }
+}
