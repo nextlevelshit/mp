@@ -29,10 +29,111 @@ export class ProductListDto extends BaseListDto<ProductListItem> {
 
 export interface ProductListItem extends BaseListItem {
 	attributes: {
-		description: string;
 		name: string;
-		price: number;
+		description: string | null;
+		price: number | null;
+		createdAt: string;
 		updatedAt: string;
-		publishedAt: string | null;
+		publishedAt: string;
+		cover: {
+			data: {
+				id: number;
+				attributes: {
+					name: string;
+					binding: string;
+					price: number;
+					createdAt: string;
+					updatedAt: string;
+					copyText: {
+						text: string;
+						cover: string;
+						paper: string;
+						format: string;
+						content: string;
+						details: string;
+						banderole: string;
+					};
+				};
+			};
+		};
+		pattern: {
+			data: {
+				id: number;
+				attributes: {
+					name: string;
+					createdAt: string;
+					updatedAt: string;
+					description: string;
+				};
+			};
+		};
+		pages: {
+			data: {
+				id: number;
+				attributes: {
+					name: string;
+					price: number;
+					createdAt: string;
+					updatedAt: string;
+				};
+			};
+		};
+		ruling: {
+			data: {
+				id: number;
+				attributes: {
+					name: string;
+					price: number;
+					createdAt: string;
+					updatedAt: string;
+				};
+			};
+		};
+		image: {
+			data: {
+				id: number;
+				attributes: {
+					name: string;
+					alternativeText: string | null;
+					caption: string | null;
+					width: number;
+					height: number;
+					formats: {
+						small: {
+							ext: string;
+							url: string;
+							hash: string;
+							mime: string;
+							name: string;
+							path: string | null;
+							size: number;
+							width: number;
+							height: number;
+						};
+						thumbnail: {
+							ext: string;
+							url: string;
+							hash: string;
+							mime: string;
+							name: string;
+							path: string | null;
+							size: number;
+							width: number;
+							height: number;
+						};
+					};
+					hash: string;
+					ext: string;
+					mime: string;
+					size: number;
+					url: string;
+					previewUrl: string | null;
+					provider: string;
+					provider_metadata: string | null;
+					createdAt: string;
+					updatedAt: string;
+				};
+			};
+		};
 	};
 }

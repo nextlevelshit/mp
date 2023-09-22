@@ -1,0 +1,24 @@
+{
+  "kind": "singleType",
+  "collectionName": "vats",
+  "info": {
+    "singularName": "vat",
+    "pluralName": "vats",
+    "displayName": "VAT"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "name": {
+      "type": "string"
+    },
+    "percent": {
+      "type": "integer"
+    },
+    "decimal": {
+      "type": "decimal"
+    }
+  }
+}

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "order",
     "pluralName": "orders",
-    "displayName": "Order"
+    "displayName": "Order",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -19,16 +20,28 @@
       "relation": "oneToOne",
       "target": "api::customer.customer"
     },
-    "invoice": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::invoice.invoice"
-    },
     "cart": {
       "type": "relation",
       "relation": "oneToOne",
       "target": "api::cart.cart",
       "mappedBy": "order"
+    },
+    "invoice": {
+      "allowedTypes": [
+        "files"
+      ],
+      "type": "media",
+      "multiple": false
+    },
+    "deliveryNote": {
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }
