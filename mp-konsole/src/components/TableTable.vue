@@ -108,7 +108,12 @@
 							<tbody
 								class="bg-white divide-y divide-gray-200 dark:divide-gray-700 dark:bg-gray-900"
 							>
-								<tr v-for="(row, i) in table.rows" :key="i" @click="navigate(table.editLink(table.list[i].id))" class="hover:text-cyan-950 hover:cursor-pointer">
+								<tr
+									v-for="(row, i) in table.rows"
+									:key="i"
+									@click="navigate(table.editLink(table.list[i].id))"
+									class="hover:text-cyan-950 hover:cursor-pointer"
+								>
 									<td
 										v-for="(cell, i) in row"
 										:key="i"
@@ -162,12 +167,12 @@ export default {
 	data() {
 		return {
 			error: null,
-      logger: debug("app:i:table-table")
+			logger: debug("app:i:table-table")
 		};
 	},
 	updated() {
 		this.logger(`Table updated:`);
-    this.logger(this.table);
+		this.logger(this.table);
 	},
 	methods: {
 		navigate(path) {

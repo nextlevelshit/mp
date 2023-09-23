@@ -1,0 +1,24 @@
+{
+  "kind": "singleType",
+  "collectionName": "legals",
+  "info": {
+    "singularName": "legal",
+    "pluralName": "legals",
+    "displayName": "Legal"
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "pluginOptions": {},
+  "attributes": {
+    "imprint": {
+      "type": "richtext"
+    },
+    "contact": {
+      "type": "richtext"
+    },
+    "privacyPolicy": {
+      "type": "richtext"
+    }
+  }
+}

@@ -17,12 +17,6 @@
     },
     "Address": {
       "type": "text"
-    },
-    "invoices": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::invoice.invoice",
-      "mappedBy": "customer"
     }
   }
 }

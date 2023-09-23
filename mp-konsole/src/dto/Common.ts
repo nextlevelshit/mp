@@ -4,10 +4,11 @@ import type { OrderListItem } from "@/dto/OrderListDto";
 import type { InvoiceListItem } from "@/dto/InvoiceListDto";
 import type { ListDto } from "@/dto/ListDto";
 
-export type GenericListItem = CustomerListItem |
-	ProductListItem |
-	OrderListItem |
-	InvoiceListItem;
+export type GenericListItem =
+	| CustomerListItem
+	| ProductListItem
+	| OrderListItem
+	| InvoiceListItem;
 
 export class BaseListDto<T> implements ListDto<T> {
 	transformer = (item: T): string[] => [item as string];

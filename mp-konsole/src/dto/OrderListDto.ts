@@ -1,23 +1,32 @@
-import type { CustomerListItem } from "@/dto/CustomerListDto";
-import type { InvoiceListItem } from "@/dto/InvoiceListDto";
-import type { BaseListItem } from "@/dto/Common";
-import { BaseListDto } from "@/dto/Common";
+import type {BaseListItem} from "@/dto/Common";
+import {BaseListDto} from "@/dto/Common";
 
 export class OrderListDto extends BaseListDto<OrderListItem> {
 	transformer = (item: OrderListItem) => {
-		const customer = item.attributes.cart.data;
 		return [
-			new Date(item.attributes.createdAt).toDateString(),
-			customer ? customer.attributes.UUID : "Keine Daten",
-			item.attributes.customer ? "Kundendaten hinterlegt" : "Anonym"
+			item.attributes.products.data.length,
+			item.attributes.address,
+			item.attributes.invoiceAddress,
+			item.attributes.delivery.data?.attributes.name,
+			item.attributes.payment.data?.attributes.name,
+			`${item.attributes.total} EUR`,
+			new Date(item.attributes.createdAt).toLocaleDateString()
 		];
 	};
+	header = [
+		"Produkte",
+		"Lieferadresse",
+		"Rechnungsadresse",
+		"Versandart",
+		"Zahlung",
+		"Gesamt",
+		"Datum"
+	];
 	title = "Bestellungen";
-	header = ["Datum", "Warenkorb", "Status"];
 	options = new Map([
-		["Alle", { query: "all" }],
-		["Geschlossen", { query: "" }],
-		["Offen", { query: "all " }]
+		["Alle", {query: "all"}],
+		["Geschlossen", {query: ""}],
+		["Offen", {query: "all "}]
 	]);
 	editLink = (id: number) => `/edit/order/${id}`;
 
@@ -30,18 +39,140 @@ export interface OrderListItem extends BaseListItem {
 	attributes: {
 		Date: string;
 		createdAt: string;
-		customer: {
-			data: CustomerListItem;
-		};
+		updatedAt: string;
+		email: string | null;
+		address: string;
+		invoiceAddress: string;
+		VAT: number;
+		subtotal: number | null;
+		total: number | null;
 		invoice: {
-			data: InvoiceListItem;
+			data: null | {
+				id: number;
+				attributes: {
+					name: string;
+					alternativeText: string | null;
+					caption: string | null;
+					width: number | null;
+					height: number | null;
+					formats: {
+						[key: string]: {
+							ext: string;
+							url: string;
+							hash: string;
+							mime: string;
+							size: number;
+							width: number;
+							height: number;
+						} | null;
+					} | null;
+					hash: string;
+					ext: string;
+					mime: string;
+					size: number;
+					url: string;
+					previewUrl: string | null;
+					provider: string;
+					provider_metadata: any | null;
+					createdAt: string;
+					updatedAt: string;
+				};
+			};
 		};
-		cart: {
+		deliveryNote: {
+			data: null | {
+				id: number;
+				attributes: {
+					name: string;
+					alternativeText: string | null;
+					caption: string | null;
+					width: number | null;
+					height: number | null;
+					formats: {
+						[key: string]: {
+							ext: string;
+							url: string;
+							hash: string;
+							mime: string;
+							size: number;
+							width: number;
+							height: number;
+						} | null;
+					} | null;
+					hash: string;
+					ext: string;
+					mime: string;
+					size: number;
+					url: string;
+					previewUrl: string | null;
+					provider: string;
+					provider_metadata: any | null;
+					createdAt: string;
+					updatedAt: string;
+				};
+			};
+		};
+		products: {
+			data: ProductData[];
+		};
+		delivery: {
+			data: {
+				id: number;
+				attributes: {
+					name: string;
+					price: number;
+					createdAt: string;
+					updatedAt: string;
+				};
+			} | null;
+		};
+		payment: {
+			data: {
+				id: number;
+				attributes: {
+					name: string;
+					price: number;
+					createdAt: string;
+					updatedAt: string;
+				};
+			} | null;
+		};
+	}
+}
+
+interface ProductData {
+	id: number;
+	attributes: {
+		name: string;
+		description: string | null;
+		price: number | null;
+		createdAt: string;
+		updatedAt: string;
+		publishedAt: string;
+		slug: string | null;
+		cover: {
+			data: {
+				id: number;
+				attributes: {
+					price: number;
+				};
+			};
+		};
+		payment: {
 			data: {
 				id: string;
 				attributes: {
-					UUID: string;
-					updatedAt: string;
+					name: string;
+					price: number;
+				};
+			};
+		};
+		delivery: {
+			data: {
+				id: string;
+				attributes: {
+					name: string;
+					price: number;
 				};
 			};
 		};

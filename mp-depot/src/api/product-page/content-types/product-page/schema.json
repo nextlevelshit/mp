@@ -4,7 +4,8 @@
   "info": {
     "singularName": "product-page",
     "pluralName": "product-pages",
-    "displayName": "ProductPages"
+    "displayName": "Product Pages",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
