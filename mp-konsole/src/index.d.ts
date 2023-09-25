@@ -1,2 +1,1 @@
-declare namespace MpKonsole {
-}
+declare namespace MpKonsole {}

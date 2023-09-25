@@ -1,20 +1,20 @@
 <template>
 	<section v-if="table" class="container mx-auto">
 		<div class="sm:flex sm:items-center sm:justify-between">
-			<div>
-				<div class="flex items-center gap-x-3">
-					<h2 class="text-lg font-medium text-gray-800 dark:text-white">
-						{{ table.title }}
-					</h2>
+			<!--			<div>-->
+			<!--				<div class="flex items-center gap-x-3">-->
+			<!--					<h2 class="text-lg font-medium text-gray-800 dark:text-white">-->
+			<!--						{{ table.title }}-->
+			<!--					</h2>-->
 
-					<span
-						class="px-3 py-1 text-xs tfext-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400"
-						>{{ table.length }} Einträge</span
-					>
-				</div>
-			</div>
+			<!--					<span-->
+			<!--						class="px-3 py-1 text-xs tfext-blue-600 bg-blue-100 rounded-full dark:bg-gray-800 dark:text-blue-400"-->
+			<!--						>{{ table.length }} Einträge</span-->
+			<!--					>-->
+			<!--				</div>-->
+			<!--			</div>-->
 
-			<div class="flex items-center mt-4 gap-x-3">
+			<div class="flex items-center gap-x-3">
 				<button
 					v-if="table.createLink"
 					@click="navigate(table.createLink)"

@@ -19,7 +19,6 @@ class DepotApi {
 		return data;
 	}
 
-
 	orderFactory(): Factory<OrderListItem> {
 		return {
 			create: async (): Promise<OrderListItem> => {
@@ -31,12 +30,29 @@ class DepotApi {
 				return this.handleResponse<OrderListItem>(response);
 			},
 
-			one: async (id: string): Promise<OrderListItem | null> => {
+			one: async (id: number): Promise<OrderListItem | null> => {
 				const response = await fetch(
 					`${this.baseUrl}/orders/${id}?populate=deep,3`,
 					{
 						method: "GET",
 						headers: this.headers
+					}
+				);
+
+				if (response.status === 404) {
+					return null;
+				}
+
+				return this.handleResponse<OrderListItem>(response);
+			},
+
+			update: async (id, body): Promise<OrderListItem | null> => {
+				const response = await fetch(
+					`${this.baseUrl}/orders/${id}?populate=deep,3`,
+					{
+						method: "PUT",
+						headers: this.headers,
+						body
 					}
 				);
 
@@ -57,12 +73,56 @@ class DepotApi {
 			}
 		};
 	}
-}
 
-export enum DepotApiRoutes {
-	CUSTOMERS = "customers",
-	ORDERS = "orders",
-	INVOICES = "invoices"
+	async delivery(): Promise<{ id: number; name: string; price: number } | null> {
+		const response = await fetch(`${this.baseUrl}/deliveries`, {
+			method: "GET",
+			headers: this.headers
+		});
+
+		if (response.status === 404) {
+			return null;
+		}
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const { data } = await response.json();
+
+		return data.map(({ id, attributes }) => {
+			return {
+				id,
+				name: attributes.name,
+				price: attributes.price
+			};
+		});
+	}
+
+	async payment(): Promise<{ id: number; name: string; price: number } | null> {
+		const response = await fetch(`${this.baseUrl}/payments`, {
+			method: "GET",
+			headers: this.headers
+		});
+
+		if (response.status === 404) {
+			return null;
+		}
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const { data } = await response.json();
+
+		return data.map(({ id, attributes }) => {
+			return {
+				id,
+				name: attributes.name,
+				price: attributes.price
+			};
+		});
+	}
 }
 
 interface DepotApiOptions {
@@ -74,9 +134,9 @@ type Headers = Record<string, string>;
 
 interface Factory<T> {
 	create: (data: never) => Promise<T>;
-	one: (id: string) => Promise<T | null>;
+	one: (id: number) => Promise<T | null>;
 	all: () => Promise<T[]>;
-	update?: (id: string, data: T) => Promise<T | null>;
+	update?: (id: number, data: any) => Promise<T | null>;
 }
 
 export const depotApi = new DepotApi({

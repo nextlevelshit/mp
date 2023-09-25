@@ -1,5 +1,5 @@
-import type {BaseListItem} from "@/dto/Common";
-import {BaseListDto} from "@/dto/Common";
+import type { BaseListItem } from "@/dto/Common";
+import { BaseListDto } from "@/dto/Common";
 
 export class OrderListDto extends BaseListDto<OrderListItem> {
 	transformer = (item: OrderListItem) => {
@@ -24,9 +24,9 @@ export class OrderListDto extends BaseListDto<OrderListItem> {
 	];
 	title = "Bestellungen";
 	options = new Map([
-		["Alle", {query: "all"}],
-		["Geschlossen", {query: ""}],
-		["Offen", {query: "all "}]
+		["Alle", { query: "all" }],
+		["Geschlossen", { query: "" }],
+		["Offen", { query: "all " }]
 	]);
 	editLink = (id: number) => `/edit/order/${id}`;
 
@@ -137,7 +137,7 @@ export interface OrderListItem extends BaseListItem {
 				};
 			} | null;
 		};
-	}
+	};
 }
 
 interface ProductData {

@@ -19,7 +19,7 @@ const router = createRouter({
 			alias: ["/edit/order", "/create/order"],
 			name: "order-edit",
 			component: () => import("../views/OrderView.vue")
-		},
+		}
 	]
 });
 

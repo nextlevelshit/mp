@@ -2,7 +2,7 @@
 import { depotApi } from "@/services/DepotApi";
 import TableTable from "@/components/TableTable.vue";
 import debug from "debug";
-import {OrderListDto} from "@/dto/OrderListDto";
+import { OrderListDto } from "@/dto/OrderListDto";
 
 export default {
 	components: { TableTable },
@@ -14,7 +14,10 @@ export default {
 		};
 	},
 	mounted() {
-			depotApi.orderFactory().all().then((data) => {
+		depotApi
+			.orderFactory()
+			.all()
+			.then((data) => {
 				this.table = new OrderListDto(data);
 			});
 	}
