@@ -110,10 +110,10 @@ export default {
 
 			const data = this.order.data;
 
-      const body = new FormData();
+			const body = new FormData();
 			body.append("data", JSON.stringify(data));
 
-      this.logger(data);
+			this.logger(data);
 
 			depotApi
 				.orderFactory()
@@ -129,7 +129,38 @@ export default {
 		},
 		generateDeliveryNote() {
 			this.logger(this.order.raw);
-			const data = this.defaultInvoiceData;
+
+			const data = {
+				...this.defaultInvoiceData,
+				date: this.order.raw.attributes.Date,
+				shipping: this.order.raw.attributes.delivery.data.attributes.price,
+				VAT: {
+					rate: 19,
+					amount: this.order.raw.attributes.VAT
+				},
+				subtotal: this.order.data.subtotal,
+				total: this.order.data.total,
+				to: {
+					name: "",
+					address: this.order.raw.attributes.address.split("\n")
+				},
+				nr: {
+					customer: "XXX-XXX-XXX",
+					order: "XXX-XXX-XXX",
+					shipping: "XXX-XXX-XXX"
+				},
+				service: this.order.products.map((product) => ({
+					description: product.attributes.name,
+					price: {
+						per_unit: product.attributes.cover.data.attributes.price,
+						total: product.attributes.cover.data.attributes.price
+					},
+					count: 1,
+					nr: "XXXX"
+				}))
+			};
+
+			this.logger(data);
 
 			this.order.resetDeliveryNote();
 			this.isGeneratingDeliveryNote = true;
@@ -162,7 +193,10 @@ export default {
 					return depotApi
 						.orderFactory()
 						.update(this.id, body)
-						.then((data) => (this.order = new OrderViewDto(data)));
+						.then((data) => {
+							this.logger(data.attributes.deliveryNote);
+							this.order = new OrderViewDto(data);
+						});
 				})
 				.catch((error) => {
 					this.logger(error);
@@ -174,9 +208,9 @@ export default {
 		generateInvoicePdf() {
 			this.logger(this.order.raw);
 			this.order.resetInvoice();
-      this.isGeneratingInvoice = true;
+			this.isGeneratingInvoice = true;
 
-      const data = this.defaultInvoiceData;
+			const data = this.defaultInvoiceData;
 
 			fetch("/api/mp-inkasso/v1/invoice", {
 				method: "POST",
@@ -208,7 +242,10 @@ export default {
 					return depotApi
 						.orderFactory()
 						.update(this.id, body)
-						.then((data) => (this.order = new OrderViewDto(data)));
+						.then((data) => {
+							this.logger(data.attributes.invoice);
+							this.order = new OrderViewDto(data);
+						});
 				})
 				.catch((error) => {
 					this.logger(error);
@@ -354,18 +391,13 @@ export default {
 							name="delivery"
 							class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
 						>
-							<option
-								disabled
-								:selected="!order.data.payment"
-							>
+							<option disabled :selected="!order.data.payment">
 								Bitte eine Zahlungsart wählen
 							</option>
 							<option
 								v-for="option in paymentOptions"
 								:value="option.id"
-								:selected="
-									option.id === order.data.payment
-								"
+								:selected="option.id === order.data.payment"
 							>
 								{{ option.name }} (+ {{ option.price }} €)
 							</option>
@@ -389,18 +421,13 @@ export default {
 							name="delivery"
 							class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
 						>
-							<option
-								disabled
-								:selected="!order.data.delivery"
-							>
+							<option disabled :selected="!order.data.delivery">
 								Zahlungsart wählen
 							</option>
 							<option
 								v-for="option in deliveryOptions"
 								:value="option.id"
-								:selected="
-									option.id === order.data.delivery
-								"
+								:selected="option.id === order.data.delivery"
 							>
 								{{ option.name }} (+ {{ option.price }} €)
 							</option>
@@ -415,11 +442,7 @@ export default {
 					v-if="order.products"
 					class="flex flex-col gap-6 rounded-md border-gray-200"
 				>
-					<article
-						v-for="(product, i) in order.products"
-						:key="i"
-						class="flex"
-					>
+					<article v-for="(product, i) in order.products" :key="i" class="flex">
 						<div class="">
 							<span class="bg-stone-100 p-2 rounded-md mr-2"
 								>{{
@@ -480,7 +503,7 @@ export default {
 								: `text-white`
 						]"
 						:disabled="isGeneratingDeliveryNote"
-						class="h-16 w-full px-3 py-2 text-left bg-gray-900 font-semibold text-white drop-shadow-md rounded-md"
+						class="h-16 w-full px-3 py-2 text-left bg-gray-900 font-semibold drop-shadow-md rounded-md"
 					>
 						Lieferschein erstellen
 					</button>
@@ -492,7 +515,9 @@ export default {
 								target="_blank"
 							>
 								Lieferschein herunterladen
-								<span class="text-xs text-right">{{order.deliveryNote.createdAt}}</span>
+								<span class="text-xs text-right">{{
+									order.deliveryNote.createdAt
+								}}</span>
 							</a>
 						</div>
 					</div>

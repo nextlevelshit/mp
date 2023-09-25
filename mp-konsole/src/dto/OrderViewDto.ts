@@ -1,23 +1,23 @@
-import type {MediaData, OrderListItem, ProductData} from "@/dto/OrderListDto";
+import type { MediaData, OrderListItem, ProductData } from "@/dto/OrderListDto";
 
 export class OrderViewDto {
 	raw: OrderListItem;
 	data: {
-		total: number,
-		subtotal: number,
-		VAT: number,
-		delivery: number,
-		payment: number,
+		total: number;
+		subtotal: number;
+		VAT: number;
+		delivery: number;
+		payment: number;
 	} = {
 		total: 0,
 		subtotal: 0,
 		VAT: 0,
 		delivery: -1,
-		payment: -1,
+		payment: -1
 	};
 
 	constructor(rawApiResponse: OrderListItem) {
-		this.raw = rawApiResponse
+		this.raw = rawApiResponse;
 		this.data = this.digest(rawApiResponse);
 	}
 
