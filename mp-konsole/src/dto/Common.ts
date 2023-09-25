@@ -1,15 +1,3 @@
-import type { CustomerListItem } from "@/dto/CustomerListDto";
-import type { ProductListItem } from "@/dto/ProductListDto";
-import type { OrderListItem } from "@/dto/OrderListDto";
-import type { InvoiceListItem } from "@/dto/InvoiceListDto";
-import type { ListDto } from "@/dto/ListDto";
-
-export type GenericListItem =
-	| CustomerListItem
-	| ProductListItem
-	| OrderListItem
-	| InvoiceListItem;
-
 export class BaseListDto<T> implements ListDto<T> {
 	transformer = (item: T): string[] => [item as string];
 	header = ["ID"];
@@ -31,4 +19,20 @@ export class BaseListDto<T> implements ListDto<T> {
 
 export interface BaseListItem {
 	id: string;
+}
+
+export interface ListDto<T> {
+	header: string[];
+	list: T[];
+	title: string;
+	options?: Map<string, { query: string }>;
+	createLink?: string;
+	editLink?: (id: number) => string;
+	deleteLink?: (id: number) => string;
+
+	get rows(): string[][];
+
+	get length(): number;
+
+	transformer(item: T): string[];
 }

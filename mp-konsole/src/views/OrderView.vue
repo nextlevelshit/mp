@@ -1,13 +1,18 @@
 <script>
 import { depotApi } from "@/services/DepotApi";
 import debug from "debug";
+import { OrderViewDto } from "@/dto/OrderViewDto";
 
 export default {
 	props: ["id"],
 	data() {
 		return {
 			error: null,
-			formData: {},
+			orderData: {},
+			order: {},
+			isGeneratingInvoice: false,
+			isGeneratingDeliveryNote: false,
+			isUpdatingForm: false,
 			hasChanges: true,
 			pdfUrl: null,
 			logger: debug("app:i:order-view"),
@@ -93,38 +98,41 @@ export default {
 			}
 		},
 		fillForm(data) {
-			this.formData = data;
+			// this.orderData = data;
+			// this.formData = OrderListDto.toFormInput(data);
+			this.order = new OrderViewDto(data);
 		},
 		save() {
 			this.logger("Saving form data");
+			this.isUpdatingForm = true;
 
-			const { total, subtotal, VAT, delivery, payment } = this.formData.attributes;
+			// const { total, subtotal, VAT, delivery, payment } = this.orderData.attributes;
 
-			const data = {
-				total,
-				subtotal,
-				VAT,
-				delivery: delivery.data.id,
-				payment: payment.data.id
-			};
+			const data = this.order.data;
 
-			const body = new FormData();
+      const body = new FormData();
 			body.append("data", JSON.stringify(data));
 
-			this.logger(body);
+      this.logger(data);
 
 			depotApi
 				.orderFactory()
 				.update(this.id, body)
 				.then((data) => {
-					this.formData = data;
-				});
+					setTimeout(() => {
+						this.orderData = data;
+
+						this.isUpdatingForm = false;
+					}, 711);
+				})
+				.finally(() => {});
 		},
-		generateDeliveryNote(formData) {
-			this.logger(formData);
+		generateDeliveryNote() {
+			this.logger(this.order.raw);
 			const data = this.defaultInvoiceData;
 
-      this.formData.attributes.deliveryNote.data = null;
+			this.order.resetDeliveryNote();
+			this.isGeneratingDeliveryNote = true;
 
 			fetch("/api/mp-inkasso/v1/invoice", {
 				method: "POST",
@@ -149,22 +157,26 @@ export default {
 					const body = new FormData();
 
 					body.append("files.deliveryNote", blob);
-					body.append("data", JSON.stringify({}));
+					body.append("data", JSON.stringify(this.order.data));
 
-					depotApi
+					return depotApi
 						.orderFactory()
 						.update(this.id, body)
-						.then((data) => (this.formData = data));
+						.then((data) => (this.order = new OrderViewDto(data)));
 				})
 				.catch((error) => {
 					this.logger(error);
+				})
+				.finally(() => {
+					this.isGeneratingDeliveryNote = false;
 				});
 		},
-		generateInvoicePdf(formData) {
-			this.logger(formData);
-			const data = this.defaultInvoiceData;
+		generateInvoicePdf() {
+			this.logger(this.order.raw);
+			this.order.resetInvoice();
+      this.isGeneratingInvoice = true;
 
-      this.formData.attributes.invoice.data = null;
+      const data = this.defaultInvoiceData;
 
 			fetch("/api/mp-inkasso/v1/invoice", {
 				method: "POST",
@@ -189,17 +201,20 @@ export default {
 					const body = new FormData();
 
 					body.append("files.invoice", blob);
-					body.append("data", JSON.stringify({}));
+					body.append("data", JSON.stringify(this.order.data));
 
 					this.logger(body);
 
-					depotApi
+					return depotApi
 						.orderFactory()
 						.update(this.id, body)
-						.then((data) => (this.formData = data));
+						.then((data) => (this.order = new OrderViewDto(data)));
 				})
 				.catch((error) => {
 					this.logger(error);
+				})
+				.finally(() => {
+					this.isGeneratingInvoice = false;
 				});
 		}
 	}
@@ -207,11 +222,11 @@ export default {
 </script>
 
 <template>
-<!--  <pre class="container mx-auto">{{JSON.stringify({deliveryOptions, paymentOptions}, null, 2)}}</pre>-->
-	<section v-if="formData?.attributes" class="container mx-auto relative">
+	<!--  <pre class="container mx-auto">{{JSON.stringify({deliveryOptions, paymentOptions}, null, 2)}}</pre>-->
+	<section v-if="order.data" class="container mx-auto relative">
 		<h1 class="font-semibold text-2xl mb-6">
-			{{ formData.attributes.Date }}
-			<span class="font-light">(ID: {{ formData.id }})</span>
+			{{ order.raw.attributes.Date }}
+			<span class="font-light">(ID: {{ order.raw.id }})</span>
 		</h1>
 		<button
 			v-if="hasChanges"
@@ -233,7 +248,8 @@ export default {
 				/>
 			</svg>
 
-			<span>Speichern</span>
+			<span v-if="isUpdatingForm">Wird gespeichert...</span>
+			<span v-else>Speichern</span>
 		</button>
 		<fieldset class="flex gap-2">
 			<div class="w-1/5">
@@ -249,7 +265,7 @@ export default {
 						<span class="text-gray-500 sm:text-sm">€</span>
 					</div>
 					<input
-						v-model="formData.attributes.total"
+						v-model="order.data.total"
 						type="text"
 						name="total"
 						id="total"
@@ -281,7 +297,7 @@ export default {
 						<span class="text-gray-500 sm:text-sm">€</span>
 					</div>
 					<input
-						v-model="formData.attributes.subtotal"
+						v-model="order.data.subtotal"
 						type="text"
 						name="subtotal"
 						id="subtotal"
@@ -306,14 +322,20 @@ export default {
 				>
 				<div class="relative mt-2 rounded-md shadow-sm">
 					<input
-						v-model="formData.attributes.VAT"
+						v-model="order.data.VAT"
 						type="text"
 						name="VAT"
 						id="VAT"
-						class="block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+						class="tabular-nums block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
 						placeholder="0"
+						inputmode="numeric"
+						pattern="\d*"
 					/>
-					<div class="absolute inset-y-0 right-2 flex items-center">%</div>
+					<div
+						class="absolute inset-y-0 right-2 flex items-center text-sm text-gray-700"
+					>
+						EUR
+					</div>
 				</div>
 			</div>
 			<div class="w-1/5">
@@ -327,13 +349,24 @@ export default {
 						class="block w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
 					>
 						<select
-							v-model="formData.attributes.payment.data.id"
+							v-model="order.data.payment"
 							id="delivery"
 							name="delivery"
 							class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
 						>
-							<option disabled :selected="!formData.attributes.payment.data">Bitte eine Zahlungsart wählen</option>
-							<option v-for="option in paymentOptions" :value="option.id" :selected="option.id === formData.attributes.payment.data?.id">
+							<option
+								disabled
+								:selected="!order.data.payment"
+							>
+								Bitte eine Zahlungsart wählen
+							</option>
+							<option
+								v-for="option in paymentOptions"
+								:value="option.id"
+								:selected="
+									option.id === order.data.payment
+								"
+							>
 								{{ option.name }} (+ {{ option.price }} €)
 							</option>
 						</select>
@@ -351,13 +384,24 @@ export default {
 						class="block w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
 					>
 						<select
-							v-model="formData.attributes.delivery.data.id"
+							v-model="order.data.delivery"
 							id="delivery"
 							name="delivery"
 							class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
 						>
-							<option disabled :selected="!formData.attributes.delivery.data">Zahlungsart wählen</option>
-							<option v-for="option in deliveryOptions" :value="option.id" :selected="option.id === formData.attributes.delivery.data?.id">
+							<option
+								disabled
+								:selected="!order.data.delivery"
+							>
+								Zahlungsart wählen
+							</option>
+							<option
+								v-for="option in deliveryOptions"
+								:value="option.id"
+								:selected="
+									option.id === order.data.delivery
+								"
+							>
 								{{ option.name }} (+ {{ option.price }} €)
 							</option>
 						</select>
@@ -368,11 +412,11 @@ export default {
 		<div class="flex gap-2 my-8">
 			<div class="w-3/5">
 				<section
-					v-if="formData?.attributes?.products"
+					v-if="order.products"
 					class="flex flex-col gap-6 rounded-md border-gray-200"
 				>
 					<article
-						v-for="(product, i) in formData.attributes.products.data"
+						v-for="(product, i) in order.products"
 						:key="i"
 						class="flex"
 					>
@@ -393,55 +437,75 @@ export default {
 			<div class="w-2/5 flex gap-2">
 				<div class="w-1/2 flex flex-col gap-2">
 					<button
-						@click="() => generateInvoicePdf(formData)"
-						class="h-16 w-full px-3 py-2 text-left bg-gray-900 font-semibold text-white drop-shadow-md rounded-md"
+						@click="() => generateInvoicePdf()"
+						:class="[
+							isGeneratingInvoice
+								? `text-gray-500 cursor-progress`
+								: `text-white`
+						]"
+						:disabled="isGeneratingInvoice"
+						class="h-16 w-full px-3 py-2 text-left bg-gray-900 font-semibold drop-shadow-md rounded-md"
 					>
 						Rechnung erstellen
 					</button>
-					<div v-if="formData.attributes.invoice.data">
+					<div v-if="order.invoice">
 						<div>
 							<a
-								:href="`http://localhost:5555${formData.attributes.invoice.data.attributes.url}`"
+								:href="`http://localhost:5555${order.invoice.url}`"
 								class="flex flex-row items-center space-between text-sm h-16 w-full px-3 py-2 bg-gray-200 rounded-md focus:ring-2 focus:ring-inset focus:ring-indigo-600"
 								target="_blank"
 							>
 								Rechnung herunterladen
 								<span class="text-xs text-right">{{
-									new Date(
-										formData.attributes.invoice.data.attributes.createdAt
-									).toLocaleString()
+									order.invoice.createdAt
 								}}</span>
 							</a>
+						</div>
+					</div>
+					<div v-if="isGeneratingInvoice">
+						<div
+							class="flex flex-row items-center space-between text-sm h-16 w-full px-3 py-2 bg-gray-200 rounded-md focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+						>
+							Rechnung wird geladen...
 						</div>
 					</div>
 				</div>
 
 				<div class="w-1/2 flex flex-col gap-2">
 					<button
-						@click="() => generateDeliveryNote(formData)"
+						@click="() => generateDeliveryNote(orderData)"
+						:class="[
+							isGeneratingDeliveryNote
+								? `text-gray-500 cursor-progress`
+								: `text-white`
+						]"
+						:disabled="isGeneratingDeliveryNote"
 						class="h-16 w-full px-3 py-2 text-left bg-gray-900 font-semibold text-white drop-shadow-md rounded-md"
 					>
 						Lieferschein erstellen
 					</button>
-					<div v-if="formData.attributes.deliveryNote.data">
+					<div v-if="order.deliveryNote">
 						<div>
 							<a
-								:href="`http://localhost:5555${formData.attributes.deliveryNote.data.attributes.url}`"
+								:href="`http://localhost:5555${order.deliveryNote.url}`"
 								class="flex flex-row items-center space-between text-sm h-16 w-full px-3 py-2 bg-gray-200 rounded-md focus:ring-2 focus:ring-inset focus:ring-indigo-600"
 								target="_blank"
 							>
 								Lieferschein herunterladen
-								<span class="text-xs text-right">{{
-									new Date(
-										formData.attributes.deliveryNote.data.attributes.createdAt
-									).toLocaleString()
-								}}</span>
+								<span class="text-xs text-right">{{order.deliveryNote.createdAt}}</span>
 							</a>
+						</div>
+					</div>
+					<div v-if="isGeneratingDeliveryNote">
+						<div
+							class="flex flex-row items-center space-between text-sm h-16 w-full px-3 py-2 bg-gray-200 rounded-md focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+						>
+							Lieferschein wird geladen...
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
 	</section>
-<!--	  <pre class="container mx-auto">{{ JSON.stringify(formData, null, 2) }}</pre>-->
+	<!--	  <pre class="container mx-auto">{{ JSON.stringify(formData, null, 2) }}</pre>-->
 </template>
