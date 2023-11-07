@@ -8,10 +8,10 @@
     "strapi": "strapi"
   },
   "dependencies": {
-    "@strapi/plugin-i18n": "^4.13.7",
-    "@strapi/plugin-users-permissions": "^4.13.7",
-    "@strapi/strapi": "^4.13.7",
-    "pg": "8.8.0",
-    "strapi-plugin-populate-deep": "^3.0.0"
+    "@strapi/plugin-i18n": "^4.15.0",
+    "@strapi/plugin-users-permissions": "^4.15.0",
+    "@strapi/strapi": "^4.15.0",
+    "pg": "^8.11.3",
+    "strapi-plugin-populate-deep": "^3.0.1"
   }
 }
