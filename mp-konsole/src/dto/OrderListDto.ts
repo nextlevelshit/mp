@@ -79,7 +79,7 @@ export interface OrderListItem {
 			data: ProductData[];
 		};
 		delivery: {
-			data: {
+			data: null | {
 				id: number;
 				attributes: {
 					name: string;
@@ -87,10 +87,10 @@ export interface OrderListItem {
 					createdAt: string;
 					updatedAt: string;
 				};
-			} | null;
+			};
 		};
 		payment: {
-			data: {
+			data: null | {
 				id: number;
 				attributes: {
 					name: string;
@@ -98,7 +98,16 @@ export interface OrderListItem {
 					createdAt: string;
 					updatedAt: string;
 				};
-			} | null;
+			};
+		};
+		customer: {
+			data: null | {
+				id: number;
+				attributes: {
+					Name: string;
+					Address: string;
+				};
+			};
 		};
 	};
 }
