@@ -8,7 +8,6 @@ export default {
 	data() {
 		return {
 			error: null,
-			orderData: {},
 			order: {},
 			isGeneratingInvoice: false,
 			isGeneratingDeliveryNote: false,
@@ -16,56 +15,8 @@ export default {
 			hasChanges: true,
 			pdfUrl: null,
 			logger: debug("app:i:order-view"),
-			defaultInvoiceData: {
-				subject: "Invoice Subject",
-				date: "01.12.2021",
-				nr: {
-					invoice: "INV12345",
-					customer: "CUST6789",
-					order: "ORD9876",
-					shipping: "C-0012-23333-1"
-				},
-				to: {
-					name: "Customer Name",
-					address: ["123 Main St", "City, Country", "ZIP Code"]
-				},
-				VAT: {
-					rate: 19,
-					amount: 100
-				},
-				shipping: 10,
+			defaultPdfData: {
 				currency: "\\euro",
-				subtotal: 500,
-				total: 610,
-				service: [
-					{
-						description: "Service 1",
-						price: {
-							per_unit: 12,
-							total: 12
-						},
-						count: 3,
-						nr: "12345"
-					},
-					{
-						description: "Service 2",
-						price: {
-							per_unit: 12,
-							total: 12
-						},
-						count: 1,
-						nr: "12345"
-					},
-					{
-						description: "Service 3",
-						price: {
-							per_unit: 12,
-							total: 12
-						},
-						count: 1,
-						nr: "12345"
-					}
-				],
 				body: "**Gewählte Zahlungsart:** PayPal\n\nDie Rechnung wurde per **PayPal** bereits beglichen.\n\nVielen Dank für Ihren Einkauf"
 			},
 			deliveryOptions: [],
@@ -120,8 +71,6 @@ export default {
 				.update(this.id, body)
 				.then((data) => {
 					setTimeout(() => {
-						this.orderData = data;
-
 						this.isUpdatingForm = false;
 					}, 711);
 				})
@@ -129,25 +78,27 @@ export default {
 		},
 		generateDeliveryNote() {
 			this.logger(this.order.raw);
+			this.order.resetDeliveryNote();
 
 			const data = {
-				...this.defaultInvoiceData,
-				date: this.order.raw.attributes.Date,
-				shipping: this.order.raw.attributes.delivery.data.attributes.price,
-				VAT: {
-					rate: 19,
-					amount: this.order.raw.attributes.VAT
-				},
-				subtotal: this.order.data.subtotal,
-				total: this.order.data.total,
+				...this.defaultPdfData,
+				subject: "LIEFERSCHEIN",
+				date: new Date(this.order.data.Date).toLocaleDateString(),
+				// shipping: this.order.raw.attributes.delivery.data.attributes.price,
+				// VAT: {
+				// 	rate: 19,
+				// 	amount: this.order.raw.attributes.VAT
+				// },
+				// subtotal: this.order.data.subtotal,
+				// total: this.order.data.total,
 				to: {
 					name: "",
-					address: this.order.raw.attributes.address.split("\n")
+					address: this.order.data.address.split("\n")
 				},
 				nr: {
-					customer: "XXX-XXX-XXX",
-					order: "XXX-XXX-XXX",
-					shipping: "XXX-XXX-XXX"
+					customer: this.order.nr.customer,
+					order: this.order.nr.order,
+					shipping: this.order.nr.shipping
 				},
 				service: this.order.products.map((product) => ({
 					description: product.attributes.name,
@@ -156,13 +107,11 @@ export default {
 						total: product.attributes.cover.data.attributes.price
 					},
 					count: 1,
-					nr: "XXXX"
+					nr: product.id
 				}))
 			};
 
 			this.logger(data);
-
-			this.order.resetDeliveryNote();
 			this.isGeneratingDeliveryNote = true;
 
 			fetch("/api/mp-inkasso/v1/invoice", {
@@ -210,7 +159,41 @@ export default {
 			this.order.resetInvoice();
 			this.isGeneratingInvoice = true;
 
-			const data = this.defaultInvoiceData;
+			const { customer, order, invoice } = this.order.nr;
+			const { subtotal, total } = this.order.data;
+
+			const data = {
+				...this.defaultPdfData,
+				subject: "RECHNUNG",
+				date: new Date(this.order.data.Date).toLocaleDateString(),
+				shipping: this.order.raw.attributes.delivery.data.attributes.price,
+				VAT: {
+					rate: 19,
+					amount: this.order.raw.attributes.VAT
+				},
+				subtotal,
+				total,
+				to: {
+					name: "",
+					address: this.order.data.invoiceAddress.split("\n")
+				},
+				nr: {
+					customer,
+					order,
+					invoice
+				},
+				service: this.order.products.map((product) => ({
+					description: product.attributes.name,
+					price: {
+						per_unit: product.attributes.cover.data.attributes.price,
+						total: product.attributes.cover.data.attributes.price
+					},
+					count: 1,
+					nr: product.id
+				}))
+			};
+
+			this.logger(data);
 
 			fetch("/api/mp-inkasso/v1/invoice", {
 				method: "POST",
@@ -259,10 +242,10 @@ export default {
 </script>
 
 <template>
-	<!--  <pre class="container mx-auto">{{JSON.stringify({deliveryOptions, paymentOptions}, null, 2)}}</pre>-->
-	<section v-if="order.data" class="container mx-auto relative">
+	<!--	<pre class="container mx-auto">{{ JSON.stringify(order, null, 2) }}</pre>-->
+	<section v-if="true" class="container mx-auto relative flex flex-col gap-4">
 		<h1 class="font-semibold text-2xl mb-6">
-			{{ order.raw.attributes.Date }}
+			{{ order.data.Date }}
 			<span class="font-light">(ID: {{ order.raw.id }})</span>
 		</h1>
 		<button
@@ -288,177 +271,212 @@ export default {
 			<span v-if="isUpdatingForm">Wird gespeichert...</span>
 			<span v-else>Speichern</span>
 		</button>
-		<fieldset class="flex gap-2">
+		<fieldset class="flex gap-2 hidden">
 			<div class="w-1/5">
 				<label
-					for="total"
+					for="nr-order"
 					class="block text-sm font-medium leading-6 text-gray-900"
-					>Gesamtpreis</label
-				>
-				<div class="relative mt-2 rounded-md shadow-sm">
-					<div
-						class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-					>
-						<span class="text-gray-500 sm:text-sm">€</span>
-					</div>
-					<input
-						v-model="order.data.total"
-						type="text"
-						name="total"
-						id="total"
-						class="block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-						placeholder="0.00"
-					/>
-					<div class="absolute inset-y-0 right-0 flex items-center">
-						<label for="totalCurrency" class="sr-only">Währung</label>
-						<select
-							id="totalCurrency"
-							name="totalCurrency"
-							class="h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-						>
-							<option>EUR</option>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="w-1/5">
-				<label
-					for="subtotal"
-					class="block text-sm font-medium leading-6 text-gray-900"
-					>Zwischensumme</label
-				>
-				<div class="relative mt-2 rounded-md shadow-sm">
-					<div
-						class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
-					>
-						<span class="text-gray-500 sm:text-sm">€</span>
-					</div>
-					<input
-						v-model="order.data.subtotal"
-						type="text"
-						name="subtotal"
-						id="subtotal"
-						class="block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-						placeholder="0.00"
-					/>
-					<div class="absolute inset-y-0 right-0 flex items-center">
-						<label for="subtotalCurrency" class="sr-only">Währung</label>
-						<select
-							id="subtotalCurrency"
-							name="subtotalCurrency"
-							class="h-full rounded-md border-0 bg-transparent py-0 pl-2 pr-7 text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-						>
-							<option>EUR</option>
-						</select>
-					</div>
-				</div>
-			</div>
-			<div class="w-1/5">
-				<label for="VAT" class="block text-sm font-medium leading-6 text-gray-900"
-					>MwSt.</label
+					>Bestellnr.</label
 				>
 				<div class="relative mt-2 rounded-md shadow-sm">
 					<input
-						v-model="order.data.VAT"
+						v-model="order.nr.order"
 						type="text"
-						name="VAT"
-						id="VAT"
-						class="tabular-nums block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-						placeholder="0"
-						inputmode="numeric"
-						pattern="\d*"
+						name="nr-order"
+						id="nr-order"
+						class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+						disabled
 					/>
-					<div
-						class="absolute inset-y-0 right-2 flex items-center text-sm text-gray-700"
-					>
-						EUR
-					</div>
 				</div>
 			</div>
 			<div class="w-1/5">
 				<label
-					for="payment"
+					for="nr-customer"
 					class="block text-sm font-medium leading-6 text-gray-900"
-					>Zahlungsart</label
+					>Kundennr.</label
 				>
 				<div class="relative mt-2 rounded-md shadow-sm">
-					<div
-						class="block w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
-					>
-						<select
-							v-model="order.data.payment"
-							id="delivery"
-							name="delivery"
-							class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-						>
-							<option disabled :selected="!order.data.payment">
-								Bitte eine Zahlungsart wählen
-							</option>
-							<option
-								v-for="option in paymentOptions"
-								:value="option.id"
-								:selected="option.id === order.data.payment"
-							>
-								{{ option.name }} (+ {{ option.price }} €)
-							</option>
-						</select>
-					</div>
+					<input
+						v-model="order.nr.customer"
+						type="text"
+						name="nr-customer"
+						id="nr-customer"
+						class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+						disabled
+					/>
 				</div>
 			</div>
-			<div class="w-1/5">
-				<label
-					for="delivery"
-					class="block text-smtext-sm font-medium leading-6 text-gray-900"
-					>Versandart</label
-				>
-				<div class="relative mt-2 rounded-md shadow-sm">
-					<div
-						class="block w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
-					>
-						<select
-							v-model="order.data.delivery"
-							id="delivery"
-							name="delivery"
-							class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
-						>
-							<option disabled :selected="!order.data.delivery">
-								Zahlungsart wählen
-							</option>
-							<option
-								v-for="option in deliveryOptions"
-								:value="option.id"
-								:selected="option.id === order.data.delivery"
-							>
-								{{ option.name }} (+ {{ option.price }} €)
-							</option>
-						</select>
-					</div>
-				</div>
-			</div>
+			<div class="w-3/5"></div>
 		</fieldset>
-		<div class="flex gap-2 my-8">
-			<div class="w-3/5">
-				<section
+		<div class="flex gap-12 my-8">
+			<!--      <div class="w-full">-->
+			<!--        Full-->
+			<!--      </div>-->
+			<div class="flex flex-col gap-2 w-1/6">
+				<div class="">
+					<label
+						for="total"
+						class="block text-sm font-medium leading-6 text-gray-900"
+						>Gesamtpreis</label
+					>
+					<div class="relative mt-2 rounded-md shadow-sm">
+						<div
+							class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+						>
+							<span class="text-gray-500 sm:text-sm">€</span>
+						</div>
+						<input
+							v-model="order.data.total"
+							type="text"
+							name="total"
+							id="total"
+							class="block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							placeholder="0.00"
+						/>
+					</div>
+				</div>
+				<div class="">
+					<label
+						for="subtotal"
+						class="block text-sm font-medium leading-6 text-gray-900"
+						>Zwischensumme</label
+					>
+					<div class="relative mt-2 rounded-md shadow-sm">
+						<div
+							class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3"
+						>
+							<span class="text-gray-500 sm:text-sm">€</span>
+						</div>
+						<input
+							v-model="order.data.subtotal"
+							type="text"
+							name="subtotal"
+							id="subtotal"
+							class="block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							placeholder="0.00"
+						/>
+					</div>
+				</div>
+				<div class="">
+					<label
+						for="VAT"
+						class="block text-sm font-medium leading-6 text-gray-900"
+						>MwSt.</label
+					>
+					<div class="relative mt-2 rounded-md shadow-sm">
+						<input
+							v-model="order.data.VAT"
+							type="text"
+							name="VAT"
+							id="VAT"
+							class="tabular-nums block w-full rounded-md border-0 py-1.5 pl-7 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							placeholder="0"
+							inputmode="numeric"
+							pattern="\d*"
+						/>
+						<div
+							class="absolute inset-y-0 right-2 flex items-center text-sm text-gray-700"
+						>
+							EUR
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="flex flex-col gap-2 w-1/6">
+				<div class="">
+					<label
+						for="payment"
+						class="block text-sm font-medium leading-6 text-gray-900"
+						>Zahlungsart</label
+					>
+					<div class="relative mt-2 rounded-md shadow-sm">
+						<div
+							class="block w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
+						>
+							<select
+								v-model="order.data.payment"
+								id="delivery"
+								name="delivery"
+								class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+							>
+								<option disabled :selected="!order.data.payment">
+									Bitte eine Zahlungsart wählen
+								</option>
+								<option
+									v-for="(option, i) in paymentOptions"
+									:value="option.id"
+									:key="i"
+									:selected="option.id === order.data.payment"
+								>
+									{{ option.name }} (+ {{ option.price.toFixed(2) }} €)
+								</option>
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="">
+					<label
+						for="delivery"
+						class="block text-smtext-sm font-medium leading-6 text-gray-900"
+						>Versandart</label
+					>
+					<div class="relative mt-2 rounded-md shadow-sm">
+						<div
+							class="block w-full rounded-md border-0 text-gray-900 ring-1 ring-inset ring-gray-300 sm:text-sm sm:leading-6"
+						>
+							<select
+								v-model="order.data.delivery"
+								id="delivery"
+								name="delivery"
+								class="h-full w-full py-2.5 pl-2 py-2 rounded-md border-0 bg-transparent text-gray-500 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm"
+							>
+								<option disabled :selected="!order.data.delivery">
+									Zahlungsart wählen
+								</option>
+								<option
+									v-for="(option, i) in deliveryOptions"
+									:value="option.id"
+									:key="i"
+									:selected="option.id === order.data.delivery"
+								>
+									{{ option.name }} (+ {{ option.price.toFixed(2) }} €)
+								</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="flex gap-2 w-2/3">
+				<div
 					v-if="order.products"
-					class="flex flex-col gap-6 rounded-md border-gray-200"
+					class="w-1/2 flex flex-col gap-6 rounded-md bg-stone-100 p-4"
 				>
-					<article v-for="(product, i) in order.products" :key="i" class="flex">
-						<div class="">
-							<span class="bg-stone-100 p-2 rounded-md mr-2"
+					<h2 class="block text-sm font-medium leading-6 text-gray-900">
+						Produktübersicht
+					</h2>
+					<article
+						v-for="(product, i) in order.products"
+						:key="i"
+						class="flex space-x-2"
+					>
+						<div class="text-sm truncate">
+							{{ product.attributes.name }}
+						</div>
+						<div class="text-sm">
+							<span class="bg-white p-2 rounded-md whitespace-nowrap"
 								>{{
-									product.attributes.cover.data.attributes.price
+									product.attributes.cover.data.attributes.price.toFixed(
+										2
+									)
 								}}
 								€</span
 							>
 						</div>
-						<div class="">
-							{{ product.attributes.name }}
-						</div>
 					</article>
-				</section>
-			</div>
-			<div class="w-2/5 flex gap-2">
-				<div class="w-1/2 flex flex-col gap-2">
+				</div>
+				<div class="w-1/4 flex flex-col gap-2">
 					<button
 						@click="() => generateInvoicePdf()"
 						:class="[
@@ -467,7 +485,7 @@ export default {
 								: `text-white`
 						]"
 						:disabled="isGeneratingInvoice"
-						class="h-16 w-full px-3 py-2 text-left bg-gray-900 font-semibold drop-shadow-md rounded-md"
+						class="h-16 w-full px-3 py-2 text-left bg-orange-700 font-semibold drop-shadow-md rounded-md"
 					>
 						Rechnung erstellen
 					</button>
@@ -475,7 +493,7 @@ export default {
 						<div>
 							<a
 								:href="`http://localhost:5555${order.invoice.url}`"
-								class="flex flex-row items-center space-between text-sm h-16 w-full px-3 py-2 bg-gray-200 rounded-md focus:ring-2 focus:ring-inset focus:ring-indigo-600"
+								class="flex flex-row items-center space-between text-sm h-16 w-full px-3 py-2 bg-orange-200 rounded-md focus:ring-2 focus:ring-inset focus:ring-indigo-600"
 								target="_blank"
 							>
 								Rechnung herunterladen
@@ -492,11 +510,57 @@ export default {
 							Rechnung wird geladen...
 						</div>
 					</div>
+					<div>
+						<label
+							for="invoiceAddress"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Rechnungsadresse</label
+						>
+						<textarea
+							v-model="order.data.invoiceAddress"
+							id="invoiceAddress"
+							name="invoiceAddress"
+							class="w-full h-20 rounded-md border-0 py-1.5 px-2 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+						></textarea>
+					</div>
+					<div>
+						<label
+							for="nr-invoice"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Rechnungsnr.</label
+						>
+						<div class="relative mt-2 rounded-md shadow-sm">
+							<input
+								v-model="order.nr.invoice"
+								type="text"
+								name="nr-invoice"
+								id="nr-invoice"
+								class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+								disabled
+							/>
+						</div>
+					</div>
+					<div>
+						<label
+							for="date"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Rechnungsdatum</label
+						>
+						<div class="relative mt-2 rounded-md shadow-sm">
+							<input
+								v-model="order.data.Date"
+								type="date"
+								name="date"
+								id="date"
+								class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+							/>
+						</div>
+					</div>
 				</div>
 
-				<div class="w-1/2 flex flex-col gap-2">
+				<div class="w-1/4 flex flex-col gap-2">
 					<button
-						@click="() => generateDeliveryNote(orderData)"
+						@click="() => generateDeliveryNote()"
 						:class="[
 							isGeneratingDeliveryNote
 								? `text-gray-500 cursor-progress`
@@ -528,9 +592,95 @@ export default {
 							Lieferschein wird geladen...
 						</div>
 					</div>
+					<div>
+						<label
+							for="address"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Lieferadresse</label
+						>
+						<textarea
+							v-model="order.data.address"
+							id="address"
+							name="address"
+							class="w-full h-20 rounded-md border-0 py-1.5 px-2 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+						></textarea>
+					</div>
+					<div>
+						<label
+							for="nr-deliveryNote"
+							class="block text-sm font-medium leading-6 text-gray-900"
+							>Lieferscheinnr.</label
+						>
+						<div class="relative mt-2 rounded-md shadow-sm">
+							<input
+								v-model="order.nr.shipping"
+								type="text"
+								name="nr-deliveryNote"
+								id="nr-deliveryNote"
+								class="block w-full rounded-md border-0 py-1.5 px-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+								disabled
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
+
+			<!--      <div class="flex gap-2 w-1/2"></div>-->
 		</div>
+		<div class="flex gap-2 w-1/2"></div>
+		<div class="flex gap-2 my-8"></div>
 	</section>
 	<!--	  <pre class="container mx-auto">{{ JSON.stringify(formData, null, 2) }}</pre>-->
+	<section v-if="false" class="container mx-auto bg-slate-100 rounded px-8 py-12">
+		<h2 class="leading-3 font-semibold text-size-lg">Rechnung</h2>
+		<div class="grid gap-4 grid-cols-4 grid-rows-2">
+			<fieldset>
+				<label for="date">Datum</label>
+				<input v-model="order.data.Date" type="date" id="date" name="date" />
+			</fieldset>
+
+			<fieldset>
+				<label>Rechnung Nr.</label>
+				<input v-model="order.nr.invoice" type="text" disabled />
+			</fieldset>
+
+			<fieldset>
+				<label for="invoiceAddresss">Rechnungsadresse</label>
+				<textarea
+					v-model="order.data.invoiceAddress"
+					id="invoiceAddress"
+					name="invoiceAddress"
+					class="w-full h-20 border-0 py-1.5 px-2 pr-20 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+				></textarea>
+			</fieldset>
+
+			<fieldset>
+				<label for="payment">Zahlungsart</label>
+				<div class="relative">
+					<div
+						class="block w-full border-0"
+					>
+						<select
+							v-model="order.data.payment"
+							id="delivery"
+							name="delivery"
+							class="h-full w-full py-2.5 py-2 border-0 bg-transparent"
+						>
+							<option disabled :selected="!order.data.payment">
+								Bitte eine Zahlungsart wählen
+							</option>
+							<option
+								v-for="(option, i) in paymentOptions"
+								:value="option.id"
+								:key="i"
+								:selected="option.id === order.data.payment"
+							>
+								{{ option.name }} (+ {{ option.price.toFixed(2) }} €)
+							</option>
+						</select>
+					</div>
+				</div>
+			</fieldset>
+		</div>
+	</section>
 </template>
