@@ -34,6 +34,41 @@ services:
     networks:
       - net
 
+  mp-konsole:
+    container_name: mp-konsole
+    build: ./mp-konsole
+    depends_on:
+      - mp-inkasso
+      - mp-depot
+    ports:
+      - "3333:3333"
+    env_file: .env
+    environment:
+      VITE_DEPOT_API_TOKEN: ${VITE_DEPOT_API_TOKEN}
+    networks:
+      - net
+    volumes:
+      - ./mp-konsole/src:/app/src:ro
+      - ./mp-konsole/vite.config.ts:/app/vite.config.ts:ro
+
+  mp-silo:
+    container_name: mp-silo
+    #    restart: unless-stopped
+    image: postgres:alpine
+    env_file: .env
+    environment:
+      POSTGRES_USER: ${DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+      POSTGRES_DB: ${DATABASE_NAME}
+    volumes:
+      #      - silo-data:/var/lib/postgresql/data/ #using a volume
+      - ./mp-silo/data:/var/lib/postgresql/data/ # if you want to use a bind folder
+    #      - ./mp-silo/seed/backup_2023-03-10_23-44-50.sql:/docker-entrypoint-initdb.d/seed_database.sql
+    ports:
+      - "${DATABASE_PORT}:5432"
+    networks:
+      - data
+
   mp-depot:
     container_name: mp-depot
     build: ./mp-depot
@@ -70,40 +105,17 @@ services:
     depends_on:
       - mp-silo
 
-  mp-silo:
-    container_name: mp-silo
-#    restart: unless-stopped
-    image: postgres:alpine
-    env_file: .env
-    environment:
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
-    volumes:
-#      - silo-data:/var/lib/postgresql/data/ #using a volume
-      - ./mp-silo/data:/var/lib/postgresql/data/ # if you want to use a bind folder
-#      - ./mp-silo/seed/backup_2023-03-10_23-44-50.sql:/docker-entrypoint-initdb.d/seed_database.sql
+  mp-web:
+    container_name: mp-web
+    build: ./mp-web
+    env_file:
+      - .env
     ports:
-      - "${DATABASE_PORT}:5432"
+      - "7777:7777"
     networks:
       - data
-
-  mp-konsole:
-    container_name: mp-konsole
-    build: ./mp-konsole
     depends_on:
-      - mp-inkasso
       - mp-depot
-    ports:
-      - "3333:3333"
-    env_file: .env
-    environment:
-      VITE_DEPOT_API_TOKEN: ${VITE_DEPOT_API_TOKEN}
-    networks:
-      - net
-    volumes:
-      - ./mp-konsole/src:/app/src:ro
-      - ./mp-konsole/vite.config.ts:/app/vite.config.ts:ro
 
 #volumes:
 #  silo-data:
