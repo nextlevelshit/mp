@@ -9,5 +9,5 @@ RUN npm i --no-audit --no-fund --progress=false --no-warnings --log-level=error
 COPY ./ ./
 #RUN npm run build
 
-EXPOSE 6666
+EXPOSE 7777
 CMD [ "npm", "start" ]
