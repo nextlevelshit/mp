@@ -76,6 +76,10 @@
     },
     "total": {
       "type": "decimal"
+    },
+    "uuid": {
+      "type": "string",
+      "unique": true
     }
   }
 }

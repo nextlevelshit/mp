@@ -4,7 +4,7 @@ services:
   mp-inkasso:
     build: ./mp-inkasso
     container_name: mp-inkasso
-#    restart: unless-stopped
+    #    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -20,15 +20,15 @@ services:
   mp-postamt:
     build: ./mp-postamt
     container_name: mp-postamt
-#    restart: unless-stopped
+    #    restart: unless-stopped
     env_file:
       - .env
     environment:
       - PYTHONUNBUFFERED=true
-      - SMTP_RELAY_HOST=${SMTP_RELAY_HOST}
-      - SMTP_RELAY_PORT=${SMTP_RELAY_PORT}
-      - SMTP_RELAY_USERNAME=${SMTP_RELAY_USERNAME}
-      - SMTP_RELAY_PASSWORD=${SMTP_RELAY_PASSWORD}
+#      - SMTP_RELAY_HOST=${SMTP_RELAY_HOST}
+#      - SMTP_RELAY_PORT=${SMTP_RELAY_PORT}
+#      - SMTP_RELAY_USERNAME=${SMTP_RELAY_USERNAME}
+#      - SMTP_RELAY_PASSWORD=${SMTP_RELAY_PASSWORD}
     ports:
       - "2222:2222"
     networks:
@@ -44,7 +44,11 @@ services:
       - "3333:3333"
     env_file: .env
     environment:
-      VITE_DEPOT_API_TOKEN: ${VITE_DEPOT_API_TOKEN}
+      VITE_DEPOT_API_TOKEN: ${DEPOT_TOKEN}
+      VITE_DEPOT_PORT: ${DEPOT_PORT}
+      VITE_DEPOT_TOKEN: ${DEPOT_TOKEN}
+      VITE_DEPOT_RELATIVE_PATH: ${DEPOT_RELATIVE_PATH}
+      VITE_INKASSO_PORT: ${INKASSO_PORT}
     networks:
       - net
     volumes:
@@ -73,28 +77,28 @@ services:
     container_name: mp-depot
     build: ./mp-depot
     image: strapi:latest
-#    restart: unless-stopped
+    #    restart: unless-stopped
     env_file: .env
     environment:
-      DATABASE_CLIENT: ${DATABASE_CLIENT}
+#      DATABASE_CLIENT: ${DATABASE_CLIENT}
       DATABASE_HOST: mp-silo
-      DATABASE_PORT: ${DATABASE_PORT}
-      DATABASE_NAME: ${DATABASE_NAME}
-      DATABASE_USERNAME: ${DATABASE_USERNAME}
-      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+#      DATABASE_PORT: ${DATABASE_PORT}
+#      DATABASE_NAME: ${DATABASE_NAME}
+#      DATABASE_USERNAME: ${DATABASE_USERNAME}
+#      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_SSL: false
-      JWT_SECRET: ${JWT_SECRET}
-      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
-      APP_KEYS: ${APP_KEYS}
-#      NODE_ENV: ${NODE_ENV}
-      API_TOKEN_SALT: ${API_TOKEN_SALT}
-      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
-      PORT: 5555
+#      JWT_SECRET: ${JWT_SECRET}
+#      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
+#      APP_KEYS: ${APP_KEYS}
+      #      NODE_ENV: ${NODE_ENV}
+#      API_TOKEN_SALT: ${API_TOKEN_SALT}
+#      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
+      PORT: ${DEPOT_PORT}
     volumes:
       - ./mp-depot/config:/opt/app/config
       - ./mp-depot/src:/opt/app/src
       - ./mp-depot/package.json:/opt/package.json
-#      - ./mp-depot/yarn.lock:/opt/yarn.lock
+      #      - ./mp-depot/yarn.lock:/opt/yarn.lock
       - ./.env:/opt/app/.env
       - ./mp-depot/public/uploads:/opt/app/public/uploads
     ports:
@@ -105,17 +109,46 @@ services:
     depends_on:
       - mp-silo
 
-  mp-web:
-    container_name: mp-web
-    build: ./mp-web
+#  mp-web:
+#    container_name: mp-web
+#    build: ./mp-web
+#    env_file:
+#      - .env
+#    ports:
+#      - "7777:7777"
+#    networks:
+#      - data
+#    depends_on:
+#      - mp-depot
+
+  mp-shop-api:
+    container_name: mp-shop-api
+    build: ./mp-shop-api
     env_file:
       - .env
     ports:
-      - "7777:7777"
+     - "8888:8888"
     networks:
       - data
     depends_on:
       - mp-depot
+    volumes:
+      - ./mp-shop-api/src:/app/src:ro
+
+
+
+#  mp-shop:
+#    container_name: mp-shop
+#    build: ./mp-shop
+#    env_file:
+#      - .env
+#    ports:
+#     - "9999:9999"
+#    networks:
+#      - data
+#    depends_on:
+#      - mp-shop-api
+
 
 #volumes:
 #  silo-data:

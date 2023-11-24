@@ -1,5 +1,7 @@
-import {depotBearerToken} from "@/config/constants";
-import type {OrderListItem} from "@/dto/OrderListDto";
+import { v4 as generateUuid } from "uuid";
+import {depotBearerToken, depotPort} from "../config/constants";
+import {Order} from "../util/types";
+import {verbose} from "../util/logger";
 
 class DepotApi {
 	baseUrl: string;
@@ -10,65 +12,69 @@ class DepotApi {
 		this.headers = options.defaultHeaders ?? {};
 	}
 
-	private async handleResponse<T>(response: Response): Promise<T> {
+	private async handleResponse<T>(response: Response): Promise<T | T[]> {
 		if (!response.ok) {
+			verbose(response.statusText);
 			throw new Error(`Request failed with status ${response.status}`);
 		}
 		const {data} = await response.json();
+
 		return data;
 	}
 
-	orderFactory(): Factory<OrderListItem> {
+	orderFactory() {
 		return {
-			create: async (): Promise<OrderListItem> => {
-				const response = await fetch(`${this.baseUrl}/orders?populate=*`, {
+			create: async (): Promise<Order> => {
+				const uuid = generateUuid();
+
+				verbose(`Creating cart with UUID ${uuid}`);
+
+				const response = await fetch(`${this.baseUrl}/orders?populate=uuid`, {
 					method: "POST",
-					headers: this.headers
+					headers: this.headers,
+					body: JSON.stringify({
+						data: {
+							uuid
+						}
+					})
 				});
 
-				return this.handleResponse<OrderListItem>(response);
+				const {data} = await response.json();
+
+				return data satisfies Order;
 			},
 
-			one: async (id: number): Promise<OrderListItem | null> => {
+			one: async (uuid: string): Promise<Order> => {
 				const response = await fetch(
-					`${this.baseUrl}/orders/${id}?populate=deep,3`,
+					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,2`,
 					{
 						method: "GET",
 						headers: this.headers
 					}
 				);
 
-				if (response.status === 404) {
-					return null;
-				}
+				const {data} = await response.json();
 
-				return this.handleResponse<OrderListItem>(response);
+				return data.pop() satisfies Order;
 			},
 
-			update: async (id, body): Promise<OrderListItem | null> => {
+			update: async (uuid: string, data: Partial<Order>) => {
+				const order = await this.orderFactory().one(uuid);
+
 				const response = await fetch(
-					`${this.baseUrl}/orders/${id}?populate=deep,3`,
+					`${this.baseUrl}/orders/${order.id}?populate=deep,3`,
 					{
 						method: "PUT",
 						headers: this.headers,
-						body
+						body: JSON.stringify({
+							data
+						})
 					}
 				);
 
-				if (response.status === 404) {
-					return null;
-				}
+				const {data: updatedOrder} = await response.json();
 
-				return this.handleResponse<OrderListItem>(response);
-			},
-
-			all: async (): Promise<OrderListItem[]> => {
-				const response = await fetch(`${this.baseUrl}/orders?populate=*`, {
-					method: "GET",
-					headers: this.headers
-				});
-
-				return this.handleResponse<OrderListItem[]>(response);
+				return updatedOrder;
 			}
 		};
 	}
@@ -132,15 +138,15 @@ interface DepotApiOptions {
 type Headers = Record<string, string>;
 
 interface Factory<T> {
-	create: (data: never) => Promise<T>;
-	one: (id: number) => Promise<T | null>;
-	all: () => Promise<T[]>;
-	update?: (id: number, data: any) => Promise<T | null>;
+	create: () => Promise<{ data: T}>;
+	one: (uuid: string) => Promise<T>;
+	update: (uuid: string, data: any) => Promise<never>;
 }
 
 export const depotApi = new DepotApi({
-	baseUrl: "/api/mp-depot/v1",
+	baseUrl: `http://mp-depot:${depotPort}/api`,
 	defaultHeaders: {
-		Authorization: `Bearer ${depotBearerToken}`
+		authorization: `Bearer ${depotBearerToken}`,
+		"content-type": "application/json"
 	}
 });

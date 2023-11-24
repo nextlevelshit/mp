@@ -1,0 +1,20 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "target": "ESNext",
+    "module": "CommonJS",
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "strictNullChecks": true,
+    "experimentalDecorators": true
+  },
+  "include": [
+    "./src/**/*",
+    "./src/*",
+    "./package.json"
+  ],
+  "exclude": [
+    "./src/**/*.spec.ts",
+    "./src/*.spec.ts"
+  ]
+}
