@@ -21,26 +21,10 @@ export interface Order {
 			data: Product[];
 		};
 		delivery: {
-			data: null | {
-				id: number;
-				attributes: {
-					name: string;
-					price: number;
-					createdAt: string;
-					updatedAt: string;
-				};
-			};
+			data: null | DeliveryMethod;
 		};
 		payment: {
-			data: null | {
-				id: number;
-				attributes: {
-					name: string;
-					price: number;
-					createdAt: string;
-					updatedAt: string;
-				};
-			};
+			data: null | PaymentMethod;
 		};
 		customer: {
 			data: null | {
@@ -81,8 +65,6 @@ export interface MediaData {
 		previewUrl: string | null;
 		provider: string;
 		provider_metadata: any | null;
-		createdAt: string;
-		updatedAt: string;
 	};
 }
 
@@ -92,35 +74,83 @@ export interface Product {
 		name: string;
 		description: string | null;
 		price: number | null;
-		createdAt: string;
-		updatedAt: string;
 		publishedAt: string;
 		slug: string | null;
 		cover: {
-			data: {
-				id: number;
-				attributes: {
-					price: number;
-				};
-			};
+			data: null | ProductCover;
 		};
-		// payment: {
-		//     data: {
-		//         id: string;
-		//         attributes: {
-		//             name: string;
-		//             price: number;
-		//         };
-		//     };
-		// };
-		// delivery: {
-		//     data: {
-		//         id: string;
-		//         attributes: {
-		//             name: string;
-		//             price: number;
-		//         };
-		//     };
-		// };
+		pattern: {
+			data: null | ProductPattern;
+		};
+		pages: {
+			data: null | ProductPages;
+		};
+		ruling: {
+			data: null | ProductRuling;
+		};
+		image: {
+			data: MediaData;
+		};
+	};
+}
+
+export interface ProductCover {
+	id: number;
+	attributes: {
+		name: string;
+		binding: string;
+		price: number;
+		createdAt: string;
+		updatedAt: string;
+		copyText: {
+			text: string;
+			cover: string;
+			paper: string;
+			format: string;
+			content: string;
+			details: string;
+			banderole: string;
+		};
+	};
+}
+
+export interface ProductRuling {
+	id: number;
+	attributes: {
+		name: string;
+		price: number;
+	};
+}
+
+export interface PaymentMethod {
+	id: number;
+	attributes: {
+		name: string;
+		price: number;
+	};
+}
+
+export interface DeliveryMethod {
+	id: number;
+	attributes: {
+		name: string;
+		price: number;
+	};
+}
+
+export interface ProductPattern {
+	id: number;
+	attributes: {
+		name: string;
+		description: string;
+		price?: number;
+	};
+}
+
+export interface ProductPages {
+	id: number;
+	attributes: {
+		name: string;
+		price: number;
 	};
 }

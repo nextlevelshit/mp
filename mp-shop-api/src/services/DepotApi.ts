@@ -1,7 +1,23 @@
-import { v4 as generateUuid } from "uuid";
+import {v4 as generateUuid} from "uuid";
+import qs from "qs";
 import {depotBearerToken, depotPort} from "../config/constants";
-import {Order} from "../util/types";
+import {
+	Order,
+	Product,
+	ProductRuling,
+	PaymentMethod,
+	DeliveryMethod,
+	ProductPattern,
+	ProductPages, ProductCover
+} from "../util/types";
 import {verbose} from "../util/logger";
+import {ProductDto} from "../dto/ProductDto";
+import {ProductRulingDto} from "../dto/ProductRulingDto";
+import {DeliveryMethodDto} from "../dto/DeliveryMethodDto";
+import {PaymentMethodDto} from "../dto/PaymentMethodDto";
+import {ProductPatternDto} from "../dto/ProductPatternDto";
+import {ProductPagesDto} from "../dto/ProductPagesDto";
+import {ProductCoverDto} from "../dto/ProductCoverDto";
 
 class DepotApi {
 	baseUrl: string;
@@ -12,19 +28,9 @@ class DepotApi {
 		this.headers = options.defaultHeaders ?? {};
 	}
 
-	private async handleResponse<T>(response: Response): Promise<T | T[]> {
-		if (!response.ok) {
-			verbose(response.statusText);
-			throw new Error(`Request failed with status ${response.status}`);
-		}
-		const {data} = await response.json();
-
-		return data;
-	}
-
 	orderFactory() {
 		return {
-			create: async (): Promise<Order> => {
+			create: async () => {
 				const uuid = generateUuid();
 
 				verbose(`Creating cart with UUID ${uuid}`);
@@ -41,10 +47,10 @@ class DepotApi {
 
 				const {data} = await response.json();
 
-				return data satisfies Order;
+				return data as Order;
 			},
 
-			one: async (uuid: string): Promise<Order> => {
+			one: async (uuid: string) => {
 				const response = await fetch(
 					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,2`,
 					{
@@ -55,7 +61,7 @@ class DepotApi {
 
 				const {data} = await response.json();
 
-				return data.pop() satisfies Order;
+				return data.pop() as Order;
 			},
 
 			update: async (uuid: string, data: Partial<Order>) => {
@@ -74,59 +80,142 @@ class DepotApi {
 
 				const {data: updatedOrder} = await response.json();
 
-				return updatedOrder;
+				return updatedOrder as Order;
 			}
 		};
 	}
 
-	async delivery(): Promise<{ id: number; name: string; price: number } | null> {
+	productFactory() {
+		return {
+			one: async (id: string) => {
+				const response = await fetch(
+					`${this.baseUrl}/products/${id}?populate=deep,2`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				const {data} = await response.json();
+
+				return new ProductDto(data).dto;
+			},
+			all: async (filter?: any) => {
+				const query = filter ? qs.stringify(filter) : "";
+
+				verbose(`Querying products with "${query}"`)
+
+				const response = await fetch(
+					`${this.baseUrl}/products?${query}&populate=deep,2`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				if (!response.ok) {
+					throw new Error(`Request failed with status ${response.status}`);
+				}
+
+				const {data} = await response.json();
+
+				return (data as Product[]).map((product) => new ProductDto(product).dto);
+			}
+		}
+	}
+
+	async productRuling(filter?: any) {
+		const query = filter ? qs.stringify(filter, { encode: false }) : "";
+
+		verbose(`Querying product-rulings with "${query}"`)
+
+		const response = await fetch(
+			`${this.baseUrl}/product-rulings?${query}&populate=deep,2`,
+			{
+				method: "GET",
+				headers: this.headers
+			}
+		);
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const {data} = await response.json();
+		return (data as ProductRuling[]).map((productRuling) => new ProductRulingDto(productRuling).dto);
+	}
+
+	async productPattern() {
+		const response = await fetch(`${this.baseUrl}/product-patterns?populate=deep,2`, {
+			method: "GET",
+			headers: this.headers
+		});
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const { data } = await response.json();
+		return (data as ProductPattern[]).map((pattern) => new ProductPatternDto(pattern).dto);
+	}
+
+	async productPages() {
+		const response = await fetch(`${this.baseUrl}/product-pages?populate=deep,2`, {
+			method: "GET",
+			headers: this.headers
+		});
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const { data } = await response.json();
+		return (data as ProductPages[]).map((pages) => new ProductPagesDto(pages).dto);
+	}
+
+	async productCover() {
+		const response = await fetch(`${this.baseUrl}/product-covers?populate=deep,2`, {
+			method: "GET",
+			headers: this.headers
+		});
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const { data } = await response.json();
+		return (data as ProductCover[]).map((cover) => new ProductCoverDto(cover).dto);
+	}
+
+	async deliveryMethod() {
 		const response = await fetch(`${this.baseUrl}/deliveries`, {
 			method: "GET",
 			headers: this.headers
 		});
 
-		if (response.status === 404) {
-			return null;
-		}
-
 		if (!response.ok) {
 			throw new Error(`Request failed with status ${response.status}`);
 		}
 
 		const {data} = await response.json();
 
-		return data.map(({id, attributes}) => {
-			return {
-				id,
-				name: attributes.name,
-				price: attributes.price
-			};
-		});
+		return (data as DeliveryMethod[]).map(deliveryMethod => new DeliveryMethodDto(deliveryMethod).dto);
 	}
 
-	async payment(): Promise<{ id: number; name: string; price: number } | null> {
+	async paymentMethod() {
 		const response = await fetch(`${this.baseUrl}/payments`, {
 			method: "GET",
 			headers: this.headers
 		});
 
-		if (response.status === 404) {
-			return null;
-		}
-
 		if (!response.ok) {
 			throw new Error(`Request failed with status ${response.status}`);
 		}
 
 		const {data} = await response.json();
 
-		return data.map(({id, attributes}) => {
-			return {
-				id,
-				name: attributes.name,
-				price: attributes.price
-			};
-		});
+		return (data as PaymentMethod[]).map(paymentMethod => new PaymentMethodDto(paymentMethod).dto);
+
 	}
 }
 
@@ -136,12 +225,6 @@ interface DepotApiOptions {
 }
 
 type Headers = Record<string, string>;
-
-interface Factory<T> {
-	create: () => Promise<{ data: T}>;
-	one: (uuid: string) => Promise<T>;
-	update: (uuid: string, data: any) => Promise<never>;
-}
 
 export const depotApi = new DepotApi({
 	baseUrl: `http://mp-depot:${depotPort}/api`,

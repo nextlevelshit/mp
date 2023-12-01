@@ -90,13 +90,10 @@ export default {
         showPayButton: true,
         session: session,
         paymentMethodsConfiguration: {
-          ideal: {
-            showImage: true
-          },
           card: {
             hasHolderName: true,
             holderNameRequired: true,
-            name: "Credit or debit card",
+            name: "Kreditkarte oder Debitkarte",
             amount: {
               value: 1000,
               currency: "EUR"
@@ -104,11 +101,11 @@ export default {
           },
           paypal: {
             amount: {
-              currency: "USD",
+              currency: "EUR",
               value: 1000
             },
             environment: "test",
-            countryCode: "US"   // Only needed for test. This will be automatically retrieved when you are in production.
+            countryCode: "DE"   // Only needed for test. This will be automatically retrieved when you are in production.
           }
         },
         onPaymentCompleted: (result, component) => {

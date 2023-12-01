@@ -1,5 +1,6 @@
 const express = require("express");
 const consola = require("consola");
+const dotenv = require("dotenv");
 const { v4: uuid } = require("uuid");
 const { hmacValidator } = require('@adyen/api-library');
 const { Client, Config, CheckoutAPI } = require("@adyen/api-library");
@@ -17,6 +18,11 @@ app.use(express.urlencoded({ extended: true }));
 // Import and set Nuxt.js options
 const nuxtConfig = require("../nuxt.config.js");
 nuxtConfig.dev = process.env.NODE_ENV !== "production";
+
+// Enables environment variables by parsing the .env file and assigning it to process.env
+dotenv.config({
+  path: "./.env"
+});
 
 // Adyen Node.js API library boilerplate (configuration, etc.)
 const config = new Config();
