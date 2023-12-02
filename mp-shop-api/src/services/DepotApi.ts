@@ -28,6 +28,28 @@ class DepotApi {
 		this.headers = options.defaultHeaders ?? {};
 	}
 
+	private async fetchEntity<T>(
+		endpoint: string,
+		mapDto: (item: T) => any,
+		filter?: any
+	): Promise<any[]> {
+		const query = filter ? qs.stringify(filter, { encode: false }) : "";
+
+		verbose(`Querying ${endpoint} with "${query}"`);
+
+		const response = await fetch(`${this.baseUrl}/${endpoint}?${query}&populate=deep,2`, {
+			method: "GET",
+			headers: this.headers,
+		});
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const { data } = await response.json();
+		return (data as T[]).map((item) => mapDto(item).dto);
+	}
+
 	orderFactory() {
 		return {
 			create: async () => {
@@ -101,121 +123,56 @@ class DepotApi {
 				return new ProductDto(data).dto;
 			},
 			all: async (filter?: any) => {
-				const query = filter ? qs.stringify(filter) : "";
-
-				verbose(`Querying products with "${query}"`)
-
-				const response = await fetch(
-					`${this.baseUrl}/products?${query}&populate=deep,2`,
-					{
-						method: "GET",
-						headers: this.headers
-					}
+				return this.fetchEntity<Product>(
+					"products",
+					(product) => new ProductDto(product),
+					filter
 				);
-
-				if (!response.ok) {
-					throw new Error(`Request failed with status ${response.status}`);
-				}
-
-				const {data} = await response.json();
-
-				return (data as Product[]).map((product) => new ProductDto(product).dto);
-			}
+			},
 		}
 	}
 
 	async productRuling(filter?: any) {
-		const query = filter ? qs.stringify(filter, { encode: false }) : "";
-
-		verbose(`Querying product-rulings with "${query}"`)
-
-		const response = await fetch(
-			`${this.baseUrl}/product-rulings?${query}&populate=deep,2`,
-			{
-				method: "GET",
-				headers: this.headers
-			}
+		return this.fetchEntity<ProductRuling>(
+			"product-rulings",
+			(productRuling) => new ProductRulingDto(productRuling),
+			filter
 		);
-
-		if (!response.ok) {
-			throw new Error(`Request failed with status ${response.status}`);
-		}
-
-		const {data} = await response.json();
-		return (data as ProductRuling[]).map((productRuling) => new ProductRulingDto(productRuling).dto);
 	}
 
 	async productPattern() {
-		const response = await fetch(`${this.baseUrl}/product-patterns?populate=deep,2`, {
-			method: "GET",
-			headers: this.headers
-		});
-
-		if (!response.ok) {
-			throw new Error(`Request failed with status ${response.status}`);
-		}
-
-		const { data } = await response.json();
-		return (data as ProductPattern[]).map((pattern) => new ProductPatternDto(pattern).dto);
+		return this.fetchEntity<ProductPattern>(
+			"product-patterns",
+			(pattern) => new ProductPatternDto(pattern)
+		);
 	}
 
 	async productPages() {
-		const response = await fetch(`${this.baseUrl}/product-pages?populate=deep,2`, {
-			method: "GET",
-			headers: this.headers
-		});
-
-		if (!response.ok) {
-			throw new Error(`Request failed with status ${response.status}`);
-		}
-
-		const { data } = await response.json();
-		return (data as ProductPages[]).map((pages) => new ProductPagesDto(pages).dto);
+		return this.fetchEntity<ProductPages>(
+			"product-pages",
+			(pages) => new ProductPagesDto(pages)
+		);
 	}
 
 	async productCover() {
-		const response = await fetch(`${this.baseUrl}/product-covers?populate=deep,2`, {
-			method: "GET",
-			headers: this.headers
-		});
-
-		if (!response.ok) {
-			throw new Error(`Request failed with status ${response.status}`);
-		}
-
-		const { data } = await response.json();
-		return (data as ProductCover[]).map((cover) => new ProductCoverDto(cover).dto);
+		return this.fetchEntity<ProductCover>(
+			"product-covers",
+			(cover) => new ProductCoverDto(cover)
+		);
 	}
 
 	async deliveryMethod() {
-		const response = await fetch(`${this.baseUrl}/deliveries`, {
-			method: "GET",
-			headers: this.headers
-		});
-
-		if (!response.ok) {
-			throw new Error(`Request failed with status ${response.status}`);
-		}
-
-		const {data} = await response.json();
-
-		return (data as DeliveryMethod[]).map(deliveryMethod => new DeliveryMethodDto(deliveryMethod).dto);
+		return this.fetchEntity<DeliveryMethod>(
+			"deliveries",
+			(deliveryMethod) => new DeliveryMethodDto(deliveryMethod)
+		);
 	}
 
 	async paymentMethod() {
-		const response = await fetch(`${this.baseUrl}/payments`, {
-			method: "GET",
-			headers: this.headers
-		});
-
-		if (!response.ok) {
-			throw new Error(`Request failed with status ${response.status}`);
-		}
-
-		const {data} = await response.json();
-
-		return (data as PaymentMethod[]).map(paymentMethod => new PaymentMethodDto(paymentMethod).dto);
-
+		return this.fetchEntity<PaymentMethod>(
+			"payments",
+			(paymentMethod) => new PaymentMethodDto(paymentMethod)
+		);
 	}
 }
 

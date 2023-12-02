@@ -59,25 +59,25 @@ router.get("/v1/product", async (req, res) => {
 		const productList = await depotApi.productFactory().all({
 			pagination: {
 				start: 0,
-				limit: 2
+				limit: 20
 			},
-			filters: {
-				ruling: {
-					id: {
-						$eq: 3
-					}
-				},
-				cover: {
-					id: {
-						$eq: 1
-					}
-				}
-			}
+			// filters: {
+			// 	ruling: {
+			// 		id: {
+			// 			$eq: 3
+			// 		}
+			// 	},
+			// 	cover: {
+			// 		id: {
+			// 			$eq: 1
+			// 		}
+			// 	}
+			// }
 		});
 
 		res.status(200).send(productList);
 	} catch (e) {
-		res.status(500).send("Could not fetch cart");
+		res.status(500).send("Could not fetch products");
 	}
 });
 
