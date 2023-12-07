@@ -17,6 +17,7 @@
     "ext": "ts"
   },
   "dependencies": {
+    "@adyen/api-library": "^15.0.0-beta",
     "@types/cors": "^2.8.16",
     "@types/debug": "^4.1.12",
     "@types/express": "^4.17.21",

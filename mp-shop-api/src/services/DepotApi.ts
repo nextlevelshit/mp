@@ -8,9 +8,8 @@ import {
 	PaymentMethod,
 	DeliveryMethod,
 	ProductPattern,
-	ProductPages, ProductCover
+	ProductPages, ProductCover, OrderUpdate, OrderUpdateCalculated, OrderUpdateRequest
 } from "../util/types";
-import {verbose} from "../util/logger";
 import {ProductDto} from "../dto/ProductDto";
 import {ProductRulingDto} from "../dto/ProductRulingDto";
 import {DeliveryMethodDto} from "../dto/DeliveryMethodDto";
@@ -18,6 +17,11 @@ import {PaymentMethodDto} from "../dto/PaymentMethodDto";
 import {ProductPatternDto} from "../dto/ProductPatternDto";
 import {ProductPagesDto} from "../dto/ProductPagesDto";
 import {ProductCoverDto} from "../dto/ProductCoverDto";
+import debug from "debug";
+import {OrderDto} from "../dto/OrderDto";
+
+const logger = debug("mp:i:shop-api:depot-api");
+const verbose = debug("mp:v:shop-api:depot-api");
 
 class DepotApi {
 	baseUrl: string;
@@ -33,7 +37,7 @@ class DepotApi {
 		mapDto: (item: T) => any,
 		filter?: any
 	): Promise<any[]> {
-		const query = filter ? qs.stringify(filter, { encode: false }) : "";
+		const query = filter ? qs.stringify(filter, {encode: false}) : "";
 
 		verbose(`Querying ${endpoint} with "${query}"`);
 
@@ -46,7 +50,7 @@ class DepotApi {
 			throw new Error(`Request failed with status ${response.status}`);
 		}
 
-		const { data } = await response.json();
+		const {data} = await response.json();
 		return (data as T[]).map((item) => mapDto(item).dto);
 	}
 
@@ -74,7 +78,7 @@ class DepotApi {
 
 			one: async (uuid: string) => {
 				const response = await fetch(
-					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,2`,
+					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,3`,
 					{
 						method: "GET",
 						headers: this.headers
@@ -86,23 +90,35 @@ class DepotApi {
 				return data.pop() as Order;
 			},
 
-			update: async (uuid: string, data: Partial<Order>) => {
-				const order = await this.orderFactory().one(uuid);
+			update: async (uuid: string, orderUpdates: Partial<OrderUpdate>) => {
+				const order = new OrderDto(await this.orderFactory().one(uuid)).dto;
+
+				const data : OrderUpdateRequest = {
+					...orderUpdates,
+					VAT: order.VAT,
+					total: order.total,
+					subtotal: order.subtotal
+				}
+
+				verbose(`Updating order "${order.id}"`);
+				verbose(data);
 
 				const response = await fetch(
 					`${this.baseUrl}/orders/${order.id}?populate=deep,3`,
 					{
 						method: "PUT",
 						headers: this.headers,
-						body: JSON.stringify({
-							data
-						})
+						body: JSON.stringify({data})
 					}
 				);
 
-				const {data: updatedOrder} = await response.json();
+				const updatedOrderResponse = await response.json();
 
-				return updatedOrder as Order;
+				if (updatedOrderResponse.error) {
+					throw new Error(JSON.stringify(updatedOrderResponse.error));
+				}
+
+				return new OrderDto(updatedOrderResponse.data).dto;
 			}
 		};
 	}

@@ -38,6 +38,24 @@ export interface Order {
 	};
 }
 
+export interface OrderUpdate {
+	email: string;
+	address: string;
+	invoiceAddress: string;
+	delivery: number;
+	payment: number;
+	products: number[];
+	customer: any;
+}
+
+export interface OrderUpdateCalculated {
+	subtotal: number;
+	VAT: number;
+	total: number;
+}
+
+export type OrderUpdateRequest = Partial<OrderUpdate> | OrderUpdateCalculated;
+
 export interface MediaData {
 	id: number;
 	attributes: {
@@ -154,3 +172,5 @@ export interface ProductPages {
 		price: number;
 	};
 }
+
+export type AdyenEnvironment = "TEST" | "LIVE";

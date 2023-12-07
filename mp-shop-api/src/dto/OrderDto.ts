@@ -2,6 +2,12 @@ import {MediaData, Order} from "../util/types";
 import {ProductDto, ProductDtoData} from "./ProductDto";
 import {DeliveryMethodDto, DeliveryMethodDtoData} from "./DeliveryMethodDto";
 import {PaymentMethodDto, PaymentMethodDtoData} from "./PaymentMethodDto";
+import debug from "debug";
+import {vatIncludedFactor, vatFactor} from "../config/constants";
+
+
+const logger = debug("mp:i:shop-api:order-dto");
+const verbose = debug("mp:v:shop-api:order-dto");
 
 export class OrderDto {
 	private readonly order: Order;
@@ -88,23 +94,40 @@ export class OrderDto {
 	}
 
 	get dto(): OrderDtoData {
+		const products = this.products ? this.products.map((product) => product.dto) : null;
+		const delivery = this.delivery ? this.delivery?.dto : null;
+		const payment = this.payment ? this.payment?.dto : null;
+
+		let subtotal = -1;
+		let total = -1;
+		let VAT = -1;
+
+		if (products && delivery && payment) {
+			const productsTotal = products.reduce((v, p) => (v + p.totalProductPrice), 0);
+
+			total = Math.round((productsTotal + delivery.price + payment.price) * 100) / 100;
+			VAT = Math.round(total / vatIncludedFactor * vatFactor * 100) / 100;
+			subtotal = Math.round((total - VAT) * 100) / 100;
+			verbose(total, subtotal, VAT);
+		}
+
 		return {
 			id: this.id,
-			date: this.date,
 			createdAt: this.createdAt,
 			updatedAt: this.updatedAt,
+			total,
+			subtotal,
+			VAT,
+			delivery,
+			payment,
+			products,
+			date: this.date,
 			email: this.email,
 			address: this.address,
 			invoiceAddress: this.invoiceAddress,
-			VAT: this.VAT,
-			subtotal: this.subtotal,
-			total: this.total,
 			uuid: this.uuid,
 			invoice: this.invoice,
 			deliveryNote: this.deliveryNote,
-			products: this.products ? this.products.map((product) => product.dto) : null,
-			delivery: this.delivery ? this.delivery?.dto : null,
-			payment: this.payment ? this.payment?.dto : null,
 			customer: this.customer
 				? {
 					id: this.customer.id,
@@ -127,8 +150,8 @@ export interface OrderDtoData {
 	address: string;
 	invoiceAddress: string;
 	VAT: number;
-	subtotal: number | null;
-	total: number | null;
+	subtotal: number;
+	total: number;
 	uuid: string;
 	invoice: MediaData | null;
 	deliveryNote: MediaData | null;

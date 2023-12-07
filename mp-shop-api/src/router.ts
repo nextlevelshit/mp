@@ -1,7 +1,13 @@
 import express from "express";
 import {version} from "../package.json";
-import {verbose} from "./util/logger";
 import {depotApi} from "./services/DepotApi";
+import {adyenApi} from "./services/AdyenApi";
+import debug from "debug";
+import {OrderDto} from "./dto/OrderDto";
+
+const logger = debug("mp:i:shop-api:router");
+const verbose = debug("mp:v:shop-api:router");
+
 
 export const router = express.Router();
 
@@ -31,7 +37,7 @@ router.all("/v1/cart/:uuid", async (req, res) => {
 			case "GET":
 				verbose(`Querying cart with UUID ${uuid}`);
 
-				const order = await depotApi.orderFactory().one(uuid);
+				const order = new OrderDto(await depotApi.orderFactory().one(uuid)).dto;
 
 				res.status(200).send(order);
 				break;
@@ -48,7 +54,37 @@ router.all("/v1/cart/:uuid", async (req, res) => {
 				res.status(405).send("Method not allowed")
 		}
 	} catch (e) {
-		res.status(500).send("Could not fetch cart");
+		verbose(e);
+		res.status(500).send("Could not fetch or update cart");
+	}
+});
+
+
+router.post("/v1/cart/:uuid/checkout", async (req, res) => {
+	if (!req.params.uuid) res.status(422).send("Missing cart UUID");
+
+	try {
+		const protocol = req.protocol;
+		const host = req.get("host") || "localhost";
+		const order = await depotApi.orderFactory().one(req.params.uuid);
+		const orderDto = new OrderDto(order);
+		const adyenSession = await adyenApi.createSessionOrThrow(protocol, host, orderDto);
+		res.status(200).json(adyenSession);
+	} catch (e) {
+		res.status(500).send("Could not create checkout session");
+	}
+});
+
+router.all("/v1/cart/:uuid/redirect", async (req, res) => {
+	if (!req.params.uuid) res.status(422).send("Missing cart UUID");
+
+	try {
+		await depotApi.orderFactory().one(req.params.uuid);
+
+		const resultPath = await adyenApi.handleShopperRedirect(req.method === "GET" ? req.query : req.body);
+		res.redirect(resultPath);
+	} catch (e) {
+		res.redirect("/result/error");
 	}
 });
 
@@ -84,7 +120,7 @@ router.get("/v1/product", async (req, res) => {
 router.get("/v1/product/:id", async (req, res) => {
 	try {
 		const {id} = req.params;
-		verbose(`Querying product with ID ${id}`);
+		verbose(`Querying product with ID ${req.get("id")}`);
 
 		const product = await depotApi.productFactory().one(id);
 
@@ -164,4 +200,9 @@ router.get("/v1/product-cover", async (req, res) => {
 	} catch (e) {
 		res.status(500).send("Could not fetch product covers");
 	}
+});
+
+router.post("/v1/webhooks/notifications", async (req, res) => {
+	const webhookResponse = await adyenApi.handleWebhook(req.body);
+	res.status(webhookResponse.statusCode).send(webhookResponse.message);
 });

@@ -3,7 +3,10 @@ import express from "express";
 import cors from "cors";
 import {router} from "./router";
 import {expressTrustProxy, port} from "./config/constants";
-import {logger} from "./util/logger";
+import debug from "debug";
+
+const logger = debug("mp:i:shop-api:app");
+const verbose = debug("mp:v:shop-api:app");
 
 config();
 
