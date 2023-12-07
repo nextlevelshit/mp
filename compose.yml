@@ -130,24 +130,29 @@ services:
      - "8888:8888"
     networks:
       - data
+      - net
     depends_on:
       - mp-depot
     volumes:
       - ./mp-shop-api/src:/app/src:ro
 
-
-
-#  mp-shop:
-#    container_name: mp-shop
-#    build: ./mp-shop
-#    env_file:
-#      - .env
-#    ports:
-#     - "9999:9999"
-#    networks:
-#      - data
-#    depends_on:
-#      - mp-shop-api
+  mp-shop:
+    container_name: mp-shop
+    build: ./mp-shop
+    env_file:
+      - .env
+    ports:
+     - "9999:9999"
+    depends_on:
+      - mp-shop-api
+    environment:
+        VITE_SHOP_API_ADYEN_CLIENT_KEY: ${ADYEN_CLIENT_KEY}
+        VITE_SHOP_API_PORT: ${SHOP_API_PORT}
+    networks:
+        - net
+    volumes:
+        - ./mp-shop/src:/app/src:ro
+        - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
 
 
 #volumes:
