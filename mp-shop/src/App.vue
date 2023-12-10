@@ -12,7 +12,7 @@
 			</nav>
 		</div>
 	</header>
-	<main class="pt-4">
+	<main class="pt-4 container mx-auto">
 		<router-view :key="$route.path"></router-view>
 	</main>
 </template>

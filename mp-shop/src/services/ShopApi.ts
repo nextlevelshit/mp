@@ -45,6 +45,9 @@ class ShopApi {
 	async updateCart(uuid: string, data: any): Promise<any> {
 		const response = await fetch(`${this.baseUrl}/v1/cart/${uuid}`, {
 			method: "PUT",
+			headers: {
+				"content-type": "application/json"
+			},
 			body: JSON.stringify(data),
 		});
 		return this.handleResponse<any>(response);

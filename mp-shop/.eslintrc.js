@@ -31,5 +31,7 @@ module.exports = {
         "vue"
     ],
     "rules": {
-    }
+		"no-debugger": false,
+		"no-unused-vars": false
+	}
 }

@@ -54,7 +54,7 @@ export interface OrderUpdateCalculated {
 	total: number;
 }
 
-export type OrderUpdateRequest = Partial<OrderUpdate> | OrderUpdateCalculated;
+export type OrderUpdatedTotalRequest = Partial<OrderUpdate> | OrderUpdateCalculated;
 
 export interface MediaData {
 	id: number;

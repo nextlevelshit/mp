@@ -8,7 +8,7 @@ import {
 	PaymentMethod,
 	DeliveryMethod,
 	ProductPattern,
-	ProductPages, ProductCover, OrderUpdate, OrderUpdateCalculated, OrderUpdateRequest
+	ProductPages, ProductCover, OrderUpdate, OrderUpdateCalculated, OrderUpdatedTotalRequest
 } from "../util/types";
 import {ProductDto} from "../dto/ProductDto";
 import {ProductRulingDto} from "../dto/ProductRulingDto";
@@ -91,19 +91,32 @@ class DepotApi {
 			},
 
 			update: async (uuid: string, orderUpdates: Partial<OrderUpdate>) => {
-				const order = new OrderDto(await this.orderFactory().one(uuid)).dto;
+				const order = new OrderDto(await this.orderFactory().one(uuid));
 
-				const data : OrderUpdateRequest = {
-					...orderUpdates,
-					VAT: order.VAT,
-					total: order.total,
-					subtotal: order.subtotal
+				const responseWithoutTotal = await fetch(
+					`${this.baseUrl}/orders/${order.id}?populate=deep,3`,
+					{
+						method: "PUT",
+						headers: this.headers,
+						body: JSON.stringify({data: orderUpdates})
+					}
+				);
+
+				const orderUpdatedWithoutTotal = await responseWithoutTotal.json();
+
+				if (orderUpdatedWithoutTotal.error) {
+					throw new Error(JSON.stringify(orderUpdatedWithoutTotal.error));
 				}
 
-				verbose(`Updating order "${order.id}"`);
-				verbose(data);
+				const orderAfterUpdate = new OrderDto(orderUpdatedWithoutTotal.data).dto;
 
-				const response = await fetch(
+				const data : OrderUpdatedTotalRequest = {
+					VAT: orderAfterUpdate.VAT,
+					total: orderAfterUpdate.total,
+					subtotal: orderAfterUpdate.subtotal
+				}
+
+				const responseWithTotal = await fetch(
 					`${this.baseUrl}/orders/${order.id}?populate=deep,3`,
 					{
 						method: "PUT",
@@ -112,13 +125,13 @@ class DepotApi {
 					}
 				);
 
-				const updatedOrderResponse = await response.json();
+				const orderUpdatedWithTotal = await responseWithTotal.json();
 
-				if (updatedOrderResponse.error) {
-					throw new Error(JSON.stringify(updatedOrderResponse.error));
+				if (orderUpdatedWithTotal.error) {
+					throw new Error(JSON.stringify(orderUpdatedWithTotal.error));
 				}
 
-				return new OrderDto(updatedOrderResponse.data).dto;
+				return orderUpdatedWithTotal.data;
 			}
 		};
 	}

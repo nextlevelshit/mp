@@ -80,6 +80,12 @@
     "uuid": {
       "type": "string",
       "unique": true
+    },
+    "cart": {
+      "displayName": "cart",
+      "type": "component",
+      "repeatable": true,
+      "component": "products.cart"
     }
   }
 }

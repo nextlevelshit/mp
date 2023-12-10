@@ -37,18 +37,20 @@ router.all("/v1/cart/:uuid", async (req, res) => {
 			case "GET":
 				verbose(`Querying cart with UUID ${uuid}`);
 
-				const order = new OrderDto(await depotApi.orderFactory().one(uuid)).dto;
+				const fetchedOrder = new OrderDto(await depotApi.orderFactory().one(uuid));
 
-				res.status(200).send(order);
+				res.status(200).send(fetchedOrder.dto);
 				break;
 			case "PUT":
 				verbose(`Updating cart with UUID ${uuid}`);
 
 				if (!req.body) res.status(422).send("Missing data to be updated");
 
-				const updatedOrder = await depotApi.orderFactory().update(uuid, req.body);
+				verbose("Request body", req.body);
 
-				res.status(200).send(updatedOrder);
+				const updatedOrder = new OrderDto(await depotApi.orderFactory().update(uuid, req.body));
+
+				res.status(200).send(updatedOrder.dto);
 				break;
 			default:
 				res.status(405).send("Method not allowed")

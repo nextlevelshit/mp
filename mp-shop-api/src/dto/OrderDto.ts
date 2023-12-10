@@ -95,20 +95,21 @@ export class OrderDto {
 
 	get dto(): OrderDtoData {
 		const products = this.products ? this.products.map((product) => product.dto) : null;
-		const delivery = this.delivery ? this.delivery?.dto : null;
-		const payment = this.payment ? this.payment?.dto : null;
+		const delivery = this.delivery ? this.delivery.dto : null;
+		const payment = this.payment ? this.payment.dto : null;
 
 		let subtotal = -1;
 		let total = -1;
 		let VAT = -1;
 
-		if (products && delivery && payment) {
+		if (products) {
 			const productsTotal = products.reduce((v, p) => (v + p.totalProductPrice), 0);
+			const deliveryPrice = delivery ? delivery.price : 0;
+			const paymentPrice = payment ? payment.price : 0;
 
-			total = Math.round((productsTotal + delivery.price + payment.price) * 100) / 100;
+			total = Math.round((productsTotal + deliveryPrice + paymentPrice) * 100) / 100;
 			VAT = Math.round(total / vatIncludedFactor * vatFactor * 100) / 100;
 			subtotal = Math.round((total - VAT) * 100) / 100;
-			verbose(total, subtotal, VAT);
 		}
 
 		return {
