@@ -4,6 +4,7 @@ import {DeliveryMethodDto, DeliveryMethodDtoData} from "./DeliveryMethodDto";
 import {PaymentMethodDto, PaymentMethodDtoData} from "./PaymentMethodDto";
 import debug from "debug";
 import {vatIncludedFactor, vatFactor} from "../config/constants";
+import {CartProductDto, CartProductDtoData} from "./CartProductDto";
 
 
 const logger = debug("mp:i:shop-api:order-dto");
@@ -68,9 +69,18 @@ export class OrderDto {
 		return this.order.attributes.deliveryNote.data;
 	}
 
+	/**
+	 * @deprecated
+	 * Replaced by cartProducts
+	 */
 	get products(): ProductDto[] | null {
 		const products = this.order.attributes.products.data;
 		return products ? products.map(product => new ProductDto(product)) : null;
+	}
+
+	get cartProducts(): CartProductDto[] | null {
+		const cartProducts = this.order.attributes.cart;
+		return cartProducts ? cartProducts.map((cartProduct) => new CartProductDto(cartProduct)) : null;
 	}
 
 	get delivery(): DeliveryMethodDto | null {
@@ -90,11 +100,11 @@ export class OrderDto {
 			Address: string;
 		};
 	} | null {
-		return this.order.attributes.customer.data;
+		return this.order.attributes.customer?.data;
 	}
 
 	get dto(): OrderDtoData {
-		const products = this.products ? this.products.map((product) => product.dto) : null;
+		const cartProducts = this.cartProducts ? this.cartProducts.map((cartProduct) => cartProduct.dto) : null;
 		const delivery = this.delivery ? this.delivery.dto : null;
 		const payment = this.payment ? this.payment.dto : null;
 
@@ -102,8 +112,8 @@ export class OrderDto {
 		let total = -1;
 		let VAT = -1;
 
-		if (products) {
-			const productsTotal = products.reduce((v, p) => (v + p.totalProductPrice), 0);
+		if (cartProducts) {
+			const productsTotal = cartProducts.reduce((v, p) => (v + p.product.totalProductPrice * p.count), 0);
 			const deliveryPrice = delivery ? delivery.price : 0;
 			const paymentPrice = payment ? payment.price : 0;
 
@@ -121,7 +131,7 @@ export class OrderDto {
 			VAT,
 			delivery,
 			payment,
-			products,
+			cartProducts,
 			date: this.date,
 			email: this.email,
 			address: this.address,
@@ -156,7 +166,6 @@ export interface OrderDtoData {
 	uuid: string;
 	invoice: MediaData | null;
 	deliveryNote: MediaData | null;
-	products: ProductDtoData[] | null;
 	delivery: DeliveryMethodDtoData | null;
 	payment: PaymentMethodDtoData | null;
 	customer: {
@@ -166,4 +175,5 @@ export interface OrderDtoData {
 			Address: string;
 		};
 	} | null;
+	cartProducts: CartProductDtoData[] | null;
 }

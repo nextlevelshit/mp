@@ -4,6 +4,11 @@ import {ProductCoverDto, ProductCoverDtoData} from "./ProductCoverDto";
 import {ProductRulingDto, ProductRulingDtoData} from "./ProductRulingDto";
 import {MediaDataDto, MediaDataDtoData} from "./MediaDataDto";
 import {ProductPatternDto, ProductPatternDtoData} from "./ProductPatternDto";
+import debug from "debug";
+
+const logger = debug("app:i:product-dto");
+const verbose = debug("app:v:product-dto");
+
 
 export class ProductDto {
 	private readonly product: Product;

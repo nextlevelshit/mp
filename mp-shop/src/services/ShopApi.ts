@@ -12,38 +12,38 @@ class ShopApi {
 		return await response.json();
 	}
 
-	async createCart(): Promise<string> {
-		const response = await fetch(`${this.baseUrl}/v1/cart/`, {
+	async createOrder(): Promise<string> {
+		const response = await fetch(`${this.baseUrl}/v1/order/`, {
 			method: "POST",
 		});
 		return await response.text();
 	}
 
-	async getCart(uuid: string): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/cart/${uuid}`);
+	async getOrder(uuid: string): Promise<any> {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}`);
 		return this.handleResponse<any>(response);
 	}
 
-	async getOrCreateCart(uuid?: string): Promise<any> {
+	async getOrCreateOrder(uuid?: string): Promise<any> {
 		if (uuid) {
 			try {
 				// If UUID is provided, attempt to get the existing cart
-				return await this.getCart(uuid);
+				return await this.getOrder(uuid);
 			} catch (error) {
 				// If the cart doesn't exist, create a new one and then get it
-				const newCartUuid = await this.createCart();
-				return await this.getCart(newCartUuid);
+				const newCartUuid = await this.createOrder();
+				return await this.getOrder(newCartUuid);
 			}
 		} else {
 			// If no UUID is provided, create a new cart and then get it
-			const newCartUuid = await this.createCart();
-			return await this.getCart(newCartUuid);
+			const newCartUuid = await this.createOrder();
+			return await this.getOrder(newCartUuid);
 		}
 	}
 
 
-	async updateCart(uuid: string, data: any): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/cart/${uuid}`, {
+	async updateOrder(uuid: string, data: any): Promise<any> {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}`, {
 			method: "PUT",
 			headers: {
 				"content-type": "application/json"
@@ -53,15 +53,29 @@ class ShopApi {
 		return this.handleResponse<any>(response);
 	}
 
-	async checkoutCart(uuid: string): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/cart/${uuid}/checkout`, {
+	async addProductToCart(uuid: string, productId: any, count = 1): Promise<any> {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/add-product/${productId}?count=${count}`, {
+			method: "PUT"
+		});
+		return this.handleResponse<any>(response);
+	}
+
+	async removeProductFromCart(uuid: string, productId: any, count = 1): Promise<any> {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/remove-product/${productId}?count=${count}`, {
+			method: "PUT"
+		});
+		return this.handleResponse<any>(response);
+	}
+
+	async checkoutOrder(uuid: string): Promise<any> {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/checkout`, {
 			method: "POST",
 		});
 		return this.handleResponse<any>(response);
 	}
 
 	async handleRedirect(uuid: string, method: string, data: any): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/cart/${uuid}/redirect`, {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/redirect`, {
 			method,
 			body: JSON.stringify(data),
 		});

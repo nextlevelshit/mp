@@ -78,7 +78,7 @@ class DepotApi {
 
 			one: async (uuid: string) => {
 				const response = await fetch(
-					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,3`,
+					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,4`,
 					{
 						method: "GET",
 						headers: this.headers
@@ -94,7 +94,7 @@ class DepotApi {
 				const order = new OrderDto(await this.orderFactory().one(uuid));
 
 				const responseWithoutTotal = await fetch(
-					`${this.baseUrl}/orders/${order.id}?populate=deep,3`,
+					`${this.baseUrl}/orders/${order.id}?populate=deep,4`,
 					{
 						method: "PUT",
 						headers: this.headers,
@@ -117,7 +117,7 @@ class DepotApi {
 				}
 
 				const responseWithTotal = await fetch(
-					`${this.baseUrl}/orders/${order.id}?populate=deep,3`,
+					`${this.baseUrl}/orders/${order.id}?populate=deep,4`,
 					{
 						method: "PUT",
 						headers: this.headers,
@@ -132,6 +132,71 @@ class DepotApi {
 				}
 
 				return orderUpdatedWithTotal.data;
+			},
+			addProduct: async (uuid: string, productId: string, count: number = 1) => {
+				const order = new OrderDto(await this.orderFactory().one(uuid));
+				const product = await this.productFactory().one(productId);
+
+				if (!order) throw new Error(`Could not find order with UUID ${uuid}`);
+				if (!product) throw new Error(`Could not find product with ID ${productId}`);
+
+				const currentCartProducts = order.cartProducts || [];
+				const updatedCartProducts = currentCartProducts.map(cartProduct => {
+					if (cartProduct.product.id === parseInt(productId)) {
+						// Product is already in the cart, increment the count
+						return {
+							count: cartProduct.count + count,
+							product: cartProduct.product.id,
+						};
+					}
+					return {
+						count: cartProduct.count,
+						product: cartProduct.product.id
+					};
+				});
+
+				// If product not found in currentCartProducts, add it to updatedCartProducts
+				const isProductAlreadyInCart = currentCartProducts.find(cartProduct => cartProduct.product.id === parseInt(productId));
+				if (!isProductAlreadyInCart) {
+					updatedCartProducts.push({
+						count,
+						product: parseInt(productId),
+					});
+				}
+
+				return this.orderFactory().update(uuid, {
+					cart: updatedCartProducts
+				});
+			},
+			removeProduct: async (uuid: string, productId: string, count: number = 1) => {
+				const order = new OrderDto(await this.orderFactory().one(uuid));
+				const product = await this.productFactory().one(productId);
+
+				if (!order) throw new Error(`Could not find order with UUID ${uuid}`);
+				if (!product) throw new Error(`Could not find product with ID ${productId}`);
+
+				const currentCartProducts = order.cartProducts || [];
+
+				const updatedCartProducts = currentCartProducts
+					.map(cartProduct => {
+						if (cartProduct.product.id === parseInt(productId)) {
+							// Product is in the cart, decrement the count or remove if count is 1
+							return {
+								count: Math.max(0, cartProduct.count - count),
+								product: cartProduct.product.id,
+							};
+						}
+						return {
+							count: cartProduct.count,
+							product: cartProduct.product.id
+						};
+					})
+					// Remove products with count 0
+					.filter(cartProduct => cartProduct.count > 0);
+
+				return this.orderFactory().update(uuid, {
+					cart: updatedCartProducts
+				});
 			}
 		};
 	}
@@ -146,6 +211,10 @@ class DepotApi {
 						headers: this.headers
 					}
 				);
+
+				if (!response.ok) {
+					throw new Error(`Could not find product with ID ${id}`);
+				}
 
 				const {data} = await response.json();
 

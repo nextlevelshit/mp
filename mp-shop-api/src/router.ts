@@ -17,7 +17,7 @@ router.get("/v1", async (req, res) => {
 	res.send(`<h1>mp-shop-api v${version} - ${today}</h1>`);
 });
 
-router.post("/v1/cart/", async (req, res) => {
+router.post("/v1/order/", async (req, res) => {
 	try {
 		const cart = await depotApi.orderFactory().create();
 
@@ -27,7 +27,7 @@ router.post("/v1/cart/", async (req, res) => {
 	}
 });
 
-router.all("/v1/cart/:uuid", async (req, res) => {
+router.all("/v1/order/:uuid", async (req, res) => {
 	if (!req.params.uuid) res.status(422).send("Missing cart UUID");
 
 	try {
@@ -35,35 +35,69 @@ router.all("/v1/cart/:uuid", async (req, res) => {
 
 		switch (req.method) {
 			case "GET":
-				verbose(`Querying cart with UUID ${uuid}`);
+				verbose(`Querying order with UUID ${uuid}`);
 
 				const fetchedOrder = new OrderDto(await depotApi.orderFactory().one(uuid));
 
 				res.status(200).send(fetchedOrder.dto);
 				break;
 			case "PUT":
-				verbose(`Updating cart with UUID ${uuid}`);
+				verbose(`Updating order with UUID ${uuid}`);
 
 				if (!req.body) res.status(422).send("Missing data to be updated");
-
-				verbose("Request body", req.body);
 
 				const updatedOrder = new OrderDto(await depotApi.orderFactory().update(uuid, req.body));
 
 				res.status(200).send(updatedOrder.dto);
 				break;
 			default:
-				res.status(405).send("Method not allowed")
+				res.status(405).send("Method not allowed");
 		}
 	} catch (e) {
 		verbose(e);
-		res.status(500).send("Could not fetch or update cart");
+		res.status(500).send("Could not fetch or update order");
+	}
+});
+
+router.put("/v1/order/:uuid/add-product/:productId", async (req, res) => {
+	if (!req.params.uuid) res.send(422).send("Missing order UUID");
+	if (!req.params.productId) res.send(422).send("Missing product ID");
+
+	const {uuid, productId} = req.params;
+	const countParam = req.query.count;
+	const count = countParam ? parseInt(countParam as string) || 1 : 1;
+
+	try {
+		const updatedOrder = new OrderDto(await depotApi.orderFactory().addProduct(uuid, productId, count));
+
+		res.status(200).send(updatedOrder.dto);
+	} catch (e) {
+		verbose(e);
+		res.status(500).send("Could not add product to order");
+	}
+});
+
+router.put("/v1/order/:uuid/remove-product/:productId", async (req, res) => {
+	if (!req.params.uuid) res.send(422).send("Missing order UUID");
+	if (!req.params.productId) res.send(422).send("Missing product ID");
+
+	const {uuid, productId} = req.params;
+	const countParam = req.query.count;
+	const count = countParam ? parseInt(countParam as string) || 1 : 1;
+
+	try {
+		const updatedOrder = new OrderDto(await depotApi.orderFactory().removeProduct(uuid, productId, count));
+
+		res.status(200).send(updatedOrder.dto);
+	} catch (e) {
+		verbose(e);
+		res.status(500).send("Could not add product to order");
 	}
 });
 
 
-router.post("/v1/cart/:uuid/checkout", async (req, res) => {
-	if (!req.params.uuid) res.status(422).send("Missing cart UUID");
+router.post("/v1/order/:uuid/checkout", async (req, res) => {
+	if (!req.params.uuid) res.status(422).send("Missing order UUID");
 
 	try {
 		const protocol = req.protocol;
@@ -77,8 +111,8 @@ router.post("/v1/cart/:uuid/checkout", async (req, res) => {
 	}
 });
 
-router.all("/v1/cart/:uuid/redirect", async (req, res) => {
-	if (!req.params.uuid) res.status(422).send("Missing cart UUID");
+router.all("/v1/order/:uuid/redirect", async (req, res) => {
+	if (!req.params.uuid) res.status(422).send("Missing order UUID");
 
 	try {
 		await depotApi.orderFactory().one(req.params.uuid);

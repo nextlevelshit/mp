@@ -35,6 +35,7 @@ export interface Order {
 				};
 			};
 		};
+		cart: null | CartProduct[];
 	};
 }
 
@@ -44,8 +45,11 @@ export interface OrderUpdate {
 	invoiceAddress: string;
 	delivery: number;
 	payment: number;
-	products: number[];
 	customer: any;
+	cart: null | {
+		count: number;
+		product: number;
+	}[];
 }
 
 export interface OrderUpdateCalculated {
@@ -174,3 +178,11 @@ export interface ProductPages {
 }
 
 export type AdyenEnvironment = "TEST" | "LIVE";
+
+export interface CartProduct {
+	id: number;
+	count: number;
+	product: {
+		data: Product
+	};
+}
