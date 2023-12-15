@@ -1,5 +1,6 @@
 import {v4 as generateUuid} from "uuid";
 import qs from "qs";
+// import FormData from "form-data";
 import {depotBearerToken, depotPort} from "../config/constants";
 import {
 	Order,
@@ -8,7 +9,7 @@ import {
 	PaymentMethod,
 	DeliveryMethod,
 	ProductPattern,
-	ProductPages, ProductCover, OrderUpdate, OrderUpdateCalculated, OrderUpdatedTotalRequest
+	ProductPages, ProductCover, OrderUpdate, OrderUpdatedTotalRequest
 } from "../util/types";
 import {ProductDto} from "../dto/ProductDto";
 import {ProductRulingDto} from "../dto/ProductRulingDto";
@@ -19,6 +20,7 @@ import {ProductPagesDto} from "../dto/ProductPagesDto";
 import {ProductCoverDto} from "../dto/ProductCoverDto";
 import debug from "debug";
 import {OrderDto} from "../dto/OrderDto";
+import {inkassoApi} from "./InkassoApi";
 
 const logger = debug("mp:i:shop-api:depot-api");
 const verbose = debug("mp:v:shop-api:depot-api");
@@ -197,7 +199,80 @@ class DepotApi {
 				return this.orderFactory().update(uuid, {
 					cart: updatedCartProducts
 				});
-			}
+			},
+			generateInvoiceAndSaveToOrder: async (uuid: string) => {
+				const orderResponse = await this.orderFactory().one(uuid);
+
+				if (!orderResponse) throw new Error("Could not fetch order");
+
+				const order = new OrderDto(orderResponse);
+
+				if (!order.paymentAuthorised) throw new Error("Payment not authorised, cannot generate invoice");
+
+				const invoiceBlob = await inkassoApi.generateInvoice(order.invoicePdfBody);
+
+				if (!invoiceBlob) throw new Error(`Could not generate invoice, check invoice data: ${JSON.stringify(order.invoicePdfBody)}`);
+
+				const body = new FormData();
+				body.append("files.invoice", invoiceBlob, "Generated invoice by mp-inkasso");
+				body.append("data", "{}");
+
+				const updatedOrderResponse = await fetch(
+					`${this.baseUrl}/orders/${order.id}?populate=deep,4`,
+					{
+						method: "PUT",
+						headers: {
+							authorization: this.headers.authorization
+						},
+						body
+					}
+				);
+
+				if (!updatedOrderResponse.ok) {
+					throw new Error(updatedOrderResponse.statusText);
+				}
+
+				const {data} = await updatedOrderResponse.json();
+
+				return data;
+			},
+
+			generateDeliveryNoteAndSaveToOrder: async (uuid: string) => {
+				const orderResponse = await this.orderFactory().one(uuid);
+
+				if (!orderResponse) throw new Error("Could not fetch order");
+
+				const order = new OrderDto(orderResponse);
+
+				if (!order.paymentAuthorised) throw new Error("Payment not authorised, cannot generate delivery note");
+
+				const deliveryNoteBlob = await inkassoApi.generateDeliveryNote(order.deliveryNotePdfBody);
+
+				if (!deliveryNoteBlob) throw new Error(`Could not generate delivery note, check invoice data: ${JSON.stringify(order.deliveryNotePdfBody)}`);
+
+				const body = new FormData();
+				body.append("files.deliveryNote", deliveryNoteBlob, "Generated delivery note by mp-inkasso");
+				body.append("data", "{}");
+
+				const updatedOrderResponse = await fetch(
+					`${this.baseUrl}/orders/${order.id}?populate=deep,4`,
+					{
+						method: "PUT",
+						headers: {
+							authorization: this.headers.authorization
+						},
+						body
+					}
+				);
+
+				if (!updatedOrderResponse.ok) {
+					throw new Error(updatedOrderResponse.statusText);
+				}
+
+				const {data} = await updatedOrderResponse.json();
+
+				return data;
+			},
 		};
 	}
 

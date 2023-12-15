@@ -110,7 +110,6 @@ export default {
           }
         },
         onPaymentCompleted: async (result: any, component: any) => {
-          debugger;
           await this.handleCheckoutResponse(result, component);
         },
         onError: (error: any, component: any) => {
@@ -121,27 +120,47 @@ export default {
     },
     async handleCheckoutResponse(res: any, component: any) {
       verbose("Handling checkout response:", res);
+      if (!this.cart) {
+        verbose("Cart not found, cannot proceed");
+        return;
+      }
+
+      const {uuid} = this.cart;
+
       if (res.action) {
         component.handleAction(res.action);
       } else {
         switch (res.resultCode) {
           case "Authorised":
-            await shopApi.updateOrder(this.cart.uuid, {
-              paymentAuthorised: true
+            await shopApi.updateOrder(uuid, {
+              paymentAuthorised: true,
+              paymentStatus: "authorised",
+              Date: new Date().toISOString().slice(0, 10)
             });
-            window.location.assign("/checkout/result/success");
+            await shopApi.generateInvoice(uuid);
+            await shopApi.generateDeliveryNote(uuid);
             break;
           case "Pending":
           case "Received":
-            window.location.assign("/checkout/result/pending");
+            await shopApi.updateOrder(uuid, {
+              paymentStatus: "pending"
+            });
+            verbose("Order pending");
             break;
           case "Refused":
-            window.location.assign("/checkout/result/failed");
+            await shopApi.updateOrder(uuid, {
+              paymentStatus: "refused"
+            });
+            verbose("Order refused");
             break;
           default:
-            window.location.assign("/checkout/result/error");
+            await shopApi.updateOrder(uuid, {
+              paymentStatus: "error"
+            });
             break;
         }
+
+        window.location.assign(`/checkout/result/${uuid}`);
       }
     }
 	}

@@ -104,7 +104,7 @@ def generate_pdf(template_path: Template, details_json: Details):
                 yaml_file.write(details_dict["body"])
 
             normalized_recipient = normalize(details_dict["to"]["name"])
-            output_base_path = os.path.join("/", "app", "data", "output", f'{date}-invoice-{normalized_recipient}')
+            output_base_path = os.path.join("/", "app", "data", "output", f'{date}-pdf-{normalized_recipient}')
             output_example_path = os.path.join("/", "app", "data", "output", "example.pdf")
 
             if os.path.exists(output_base_path + '.pdf'):
@@ -157,7 +157,7 @@ def generate_invoice():
 def generate_shipping():
     try:
         details_json = request.json
-        tempalte = Template.SHIPPING
+        tempalte = Template.INVOICE
         pdf_content = generate_pdf(tempalte, details_json)
         if pdf_content:
             return send_file(pdf_content, mimetype='application/pdf')

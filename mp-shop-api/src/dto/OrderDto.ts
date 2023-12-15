@@ -1,9 +1,9 @@
-import {MediaData, Order} from "../util/types";
-import {ProductDto, ProductDtoData} from "./ProductDto";
+import {MediaData, Order, PdfBody} from "../util/types";
+import {ProductDto} from "./ProductDto";
 import {DeliveryMethodDto, DeliveryMethodDtoData} from "./DeliveryMethodDto";
 import {PaymentMethodDto, PaymentMethodDtoData} from "./PaymentMethodDto";
 import debug from "debug";
-import {vatIncludedFactor, vatFactor} from "../config/constants";
+import {vatDecimal, vatIncludedDecimal} from "../config/constants";
 import {CartProductDto, CartProductDtoData} from "./CartProductDto";
 
 
@@ -111,6 +111,76 @@ export class OrderDto {
 		return this.order.attributes.customer?.data;
 	}
 
+	get invoicePdfBody(): PdfBody {
+		const { id, date, email, invoiceAddress, VAT, subtotal, total, uuid } = this.dto;
+
+		return {
+			subject: "RECHNUNG",
+			date,
+			to: {
+				name: email || "",
+				address: invoiceAddress ? invoiceAddress.split("\n") : [],
+			},
+			nr: {
+				customer: `${id}`,
+				order: uuid,
+				invoice: "123",
+			},
+			service: this.cartProducts?.map((cartProduct) => ({
+				description: cartProduct.product.name,
+				price: {
+					per_unit: cartProduct.product.price || 0,
+					total: (cartProduct.product.price || 0) * cartProduct.count,
+				},
+				count: cartProduct.count,
+				nr: `${cartProduct.product.id}`,
+			})) || [],
+			currency: "\\euro",
+			body: "Thank you for your purchase!",
+			total,
+			subtotal,
+			VAT: {
+				amount: VAT,
+				rate: vatDecimal * 100
+			}
+		};
+	}
+
+	get deliveryNotePdfBody(): PdfBody {
+		const { id, date, email, address, VAT, subtotal, total, uuid } = this.dto;
+
+		return {
+			subject: "LIEFERSCHEIN",
+			date,
+			to: {
+				name: email || "",
+				address: address ? address.split("\n") : []
+			},
+			nr: {
+				customer: `${id}`,
+				order: uuid,
+				shipping: "123",
+			},
+			service: this.cartProducts?.map((cartProduct) => ({
+				description: cartProduct.product.name,
+				price: {
+					per_unit: cartProduct.product.price || 0,
+					total: (cartProduct.product.price || 0) * cartProduct.count,
+				},
+				count: cartProduct.count,
+				nr: `${cartProduct.product.id}`,
+			})) || [],
+			currency: "\\euro",
+			body: "Thank you for your purchase!",
+			total,
+			subtotal,
+			VAT: {
+				amount: VAT,
+				rate: vatDecimal * 100
+			}
+		};
+	}
+
 	get dto(): OrderDtoData {
 		const cartProducts = this.cartProducts ? this.cartProducts.map((cartProduct) => cartProduct.dto) : null;
 		const delivery = this.delivery ? this.delivery.dto : null;
@@ -126,7 +196,7 @@ export class OrderDto {
 			const paymentPrice = payment ? payment.price : 0;
 
 			total = Math.round((productsTotal + deliveryPrice + paymentPrice) * 100) / 100;
-			VAT = Math.round(total / vatIncludedFactor * vatFactor * 100) / 100;
+			VAT = Math.round(total / vatIncludedDecimal * vatDecimal * 100) / 100;
 			subtotal = Math.round((total - VAT) * 100) / 100;
 		}
 

@@ -1,4 +1,4 @@
-import type {Order} from "@/types";
+import type {Order, PdfBody} from "@/types";
 
 class ShopApi {
 	baseUrl: string;
@@ -46,8 +46,7 @@ class ShopApi {
 		}
 	}
 
-
-	async updateOrder(uuid: string, data: any): Promise<any> {
+	async updateOrder(uuid: string, data: any): Promise<Order> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}`, {
 			method: "PUT",
 			headers: {
@@ -55,21 +54,21 @@ class ShopApi {
 			},
 			body: JSON.stringify(data),
 		});
-		return this.handleResponse<any>(response);
+		return this.handleResponse<Order>(response);
 	}
 
 	async addProductToCart(uuid: string, productId: any, count = 1): Promise<Order> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/add-product/${productId}?count=${count}`, {
 			method: "PUT"
 		});
-		return this.handleResponse<any>(response);
+		return this.handleResponse<Order>(response);
 	}
 
 	async removeProductFromCart(uuid: string, productId: any, count = 1): Promise<Order> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/remove-product/${productId}?count=${count}`, {
 			method: "PUT"
 		});
-		return this.handleResponse<any>(response);
+		return this.handleResponse<Order>(response);
 	}
 
 	async checkoutOrder(uuid: string): Promise<any> {
@@ -80,6 +79,20 @@ class ShopApi {
 		});
 		return this.handleResponse<any>(response);
 	}
+
+    async generateInvoice(uuid: string): Promise<Order> {
+        const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/generate-invoice`, {
+            method: "PUT"
+        });
+        return this.handleResponse<Order>(response);
+    }
+
+    async generateDeliveryNote(uuid: string): Promise<Order> {
+        const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/generate-delivery-note`, {
+            method: "PUT"
+        });
+        return this.handleResponse<Order>(response);
+    }
 
 	async handleRedirect(uuid: string, method: string, data: any): Promise<any> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/redirect`, {

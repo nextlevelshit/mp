@@ -54,6 +54,7 @@ export interface OrderUpdate {
 	}[];
 	paymentAuthorised: boolean;
 	paymentStatus: string | boolean;
+	Date: string;
 }
 
 export interface OrderUpdateCalculated {
@@ -190,3 +191,35 @@ export interface CartProduct {
 		data: Product
 	};
 }
+
+export type PdfBody = {
+	subject: string;
+	date: string;
+	to: {
+		name: string;
+		address: string[];
+	};
+	nr: {
+		customer: string;
+		order: string;
+		shipping?: string;
+		invoice?: string;
+	};
+	service: {
+		description: string;
+		price: {
+			per_unit: number;
+			total: number;
+		};
+		count: number;
+		nr: string;
+	}[];
+	currency: "\\euro";
+	body?: string;
+	total: number;
+	subtotal: number;
+	VAT: {
+		rate: number;
+		amount: number;
+	}
+};

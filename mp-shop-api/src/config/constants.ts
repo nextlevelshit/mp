@@ -9,7 +9,8 @@ export const expressTrustProxy = process.env.SHOP_API_EXPRESS_TRUST_PROXY || "lo
 export const port = process.env.SHOP_API_PORT || 8888;
 export const depotBearerToken = process.env.SHOP_API_DEPOT_TOKEN!;
 export const depotPort = process.env.DEPOT_PORT!;
+export const inkassoPort = process.env.INKASSO_PORT!;
 // TODO: Should be retrieved from DepotApi
-export const vatIncludedFactor = 1.19;
+export const vatIncludedDecimal = 1.19;
 // TODO: Should be retrieved from DepotApi
-export const vatFactor = 0.19;
+export const vatDecimal = 0.19;

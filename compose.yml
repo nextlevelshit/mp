@@ -129,10 +129,11 @@ services:
     ports:
      - "8888:8888"
     networks:
-      - data
+      - data # TODO: Needed?
       - net
     depends_on:
       - mp-depot
+      - mp-inkasso
     volumes:
       - ./mp-shop-api/src:/app/src:ro
 
