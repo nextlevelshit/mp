@@ -4,6 +4,7 @@ import {depotApi} from "./services/DepotApi";
 import {adyenApi} from "./services/AdyenApi";
 import debug from "debug";
 import {OrderDto} from "./dto/OrderDto";
+import {adyenClientKey} from "./config/constants";
 
 const logger = debug("mp:i:shop-api:router");
 const verbose = debug("mp:v:shop-api:router");
@@ -98,15 +99,16 @@ router.put("/v1/order/:uuid/remove-product/:productId", async (req, res) => {
 
 router.post("/v1/order/:uuid/checkout", async (req, res) => {
 	if (!req.params.uuid) res.status(422).send("Missing order UUID");
+	if (!req.query.returnUrl) res.status(422).send("Missing returnUrl");
 
 	try {
-		const protocol = req.protocol;
-		const host = req.get("host") || "localhost";
+		const returnUrl = req.query.returnUrl as string;
 		const order = await depotApi.orderFactory().one(req.params.uuid);
 		const orderDto = new OrderDto(order);
-		const adyenSession = await adyenApi.createSessionOrThrow(protocol, host, orderDto);
-		res.status(200).json(adyenSession);
+		const adyenSession = await adyenApi.createSessionOrThrow(returnUrl, orderDto);
+		res.status(200).json({session: adyenSession, clientKey: adyenClientKey});
 	} catch (e) {
+		verbose(e);
 		res.status(500).send("Could not create checkout session");
 	}
 });
@@ -131,7 +133,7 @@ router.get("/v1/product", async (req, res) => {
 		const productList = await depotApi.productFactory().all({
 			pagination: {
 				start: 0,
-				limit: 20
+				limit: 200
 			},
 			// filters: {
 			// 	ruling: {
@@ -241,4 +243,5 @@ router.get("/v1/product-cover", async (req, res) => {
 router.post("/v1/webhooks/notifications", async (req, res) => {
 	const webhookResponse = await adyenApi.handleWebhook(req.body);
 	res.status(webhookResponse.statusCode).send(webhookResponse.message);
+
 });

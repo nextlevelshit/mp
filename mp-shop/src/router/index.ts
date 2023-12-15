@@ -24,15 +24,14 @@ const router = createRouter({
 			component: () => import("../views/CartView.vue")
 		},
 		{
-			path: "/checkout/:uuid",
-			props: true,
+			path: "/checkout",
 			name: "checkout",
 			component: () => import("../views/CheckoutView.vue")
 		},
 		{
-			path: "/checkout/:uuid/result",
-			props: true,
+			path: "/checkout/result/:state",
 			name: "checkout-result",
+			props: true,
 			component: () => import("../views/CheckoutResultView.vue")
 		}
 	]

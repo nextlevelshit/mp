@@ -86,6 +86,13 @@
       "type": "component",
       "repeatable": true,
       "component": "products.cart"
+    },
+    "paymentAuthorised": {
+      "type": "boolean",
+      "default": false
+    },
+    "paymentStatus": {
+      "type": "string"
     }
   }
 }

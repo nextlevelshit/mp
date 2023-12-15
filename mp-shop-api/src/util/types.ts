@@ -36,6 +36,8 @@ export interface Order {
 			};
 		};
 		cart: null | CartProduct[];
+		paymentAuthorised: boolean;
+		paymentStatus: null | string;
 	};
 }
 
@@ -50,6 +52,8 @@ export interface OrderUpdate {
 		count: number;
 		product: number;
 	}[];
+	paymentAuthorised: boolean;
+	paymentStatus: string | boolean;
 }
 
 export interface OrderUpdateCalculated {

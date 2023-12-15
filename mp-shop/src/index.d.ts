@@ -1,1 +1,2 @@
-declare namespace MpShop {}
+declare namespace MpShop {
+}

@@ -7,8 +7,6 @@ export const adyenEnvironment = process.env.ADYEN_ENVIRONMENT as AdyenEnvironmen
 export const adyenHmacKey = process.env.ADYEN_HMAC_KEY!;
 export const expressTrustProxy = process.env.SHOP_API_EXPRESS_TRUST_PROXY || "loopback, linklocal, uniquelocal";
 export const port = process.env.SHOP_API_PORT || 8888;
-
-debugger;
 export const depotBearerToken = process.env.SHOP_API_DEPOT_TOKEN!;
 export const depotPort = process.env.DEPOT_PORT!;
 // TODO: Should be retrieved from DepotApi

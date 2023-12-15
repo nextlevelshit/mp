@@ -4,7 +4,9 @@
     <ul v-if="cart?.cartProducts">
       <li v-for="(position, i) in cart.cartProducts" :key="i">
         <div class="flex py-2">
-          <a class="font-bold mr-8 cursor-pointer" v-on:click="() => removeFromCart(position.product.id)">[ X ]</a>
+          <button class="font-bold mr-8 cursor-pointer" v-on:click="() => removeFromCart(position.product.id, position.count)">[ X ]</button>
+          <button class="font-bold mr-8 cursor-pointer" v-on:click="() => removeFromCart(position.product.id)">[ - ]</button>
+          <button class="font-bold mr-8 cursor-pointer" v-on:click="() => addToCart(position.product.id)">[ + ]</button>
           <span>{{position.count}} x {{ position.product.name }} ({{ position.product.id }})</span>
         </div>
       </li>
@@ -32,7 +34,7 @@ export default {
   },
   async mounted() {
     try {
-      let uuid = localStorage.getItem(localStorageLabelCartUuid);
+      const uuid = localStorage.getItem(localStorageLabelCartUuid);
 
       const result = await shopApi.getOrCreateOrder(uuid);
       this.uuid = result.uuid;
@@ -44,13 +46,22 @@ export default {
     }
   },
   methods: {
-    async removeFromCart(productId) {
-      verbose(`Removing product with ID ${productId} from cart`);
+    async removeFromCart(productId, count = 1) {
+      verbose(`Removing ${count} product with ID ${productId} from cart`);
 
       try {
-        this.cart = await shopApi.removeProductFromCart(this.uuid, productId);
+        this.cart = await shopApi.removeProductFromCart(this.uuid, productId, count);
       } catch (error) {
-        logger(`Could not remove product ${productId} to cart:`, error);
+        logger(`Could not remove product ${productId} from cart:`, error);
+      }
+    },
+    async addToCart(productId, count = 1) {
+      verbose(`Adding ${count} product with ID ${productId} to cart`);
+
+      try {
+        this.cart = await shopApi.addProductToCart(this.uuid, productId, count);
+      } catch (error) {
+        logger(`Could not add product ${productId} to cart:`, error);
       }
     }
   }

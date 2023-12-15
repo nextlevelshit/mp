@@ -1,9 +1,9 @@
 <template>
-	Checkout Result for {{uuid}}
+	Checkout Result: {{state}}
 </template>
 
 <script>
 export default {
-	props: ["uuid"],
+	props: ["state"],
 }
 </script>

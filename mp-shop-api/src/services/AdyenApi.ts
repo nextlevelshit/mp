@@ -1,13 +1,14 @@
 import {Client, Config, CheckoutAPI} from "@adyen/api-library";
-import {depotApi} from "./DepotApi";
 import {adyenApiKey, adyenEnvironment, adyenMerchantAccount, adyenClientKey, adyenHmacKey} from "../config/constants";
-import {AdyenEnvironment, Order} from "../util/types";
+import {AdyenEnvironment} from "../util/types";
 import debug from "debug";
 import {PaymentCompletionDetails} from "@adyen/api-library/lib/src/typings/checkout/paymentCompletionDetails";
 import HmacValidator from "@adyen/api-library/lib/src/utils/hmacValidator";
 import {NotificationItem} from "@adyen/api-library/lib/src/typings/notification/notificationItem";
-import {ProductDto} from "../dto/ProductDto";
-import {OrderDto, OrderDtoData} from "../dto/OrderDto";
+import {OrderDto} from "../dto/OrderDto";
+import {NotificationRequestItem} from "@adyen/api-library/lib/src/typings/notification/notificationRequestItem";
+import EventCodeEnum = NotificationRequestItem.EventCodeEnum;
+import {depotApi} from "./DepotApi";
 
 const logger = debug("mp:i:shop-api:adyen-api");
 const verbose = debug("mp:v:shop-api:adyen-api");
@@ -26,23 +27,23 @@ class AdyenApi {
 
 		this.checkout = new CheckoutAPI(client);
 		this.clientKey = clientKey;
-		this.clientKey = hmacKey;
+		this.hmacKey = hmacKey;
 	}
 
-	async createSessionOrThrow(protocol: string, host: string, order: OrderDto) {
-		const orderRef = order.uuid;
+	async createSessionOrThrow(returnUrl: string, order: OrderDto) {
+		const reference = order.uuid;
 
-		if (!order?.total) throw new Error("Cart is empty or has no total");
+		if (!order.total) throw new Error("Cart is empty or has no total");
 
-		verbose(`Creating checkout for cart ID "${order.id}" with total "${order.total}"`);
-
-		return await this.checkout.PaymentsApi.sessions({
-			amount: {currency: "EUR", value: (order.total * 100)},
+		const checkoutConfig = {
+			amount: {currency: "EUR", value: Math.round(order.total * 100)},
 			countryCode: "DE",
 			merchantAccount: adyenMerchantAccount,
-			reference: orderRef,
-			returnUrl: `${protocol}://${host}/v1/cart/${orderRef}/redirect/?orderRef=${orderRef}&sessionId=${orderRef}`,
-		});
+			reference,
+			returnUrl,
+		};
+
+		return await this.checkout.PaymentsApi.sessions(checkoutConfig);
 	}
 
 	async handleShopperRedirect(redirect: any) {
@@ -81,15 +82,21 @@ class AdyenApi {
 			return { statusCode: 401, message: 'Invalid HMAC signature' };
 		}
 
-		this.consumeEvent(notification);
+		await this.consumeEvent(notification);
 
 		return { statusCode: 200, message: '[accepted]' };
 	}
 
-	private consumeEvent(notification: any) {
-		const merchantReference = notification.merchantReference;
-		const eventCode = notification.eventCode;
-		verbose('merchantReference:' + merchantReference + " eventCode:" + eventCode);
+	private async consumeEvent(notification: NotificationRequestItem) {
+		const {merchantReference: uuid, eventCode} = notification;
+		verbose("Recieved valid notification")
+		verbose("Order UUID: " + uuid + " eventCode: " + eventCode);
+
+		if (eventCode === EventCodeEnum.Authorisation) {
+			await depotApi.orderFactory().update(uuid, {
+				paymentAuthorised: true
+			})
+		}
 		// Add item to DB, queue, or different thread
 	}
 }

@@ -61,6 +61,14 @@ export class OrderDto {
 		return this.order.attributes.uuid;
 	}
 
+	get paymentAuthorised(): boolean {
+		return this.order.attributes.paymentAuthorised;
+	}
+
+	get paymentStatus(): string | null {
+		return this.order.attributes.paymentStatus;
+	}
+
 	get invoice(): MediaData | null {
 		return this.order.attributes.invoice.data;
 	}
@@ -131,6 +139,8 @@ export class OrderDto {
 			VAT,
 			delivery,
 			payment,
+			paymentAuthorised: this.paymentAuthorised,
+			paymentStatus: this.paymentStatus,
 			cartProducts,
 			date: this.date,
 			email: this.email,
@@ -168,6 +178,8 @@ export interface OrderDtoData {
 	deliveryNote: MediaData | null;
 	delivery: DeliveryMethodDtoData | null;
 	payment: PaymentMethodDtoData | null;
+	paymentAuthorised: boolean;
+	paymentStatus: string | null;
 	customer: {
 		id: number;
 		attributes: {

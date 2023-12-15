@@ -9,6 +9,9 @@
 				<router-link class="hover:text-gray-300" to="/cart">
 					Warenkorb
 				</router-link>
+        <router-link class="hover:text-gray-300" to="/checkout">
+          Kasse
+        </router-link>
 			</nav>
 		</div>
 	</header>
