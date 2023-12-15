@@ -5,6 +5,7 @@ import {PaymentMethodDto, PaymentMethodDtoData} from "./PaymentMethodDto";
 import debug from "debug";
 import {vatDecimal, vatIncludedDecimal} from "../config/constants";
 import {CartProductDto, CartProductDtoData} from "./CartProductDto";
+import {depotApi} from "../services/DepotApi";
 
 
 const logger = debug("mp:i:shop-api:order-dto");
@@ -34,7 +35,12 @@ export class OrderDto {
 	}
 
 	get email(): string | null {
-		return this.order.attributes.email;
+		// TODO: Remove before production
+		return this.order.attributes.email ?? "spam@dailysh.it";
+	}
+
+	get emailSent(): boolean {
+		return this.order.attributes.emailSent;
 	}
 
 	get address(): string {
@@ -69,12 +75,12 @@ export class OrderDto {
 		return this.order.attributes.paymentStatus;
 	}
 
-	get invoice(): MediaData | null {
-		return this.order.attributes.invoice.data;
+	get invoice(): string | null {
+		return  this.order.attributes.invoice.data ? `${depotApi.host}${this.order.attributes.invoice.data.attributes.url}` : null;
 	}
 
-	get deliveryNote(): MediaData | null {
-		return this.order.attributes.deliveryNote.data;
+	get deliveryNote(): string | null {
+		return this.order.attributes.deliveryNote.data ? `${depotApi.host}${this.order.attributes.deliveryNote.data.attributes.url}` : null;
 	}
 
 	/**
@@ -214,6 +220,7 @@ export class OrderDto {
 			cartProducts,
 			date: this.date,
 			email: this.email,
+			emailSent: this.emailSent,
 			address: this.address,
 			invoiceAddress: this.invoiceAddress,
 			uuid: this.uuid,
@@ -238,14 +245,15 @@ export interface OrderDtoData {
 	createdAt: string;
 	updatedAt: string;
 	email: string | null;
+	emailSent: boolean;
 	address: string;
 	invoiceAddress: string;
 	VAT: number;
 	subtotal: number;
 	total: number;
 	uuid: string;
-	invoice: MediaData | null;
-	deliveryNote: MediaData | null;
+	invoice: string | null;
+	deliveryNote: string | null;
 	delivery: DeliveryMethodDtoData | null;
 	payment: PaymentMethodDtoData | null;
 	paymentAuthorised: boolean;

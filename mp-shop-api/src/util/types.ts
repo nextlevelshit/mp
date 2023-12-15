@@ -38,6 +38,7 @@ export interface Order {
 		cart: null | CartProduct[];
 		paymentAuthorised: boolean;
 		paymentStatus: null | string;
+		emailSent: boolean;
 	};
 }
 
@@ -55,6 +56,7 @@ export interface OrderUpdate {
 	paymentAuthorised: boolean;
 	paymentStatus: string | boolean;
 	Date: string;
+	emailSent: boolean;
 }
 
 export interface OrderUpdateCalculated {

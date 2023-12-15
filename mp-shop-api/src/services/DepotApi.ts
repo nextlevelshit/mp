@@ -1,6 +1,5 @@
 import {v4 as generateUuid} from "uuid";
 import qs from "qs";
-// import FormData from "form-data";
 import {depotBearerToken, depotPort} from "../config/constants";
 import {
 	Order,
@@ -21,15 +20,18 @@ import {ProductCoverDto} from "../dto/ProductCoverDto";
 import debug from "debug";
 import {OrderDto} from "../dto/OrderDto";
 import {inkassoApi} from "./InkassoApi";
+import {postamtApi} from "./PostamtApi";
 
 const logger = debug("mp:i:shop-api:depot-api");
 const verbose = debug("mp:v:shop-api:depot-api");
 
 class DepotApi {
+	readonly host: string;
 	baseUrl: string;
 	headers: Headers;
 
 	constructor(options: DepotApiOptions) {
+		this.host = options.host;
 		this.baseUrl = options.baseUrl;
 		this.headers = options.defaultHeaders ?? {};
 	}
@@ -236,7 +238,6 @@ class DepotApi {
 
 				return data;
 			},
-
 			generateDeliveryNoteAndSaveToOrder: async (uuid: string) => {
 				const orderResponse = await this.orderFactory().one(uuid);
 
@@ -273,6 +274,39 @@ class DepotApi {
 
 				return data;
 			},
+			sendInvoiceAndUpdateOrder: async (uuid: string) => {
+				const orderResponse = await this.orderFactory().one(uuid);
+
+				if (!orderResponse) throw new Error("Could not fetch order");
+
+				const order = new OrderDto(orderResponse);
+
+				if (!order.paymentAuthorised)
+					throw new Error("Payment not authorised, cannot send invoice");
+
+				if (!order.email)
+					throw new Error("Email address not found, cannot send invoice");
+
+				const invoiceUrl = order.invoice; // Assuming it's a Blob or Buffer
+
+				if (!invoiceUrl)
+					throw new Error(
+						`Could not find invoice data in order: ${JSON.stringify(order)}`
+					);
+
+				const invoiceBlob = await fetch(invoiceUrl).then((res) => res.blob());
+
+				await postamtApi.sendPdf({
+					subject: "Invoice",
+					message: "Invoice for your order",
+					to_email: order.email,
+					pdf_blob: invoiceBlob,
+				});
+
+				return this.orderFactory().update(uuid, {
+					emailSent: true
+				});
+			}
 		};
 	}
 
@@ -350,6 +384,7 @@ class DepotApi {
 }
 
 interface DepotApiOptions {
+	host: string;
 	baseUrl: string;
 	defaultHeaders?: Headers;
 }
@@ -357,6 +392,7 @@ interface DepotApiOptions {
 type Headers = Record<string, string>;
 
 export const depotApi = new DepotApi({
+	host: `http://mp-depot:${depotPort}`,
 	baseUrl: `http://mp-depot:${depotPort}/api`,
 	defaultHeaders: {
 		authorization: `Bearer ${depotBearerToken}`,

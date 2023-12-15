@@ -94,6 +94,16 @@ class ShopApi {
         return this.handleResponse<Order>(response);
     }
 
+	async sendInvoice(uuid: string): Promise<Order> {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/send-invoice`, {
+			method: "PUT"
+		});
+		return this.handleResponse<Order>(response);
+	}
+
+	/**
+	 * @deprecated
+	 */
 	async handleRedirect(uuid: string, method: string, data: any): Promise<any> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/redirect`, {
 			method,

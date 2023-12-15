@@ -139,6 +139,7 @@ export default {
             });
             await shopApi.generateInvoice(uuid);
             await shopApi.generateDeliveryNote(uuid);
+            await shopApi.sendInvoice(uuid);
             break;
           case "Pending":
           case "Received":

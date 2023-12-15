@@ -152,6 +152,19 @@ router.put("/v1/order/:uuid/generate-delivery-note", async (req, res) => {
 	}
 });
 
+router.put("/v1/order/:uuid/send-invoice", async (req, res) => {
+	try {
+		const { uuid } = req.params;
+
+		const order = new OrderDto(await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid));
+
+		res.status(200).send(order.dto);
+	} catch (e) {
+		verbose(e);
+		res.status(500).send("Could not send invoice via email, order has not been changed");
+	}
+});
+
 router.get("/v1/product", async (req, res) => {
 	try {
 		verbose(`Querying products`);
@@ -269,5 +282,5 @@ router.get("/v1/product-cover", async (req, res) => {
 router.post("/v1/webhooks/notifications", async (req, res) => {
 	const webhookResponse = await adyenApi.handleWebhook(req.body);
 	res.status(webhookResponse.statusCode).send(webhookResponse.message);
-
 });
+

@@ -51,6 +51,44 @@ def send_message():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/v1/send/pdf', methods=['POST'])
+def send_pdf():
+    data = request.form  # Assuming form data is used to send the PDF blob
+    subject = data.get('subject')
+    message = data.get('message')
+    to_email = data.get('to_email')
+    pdf_blob = request.files.get('pdf_blob')  # assuming 'pdf_blob' is the name of the file input field
+
+    # SMTP Configuration
+    smtp_server = os.environ.get('SMTP_RELAY_HOST')
+    smtp_port = int(os.environ.get('SMTP_RELAY_PORT'))
+    smtp_username = os.environ.get('SMTP_RELAY_USERNAME')
+    smtp_password = os.environ.get('SMTP_RELAY_PASSWORD')
+
+    try:
+        smtp = smtplib.SMTP(smtp_server, smtp_port)
+        smtp.starttls()
+        smtp.login(smtp_username, smtp_password)
+
+        msg = MIMEMultipart()
+        msg['From'] = smtp_username
+        msg['To'] = to_email
+        msg['Subject'] = subject
+
+        # Attach text message
+        msg.attach(MIMEText(message, 'plain'))
+
+        # Attach PDF
+        pdf_attachment = MIMEApplication(pdf_blob.read(), _subtype="pdf")
+        pdf_attachment.add_header('Content-Disposition', 'attachment', filename='document.pdf')
+        msg.attach(pdf_attachment)
+
+        smtp.sendmail(smtp_username, to_email, msg.as_string())
+        smtp.quit()
+
+        return jsonify({"message": "Email sent successfully"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=2222)
+    app.run(host='0.0.0.0', port=2222, debug=True)
