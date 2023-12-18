@@ -1,12 +1,44 @@
 <template>
+  <Stepper :step="3" />
+
 	<div v-if="cart">
-    Checkout for {{cart.uuid}}
-    <div class="payment" ref="payment"></div>
-    <CodeBlock>{{ cart }}</CodeBlock>
+    <h2 class="text-xl mb-4">Checkout - Step 3</h2>
+
+    <div class="flex gap-6">
+      <div class="payment w-2/3" ref="payment"></div>
+      <div class="w-1/3">
+        <h3 class="text-lg font-semibold mb-2">Cart Summary</h3>
+        <p>Total: {{ cart.total?.toFixed(2) }} €</p>
+        <p>Subtotal: {{ cart.subtotal?.toFixed(2) }} €</p>
+        <p>VAT: {{ cart.VAT?.toFixed(2) }} €</p>
+
+        <h3 class="text-lg font-semibold mb-2 mt-4">Products</h3>
+        <ul>
+          <li v-for="(cartProduct, index) in cart.cartProducts" :key="index">
+            {{ cartProduct.product.name }} ({{ cartProduct.count }} items) - {{ cartProduct.product.totalProductPrice.toFixed(2) }} €
+          </li>
+        </ul>
+
+        <h3 class="text-lg font-semibold mb-2 mt-4">Customer Information</h3>
+        <p>Email: {{ cart.email }}</p>
+        <p>Address: {{ cart.address }}</p>
+
+        <div class="bg-gray-100 mt-10 p-8 text-xs text-gray-700">
+          <p>Mit dem Kauf akzeptiere ich die AGB und Nutzungsbedingungen.</p>
+          <p class="text-sm mt-4">
+            Sicherheitsabfrage bei Kreditkartenzahlung
+          </p>
+          <p class="mt-4">Möglicherweise werden Sie im nächsten Schritt von Ihrer Bank gebeten, Ihre Kreditkarte zu verifizieren (3-D Secure).</p>
+          <p class="text-sm mt-4">Hinweise zum Datenschutz</p>
+          <p class="mt-2">Die personenbezogenen Daten werden für die Abwicklung der Bestellung automatisiert verarbeitet. Der Schutz Ihrer persönlichen Daten ist uns wichtig. Daher verwenden wir bei der Übertragung moderne Verschlüsselungstechnologien. Weiteres entnehmen Sie bitte unseren Datenschutzhinweisen.</p>
+        </div>
+      </div>
+    </div>
   </div>
   <div v-else>
     Loading cart ...
   </div>
+  <CodeBlock>{{ cart }}</CodeBlock>
 </template>
 
 <script lang="ts">
@@ -17,42 +49,41 @@ import CodeBlock from "@/components/CodeBlock.vue";
 import {shopApi} from "@/services/ShopApi";
 import {localStorageLabelCartUuid} from "@/config/constants";
 import type {Order} from "@/types";
+import {cart} from "@/stores/cart";
+import Stepper from "@/components/Stepper.vue";
 
 const logger = debug("app:i:checkout-view");
 const verbose = debug("app:v:checkout-view");
 
 export default {
-  components: {CodeBlock},
-	data(): {
-    cart: Order | null,
-    sessionId: string | null,
-    redirectResult: any | null
-  } {
+  components: {Stepper, CodeBlock},
+  computed: {
+    uuid() {
+      return cart.uuid
+    }
+  },
+	data() {
 		return {
-      cart: null,
-      sessionId: "",
-			redirectResult: ""
+      cart: {} as Order | null,
+      address: "Hans Wurst\nStraße 123\n012345 Stadt",
+      deliveryAddress: "",
 		}
 	},
 	async mounted() {
 		const urlParams = new URLSearchParams(window.location.search);
-		this.sessionId = urlParams.get("sessionId");
-		this.redirectResult = urlParams.get("redirectResult");
+		const sessionId = urlParams.get("sessionId");
+		const redirectResult = urlParams.get("redirectResult");
 
     try {
-      const uuid = localStorage.getItem(localStorageLabelCartUuid);
-
-      this.cart = await shopApi.getOrCreateOrder(uuid);
+      this.cart = await shopApi.getOrder(this.uuid);
 
       if (!this.cart) {
-        verbose("Could not fetch cart with ID:", uuid);
+        verbose("Could not fetch cart with ID:", this.uuid);
         return;
       }
 
-      localStorage.setItem(localStorageLabelCartUuid, this.cart.uuid);
-
-      if (this.sessionId) {
-        await this.finalizeCheckout();
+      if (sessionId) {
+        await this.finalizeCheckout(sessionId, redirectResult!);
       } else {
         await this.startCheckout();
       }
@@ -71,14 +102,14 @@ export default {
       const checkout = await this.createAdyenCheckout(session, clientKey);
       checkout.create("dropin").mount(this.$refs["payment"]);
 		},
-		async finalizeCheckout() {
+		async finalizeCheckout(id: string, details: string) {
 			verbose("SessionId found, finilizing checkout");
-      const checkout = await this.createAdyenCheckout({id: this.sessionId});
-      checkout.submitDetails({details: this.redirectResult});
+      const checkout = await this.createAdyenCheckout({id});
+      checkout.submitDetails({details});
 		},
     async createAdyenCheckout(session: any, clientKey?: string): Promise<any> {
       if (!this.cart) {
-        verbose("Cart not found, cannot create checkout");
+        logger("Cart not found, cannot create checkout");
         return;
       }
       const configuration = {
@@ -113,6 +144,7 @@ export default {
           await this.handleCheckoutResponse(result, component);
         },
         onError: (error: any, component: any) => {
+          logger("Checkout failed");
           verbose(error.name, error.message, error.stack, component);
         }
       };
@@ -121,7 +153,7 @@ export default {
     async handleCheckoutResponse(res: any, component: any) {
       verbose("Handling checkout response:", res);
       if (!this.cart) {
-        verbose("Cart not found, cannot proceed");
+        logger("Cart not found, cannot proceed");
         return;
       }
 
@@ -132,14 +164,7 @@ export default {
       } else {
         switch (res.resultCode) {
           case "Authorised":
-            await shopApi.updateOrder(uuid, {
-              paymentAuthorised: true,
-              paymentStatus: "authorised",
-              Date: new Date().toISOString().slice(0, 10)
-            });
-            await shopApi.generateInvoice(uuid);
-            await shopApi.generateDeliveryNote(uuid);
-            await shopApi.sendInvoice(uuid);
+            await shopApi.finalizeOrder(uuid);
             break;
           case "Pending":
           case "Received":

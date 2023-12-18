@@ -1,29 +1,26 @@
 <template>
-  <h1 class="text-2xl pb-8">Product List</h1>
+  <div>
+    <h1 class="text-2xl pb-8">Product List</h1>
 
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <ProductCard v-for="(item, i) in list" :key="i" :product="item" :cartUuid="cartUuid" />
+    </div>
 
-  <ul>
-    <li v-for="(item, i) in list" :key="i">
-      <div class="flex py-2">
-        <a class="font-bold mr-8 cursor-pointer" v-on:click="() => addToCart(item.id)">Zum Warenkorb hinzufügen</a>
-        <a :href="`/details/${item.id}`">{{ item.name }} ({{ item.id }})</a>
-      </div>
-    </li>
-  </ul>
-
-  <CodeBlock>{{ JSON.stringify(list, null, 2) }}</CodeBlock>
+    <CodeBlock class="mt-8">{{ JSON.stringify(list, null, 2) }}</CodeBlock>
+  </div>
 </template>
 <script>
 import debug from "debug";
 import {shopApi} from "@/services/ShopApi";
 import {localStorageLabelCartUuid} from "@/config/constants";
 import CodeBlock from "@/components/CodeBlock.vue";
+import ProductCard from "@/components/ProductCard.vue";
 
-const logger = debug("app:i:order-list-view");
-const verbose = debug("app:v:order-list-view");
+const logger = debug("app:i:product-list-view");
+const verbose = debug("app:v:product-list-view");
 
 export default {
-  components: {CodeBlock},
+  components: {ProductCard, CodeBlock},
   data() {
     return {
       list: null,
@@ -47,15 +44,6 @@ export default {
     }
   },
   methods: {
-    async addToCart(productId) {
-      verbose(`Adding product with ID ${productId} to cart`);
-
-      try {
-        this.cart = await shopApi.addProductToCart(this.cartUuid, productId);
-      } catch (error) {
-        logger(`Could not add product ${productId} to cart:`, error);
-      }
-    }
   }
 }
 </script>

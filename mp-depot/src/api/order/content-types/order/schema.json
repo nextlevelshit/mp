@@ -97,6 +97,9 @@
     "emailSent": {
       "type": "boolean",
       "default": false
+    },
+    "acceptedTermsAndConditionsAt": {
+      "type": "datetime"
     }
   }
 }

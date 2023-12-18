@@ -104,8 +104,7 @@ router.post("/v1/order/:uuid/checkout", async (req, res) => {
 	try {
 		const returnUrl = req.query.returnUrl as string;
 		const order = await depotApi.orderFactory().one(req.params.uuid);
-		const orderDto = new OrderDto(order);
-		const adyenSession = await adyenApi.createSessionOrThrow(returnUrl, orderDto);
+		const adyenSession = await adyenApi.createSessionOrThrow(returnUrl, new OrderDto(order));
 		res.status(200).json({session: adyenSession, clientKey: adyenClientKey});
 	} catch (e) {
 		verbose(e);
@@ -130,9 +129,9 @@ router.put("/v1/order/:uuid/generate-invoice", async (req, res) => {
 	try {
 		const { uuid } = req.params;
 
-		const order = new OrderDto(await depotApi.orderFactory().generateInvoiceAndSaveToOrder(uuid));
+		const order = await depotApi.orderFactory().generateInvoiceAndSaveToOrder(uuid);
 
-		res.status(200).send(order.dto);
+		res.status(200).send(new OrderDto(order).dto);
 	} catch (e) {
 		verbose(e);
 		res.status(500).send("Could not generate and save the invoice");
@@ -143,9 +142,9 @@ router.put("/v1/order/:uuid/generate-delivery-note", async (req, res) => {
 	try {
 		const { uuid } = req.params;
 
-		const order = new OrderDto(await depotApi.orderFactory().generateDeliveryNoteAndSaveToOrder(uuid));
+		const order = await depotApi.orderFactory().generateDeliveryNoteAndSaveToOrder(uuid);
 
-		res.status(200).send(order.dto);
+		res.status(200).send(new OrderDto(order).dto);
 	} catch (e) {
 		verbose(e);
 		res.status(500).send("Could not generate and save the delivery note");
@@ -156,12 +155,33 @@ router.put("/v1/order/:uuid/send-invoice", async (req, res) => {
 	try {
 		const { uuid } = req.params;
 
-		const order = new OrderDto(await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid));
+		const order = await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid);
 
-		res.status(200).send(order.dto);
+		res.status(200).send(new OrderDto(order).dto);
 	} catch (e) {
 		verbose(e);
 		res.status(500).send("Could not send invoice via email, order has not been changed");
+	}
+});
+
+router.put("/v1/order/:uuid/finalize", async (req, res) => {
+	try {
+		const { uuid } = req.params;
+
+		await depotApi.orderFactory().update(uuid, {
+			paymentAuthorised: true,
+			paymentStatus: "authorised",
+			Date: new Date().toISOString().slice(0, 10),
+		});
+
+		await depotApi.orderFactory().generateInvoiceAndSaveToOrder(uuid);
+		await depotApi.orderFactory().generateDeliveryNoteAndSaveToOrder(uuid);
+		const order = await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid);
+
+		res.status(200).send(new OrderDto(order).dto);
+	} catch (e) {
+		verbose(e);
+		res.status(500).send("Could not finalize order");
 	}
 });
 

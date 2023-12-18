@@ -35,8 +35,7 @@ export class OrderDto {
 	}
 
 	get email(): string | null {
-		// TODO: Remove before production
-		return this.order.attributes.email ?? "spam@dailysh.it";
+		return this.order.attributes.email;
 	}
 
 	get emailSent(): boolean {
@@ -75,12 +74,16 @@ export class OrderDto {
 		return this.order.attributes.paymentStatus;
 	}
 
-	get invoice(): string | null {
-		return  this.order.attributes.invoice.data ? `${depotApi.host}${this.order.attributes.invoice.data.attributes.url}` : null;
+	get acceptedTermsAndConditionsAt(): string | null {
+		return this.order.attributes.acceptedTermsAndConditionsAt;
 	}
 
-	get deliveryNote(): string | null {
-		return this.order.attributes.deliveryNote.data ? `${depotApi.host}${this.order.attributes.deliveryNote.data.attributes.url}` : null;
+	get invoice(): MediaData | null {
+		return  this.order.attributes.invoice.data;
+	}
+
+	get deliveryNote(): MediaData | null {
+		return this.order.attributes.deliveryNote.data;
 	}
 
 	/**
@@ -91,22 +94,19 @@ export class OrderDto {
 		const products = this.order.attributes.products.data;
 		return products ? products.map(product => new ProductDto(product)) : null;
 	}
-
 	get cartProducts(): CartProductDto[] | null {
+		verbose(this.order);
 		const cartProducts = this.order.attributes.cart;
 		return cartProducts ? cartProducts.map((cartProduct) => new CartProductDto(cartProduct)) : null;
 	}
-
 	get delivery(): DeliveryMethodDto | null {
 		const deliveryMethodData = this.order.attributes.delivery.data;
 		return deliveryMethodData ? new DeliveryMethodDto(deliveryMethodData) : null;
 	}
-
 	get payment(): PaymentMethodDto | null {
 		const paymentMethodData = this.order.attributes.payment.data;
 		return paymentMethodData ? new PaymentMethodDto(paymentMethodData) : null;
 	}
-
 	get customer(): {
 		id: number;
 		attributes: {
@@ -116,7 +116,6 @@ export class OrderDto {
 	} | null {
 		return this.order.attributes.customer?.data;
 	}
-
 	get invoicePdfBody(): PdfBody {
 		const { id, date, email, invoiceAddress, VAT, subtotal, total, uuid } = this.dto;
 
@@ -135,8 +134,8 @@ export class OrderDto {
 			service: this.cartProducts?.map((cartProduct) => ({
 				description: cartProduct.product.name,
 				price: {
-					per_unit: cartProduct.product.price || 0,
-					total: (cartProduct.product.price || 0) * cartProduct.count,
+					per_unit: cartProduct.product.totalProductPrice() || 0,
+					total: (cartProduct.product.totalProductPrice() || 0) * cartProduct.count,
 				},
 				count: cartProduct.count,
 				nr: `${cartProduct.product.id}`,
@@ -217,6 +216,7 @@ export class OrderDto {
 			payment,
 			paymentAuthorised: this.paymentAuthorised,
 			paymentStatus: this.paymentStatus,
+			acceptedTermsAndConditionsAt: this.acceptedTermsAndConditionsAt,
 			cartProducts,
 			date: this.date,
 			email: this.email,
@@ -252,12 +252,13 @@ export interface OrderDtoData {
 	subtotal: number;
 	total: number;
 	uuid: string;
-	invoice: string | null;
-	deliveryNote: string | null;
+	invoice: MediaData | null;
+	deliveryNote: MediaData | null;
 	delivery: DeliveryMethodDtoData | null;
 	payment: PaymentMethodDtoData | null;
 	paymentAuthorised: boolean;
 	paymentStatus: string | null;
+	acceptedTermsAndConditionsAt: string | null;
 	customer: {
 		id: number;
 		attributes: {

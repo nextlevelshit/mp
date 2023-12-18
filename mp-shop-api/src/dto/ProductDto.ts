@@ -61,8 +61,8 @@ export class ProductDto {
 		return productRulingData ? new ProductRulingDto(productRulingData) : null;
 	}
 
-	get image(): MediaDataDto {
-		return new MediaDataDto(this.product.attributes.image.data);
+	get image(): MediaDataDtoData {
+		return new MediaDataDto(this.product.attributes.image.data).dto;
 	}
 
 	get dto(): ProductDtoData {

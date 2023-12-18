@@ -1,4 +1,4 @@
-export interface MediaData {
+export interface MediaDataUnsafe {
 	id: number;
 	attributes: {
 		name: string;
@@ -28,6 +28,34 @@ export interface MediaData {
 	};
 }
 
+export interface MediaData {
+	id: number;
+	name: string;
+	alternativeText: string | null;
+	caption: string | null;
+	width: number | null;
+	height: number | null;
+	formats: {
+		[key: string]: {
+			ext: string;
+			url: string;
+			hash: string;
+			mime: string;
+			size: number;
+			width: number;
+			height: number;
+		} | null;
+	} | null;
+	hash: string;
+	ext: string;
+	mime: string;
+	size: number;
+	url: string;
+	previewUrl: string | null;
+	provider: string;
+	provider_metadata: any | null;
+}
+
 export interface DeliveryMethod {
 	id: number;
 	name: string;
@@ -47,12 +75,39 @@ export interface Product {
 	price: number | null;
 	publishedAt: string;
 	slug: string | null;
-	cover: ProductCoverDtoData | null;
-	pattern: ProductPatternDtoData | null;
-	pages: ProductPagesDtoData | null;
-	ruling: ProductRulingDtoData | null;
-	image: MediaDataDtoData;
-	totalProductPrice: number
+	cover: {
+		id: number;
+		name: string;
+		binding: string;
+		price: number;
+		copyText: {
+			text: string;
+			cover: string;
+			paper: string;
+			format: string;
+			content: string;
+			details: string;
+			banderole: string;
+		};
+	} | null;
+	pattern: {
+		id: number;
+		name: string;
+		description: string;
+		price: number;
+	} | null;
+	pages: {
+		id: number;
+		name: string;
+		price: number;
+	} | null;
+	ruling: {
+		id: number;
+		name: string;
+		price: number;
+	} | null;
+	image: MediaData;
+	totalProductPrice: number;
 }
 
 export interface CartProduct {
@@ -74,8 +129,8 @@ export interface Order {
 	subtotal: number;
 	total: number;
 	uuid: string;
-	invoice: MediaData | null;
-	deliveryNote: MediaData | null;
+	invoice: MediaDataUnsafe | null;
+	deliveryNote: MediaDataUnsafe | null;
 	delivery: DeliveryMethod | null;
 	payment: PaymentMethod | null;
 	customer: {
@@ -88,6 +143,20 @@ export interface Order {
 	cartProducts: CartProduct[] | null;
 	paymentAuthorised: boolean;
 	paymentStatus: string | null;
+}
+
+export interface OrderUpdateBody {
+	email: string;
+	address: string;
+	invoiceAddress: string;
+	delivery: number;
+	payment: number;
+	customer: any;
+	cart: null | {
+		count: number;
+		product: number;
+	}[];
+	acceptedTermsAndConditionsAt: string;
 }
 
 export type PdfBody = {

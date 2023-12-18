@@ -39,6 +39,7 @@ export interface Order {
 		paymentAuthorised: boolean;
 		paymentStatus: null | string;
 		emailSent: boolean;
+		acceptedTermsAndConditionsAt: string | null;
 	};
 }
 
@@ -57,6 +58,7 @@ export interface OrderUpdate {
 	paymentStatus: string | boolean;
 	Date: string;
 	emailSent: boolean;
+	acceptedTermsAndConditionsAt: string;
 }
 
 export interface OrderUpdateCalculated {

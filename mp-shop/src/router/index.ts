@@ -24,15 +24,26 @@ const router = createRouter({
 			component: () => import("../views/CartView.vue")
 		},
 		{
-			path: "/checkout",
-			name: "checkout",
-			component: () => import("../views/CheckoutView.vue")
+			path: "/checkout/1",
+			alias: ["/checkout"],
+			name: "checkout-email",
+			component: () => import("../views/checkout/CheckoutEmailView.vue")
+		},
+		{
+			path: "/checkout/2",
+			name: "checkout-address",
+			component: () => import("../views/checkout/CheckoutAddressView.vue")
+		},
+		{
+			path: "/checkout/3",
+			name: "checkout-payment",
+			component: () => import("../views/checkout/CheckoutPaymentView.vue")
 		},
 		{
 			path: "/checkout/result/:uuid",
 			name: "checkout-result",
 			props: true,
-			component: () => import("../views/CheckoutResultView.vue")
+			component: () => import("../views/checkout/CheckoutResultView.vue")
 		}
 	]
 });

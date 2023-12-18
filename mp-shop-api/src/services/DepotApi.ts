@@ -135,7 +135,7 @@ class DepotApi {
 					throw new Error(JSON.stringify(orderUpdatedWithTotal.error));
 				}
 
-				return orderUpdatedWithTotal.data;
+				return orderUpdatedWithTotal.data as Order;
 			},
 			addProduct: async (uuid: string, productId: string, count: number = 1) => {
 				const order = new OrderDto(await this.orderFactory().one(uuid));
@@ -236,7 +236,7 @@ class DepotApi {
 
 				const {data} = await updatedOrderResponse.json();
 
-				return data;
+				return data as Order;
 			},
 			generateDeliveryNoteAndSaveToOrder: async (uuid: string) => {
 				const orderResponse = await this.orderFactory().one(uuid);
@@ -287,12 +287,13 @@ class DepotApi {
 				if (!order.email)
 					throw new Error("Email address not found, cannot send invoice");
 
-				const invoiceUrl = order.invoice; // Assuming it's a Blob or Buffer
-
-				if (!invoiceUrl)
+				if (!order.invoice) {
 					throw new Error(
 						`Could not find invoice data in order: ${JSON.stringify(order)}`
 					);
+				}
+
+				const invoiceUrl = `${this.host}${order.invoice.attributes.url}`;
 
 				const invoiceBlob = await fetch(invoiceUrl).then((res) => res.blob());
 

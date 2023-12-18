@@ -24,6 +24,11 @@ export default defineConfig({
                 // changeOrigin: true,
                 rewrite: (path) => path.replace(/^\/api/, ''),
             },
+            '/uploads': {
+                target: `http://mp-depot:5555/`,
+                // changeOrigin: true,
+                // rewrite: (path) => path.replace(/^\/api/, ''),
+            },
         },
     }
 })

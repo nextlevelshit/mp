@@ -1,35 +1,36 @@
-import { MediaData } from "../util/types";
+import {MediaData} from "../util/types";
+import {depotApi} from "../services/DepotApi";
 
 export class MediaDataDto {
-	private readonly mediaData: MediaData;
+    private readonly mediaData: MediaData;
 
-	constructor(mediaData: MediaData) {
-		this.mediaData = mediaData;
-	}
+    constructor(mediaData: MediaData) {
+        this.mediaData = mediaData;
+    }
 
-	get id(): number {
-		return this.mediaData.id;
-	}
+    get id(): number {
+        return this.mediaData.id;
+    }
 
-	get name(): string {
-		return this.mediaData.attributes.name;
-	}
+    get name(): string {
+        return this.mediaData.attributes.name;
+    }
 
-	get alternativeText(): string | null {
-		return this.mediaData.attributes.alternativeText;
-	}
+    get alternativeText(): string | null {
+        return this.mediaData.attributes.alternativeText;
+    }
 
-	get caption(): string | null {
-		return this.mediaData.attributes.caption;
-	}
+    get caption(): string | null {
+        return this.mediaData.attributes.caption;
+    }
 
-	get width(): number | null {
-		return this.mediaData.attributes.width;
-	}
+    get width(): number | null {
+        return this.mediaData.attributes.width;
+    }
 
-	get height(): number | null {
-		return this.mediaData.attributes.height;
-	}
+    get height(): number | null {
+        return this.mediaData.attributes.height;
+    }
 
 	get formats(): {
 		[key: string]: {
@@ -43,85 +44,99 @@ export class MediaDataDto {
 		} | null;
 	} | null {
 		return this.mediaData.attributes.formats;
+
+        // if (!this.mediaData?.attributes?.formats) {
+        //     return null;
+        // }
+        //
+        // return Object.fromEntries(Object.entries(this.mediaData.attributes.formats).map(([key, format]) => {
+        //     if (!!format) {
+        //         // Append a prefix to the URL property
+        //         return [key, {...format, url: `${depotApi.host}${format.url}`}];
+        //     }
+        //     return [key, null];
+        // }));
 	}
 
-	get hash(): string {
-		return this.mediaData.attributes.hash;
-	}
+    get hash(): string {
+        return this.mediaData.attributes.hash;
+    }
 
-	get ext(): string {
-		return this.mediaData.attributes.ext;
-	}
+    get ext(): string {
+        return this.mediaData.attributes.ext;
+    }
 
-	get mime(): string {
-		return this.mediaData.attributes.mime;
-	}
+    get mime(): string {
+        return this.mediaData.attributes.mime;
+    }
 
-	get size(): number {
-		return this.mediaData.attributes.size;
-	}
+    get size(): number {
+        return this.mediaData.attributes.size;
+    }
 
 	get url(): string {
 		return this.mediaData.attributes.url;
+        // return `${depotApi.host}${this.mediaData.attributes.url}`;
 	}
 
 	get previewUrl(): string | null {
 		return this.mediaData.attributes.previewUrl;
+        // return this.mediaData.attributes.previewUrl ? `${depotApi.host}${this.mediaData.attributes.previewUrl}` : null
 	}
 
-	get provider(): string {
-		return this.mediaData.attributes.provider;
-	}
+    get provider(): string {
+        return this.mediaData.attributes.provider;
+    }
 
-	get providerMetadata(): any | null {
-		return this.mediaData.attributes.provider_metadata;
-	}
+    get providerMetadata(): any | null {
+        return this.mediaData.attributes.provider_metadata;
+    }
 
-	get dto(): MediaDataDtoData {
-		return {
-			id: this.id,
-			name: this.name,
-			alternativeText: this.alternativeText,
-			caption: this.caption,
-			width: this.width,
-			height: this.height,
-			formats: this.formats,
-			hash: this.hash,
-			ext: this.ext,
-			mime: this.mime,
-			size: this.size,
-			url: this.url,
-			previewUrl: this.previewUrl,
-			provider: this.provider,
-			providerMetadata: this.providerMetadata
-		};
-	}
+    get dto(): MediaDataDtoData {
+        return {
+            id: this.id,
+            name: this.name,
+            alternativeText: this.alternativeText,
+            caption: this.caption,
+            width: this.width,
+            height: this.height,
+            formats: this.formats,
+            hash: this.hash,
+            ext: this.ext,
+            mime: this.mime,
+            size: this.size,
+            url: this.url,
+            previewUrl: this.previewUrl,
+            provider: this.provider,
+            providerMetadata: this.providerMetadata
+        };
+    }
 }
 
 export interface MediaDataDtoData {
-	id: number;
-	name: string;
-	alternativeText: string | null;
-	caption: string | null;
-	width: number | null;
-	height: number | null;
-	formats: {
-		[key: string]: {
-			ext: string;
-			url: string;
-			hash: string;
-			mime: string;
-			size: number;
-			width: number;
-			height: number;
-		} | null;
-	} | null;
-	hash: string;
-	ext: string;
-	mime: string;
-	size: number;
-	url: string;
-	previewUrl: string | null;
-	provider: string;
-	providerMetadata: any | null;
+    id: number;
+    name: string;
+    alternativeText: string | null;
+    caption: string | null;
+    width: number | null;
+    height: number | null;
+    formats: {
+        [key: string]: {
+            ext: string;
+            url: string;
+            hash: string;
+            mime: string;
+            size: number;
+            width: number;
+            height: number;
+        } | null;
+    } | null;
+    hash: string;
+    ext: string;
+    mime: string;
+    size: number;
+    url: string;
+    previewUrl: string | null;
+    provider: string;
+    providerMetadata: any | null;
 }

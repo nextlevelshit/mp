@@ -1,4 +1,4 @@
-import type {Order, PdfBody} from "@/types";
+import type {Order, PdfBody, OrderUpdateBody} from "@/types";
 
 class ShopApi {
 	baseUrl: string;
@@ -46,7 +46,7 @@ class ShopApi {
 		}
 	}
 
-	async updateOrder(uuid: string, data: any): Promise<Order> {
+	async updateOrder(uuid: string, data: OrderUpdateBody): Promise<Order> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}`, {
 			method: "PUT",
 			headers: {
@@ -57,14 +57,21 @@ class ShopApi {
 		return this.handleResponse<Order>(response);
 	}
 
-	async addProductToCart(uuid: string, productId: any, count = 1): Promise<Order> {
+	async finalizeOrder(uuid: string): Promise<Order> {
+		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/finalize`, {
+			method: "PUT"
+		});
+		return this.handleResponse<Order>(response);
+	}
+
+	async addProductToCart(uuid: string, productId: number, count = 1): Promise<Order> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/add-product/${productId}?count=${count}`, {
 			method: "PUT"
 		});
 		return this.handleResponse<Order>(response);
 	}
 
-	async removeProductFromCart(uuid: string, productId: any, count = 1): Promise<Order> {
+	async removeProductFromCart(uuid: string, productId: number, count = 1): Promise<Order> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/remove-product/${productId}?count=${count}`, {
 			method: "PUT"
 		});
@@ -72,7 +79,6 @@ class ShopApi {
 	}
 
 	async checkoutOrder(uuid: string): Promise<any> {
-		// const returnUrl = new URL(checkoutReturnUri, window.location.origin).href;
 		const returnUrl = window.location.href;
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/checkout?returnUrl=${encodeURIComponent(returnUrl)}`, {
 			method: "POST",
@@ -80,6 +86,9 @@ class ShopApi {
 		return this.handleResponse<any>(response);
 	}
 
+	/**
+	 * @deprecated
+	 */
     async generateInvoice(uuid: string): Promise<Order> {
         const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/generate-invoice`, {
             method: "PUT"
@@ -87,6 +96,9 @@ class ShopApi {
         return this.handleResponse<Order>(response);
     }
 
+	/**
+	 * @deprecated
+	 */
     async generateDeliveryNote(uuid: string): Promise<Order> {
         const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/generate-delivery-note`, {
             method: "PUT"
@@ -94,6 +106,9 @@ class ShopApi {
         return this.handleResponse<Order>(response);
     }
 
+	/**
+	 * @deprecated
+	 */
 	async sendInvoice(uuid: string): Promise<Order> {
 		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/send-invoice`, {
 			method: "PUT"

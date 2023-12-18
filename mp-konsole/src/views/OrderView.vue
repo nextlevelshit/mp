@@ -1,4 +1,3 @@
-<script src="../../../mp-shop-api/src/router.ts"></script>
 <script>
 import { depotApi } from "@/services/DepotApi";
 import debug from "debug";
