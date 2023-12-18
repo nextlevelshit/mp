@@ -4,7 +4,6 @@ services:
   mp-inkasso:
     build: ./mp-inkasso
     container_name: mp-inkasso
-    #    restart: unless-stopped
     env_file:
       - .env
     environment:
@@ -12,7 +11,7 @@ services:
     ports:
       - "1111:1111"
     networks:
-      - net
+      - internal
     volumes:
       - ./mp-inkasso/data:/app/data
       - ./mp-inkasso/src:/app/src:ro
@@ -20,19 +19,14 @@ services:
   mp-postamt:
     build: ./mp-postamt
     container_name: mp-postamt
-    #    restart: unless-stopped
     env_file:
       - .env
     environment:
       - PYTHONUNBUFFERED=true
-#      - SMTP_RELAY_HOST=${SMTP_RELAY_HOST}
-#      - SMTP_RELAY_PORT=${SMTP_RELAY_PORT}
-#      - SMTP_RELAY_USERNAME=${SMTP_RELAY_USERNAME}
-#      - SMTP_RELAY_PASSWORD=${SMTP_RELAY_PASSWORD}
     ports:
       - "2222:2222"
     networks:
-      - net
+      - internal
 
   mp-konsole:
     container_name: mp-konsole
@@ -50,7 +44,7 @@ services:
       VITE_DEPOT_RELATIVE_PATH: ${DEPOT_RELATIVE_PATH}
       VITE_INKASSO_PORT: ${INKASSO_PORT}
     networks:
-      - net
+      - internal
     volumes:
       - ./mp-konsole/src:/app/src:ro
       - ./mp-konsole/vite.config.ts:/app/vite.config.ts:ro
@@ -77,49 +71,24 @@ services:
     container_name: mp-depot
     build: ./mp-depot
     image: strapi:latest
-    #    restart: unless-stopped
     env_file: .env
     environment:
-#      DATABASE_CLIENT: ${DATABASE_CLIENT}
       DATABASE_HOST: mp-silo
-#      DATABASE_PORT: ${DATABASE_PORT}
-#      DATABASE_NAME: ${DATABASE_NAME}
-#      DATABASE_USERNAME: ${DATABASE_USERNAME}
-#      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
       DATABASE_SSL: false
-#      JWT_SECRET: ${JWT_SECRET}
-#      ADMIN_JWT_SECRET: ${ADMIN_JWT_SECRET}
-#      APP_KEYS: ${APP_KEYS}
-      #      NODE_ENV: ${NODE_ENV}
-#      API_TOKEN_SALT: ${API_TOKEN_SALT}
-#      TRANSFER_TOKEN_SALT: ${TRANSFER_TOKEN_SALT}
       PORT: ${DEPOT_PORT}
     volumes:
       - ./mp-depot/config:/opt/app/config
       - ./mp-depot/src:/opt/app/src
       - ./mp-depot/package.json:/opt/package.json
-      #      - ./mp-depot/yarn.lock:/opt/yarn.lock
       - ./.env:/opt/app/.env
       - ./mp-depot/public/uploads:/opt/app/public/uploads
     ports:
       - "5555:5555"
     networks:
-      - net
+      - internal
       - data
     depends_on:
       - mp-silo
-
-#  mp-web:
-#    container_name: mp-web
-#    build: ./mp-web
-#    env_file:
-#      - .env
-#    ports:
-#      - "7777:7777"
-#    networks:
-#      - data
-#    depends_on:
-#      - mp-depot
 
   mp-shop-api:
     container_name: mp-shop-api
@@ -129,11 +98,11 @@ services:
     ports:
      - "8888:8888"
     networks:
-      - data # TODO: Needed?
-      - net
+      - internal
     depends_on:
       - mp-depot
       - mp-inkasso
+      - mp-postamt
     volumes:
       - ./mp-shop-api/src:/app/src:ro
 
@@ -150,16 +119,30 @@ services:
         VITE_SHOP_API_ADYEN_CLIENT_KEY: ${ADYEN_CLIENT_KEY}
         VITE_SHOP_API_PORT: ${SHOP_API_PORT}
     networks:
-        - net
+        - internal
     volumes:
         - ./mp-shop/src:/app/src:ro
         - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
 
-
+  mp-proxy:
+    image: nginx
+    container_name: mp-proxy
+    volumes:
+      - ./mp-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "8080:80"
+    networks:
+      - public
+      - internal
+    depends_on:
+      - mp-shop-api
+      - mp-shop
+      - mp-depot
 #volumes:
 #  silo-data:
 
-
 networks:
-  net:
+  internal:
+  public:
+    driver: bridge
   data:

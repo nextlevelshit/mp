@@ -18,17 +18,17 @@ export default defineConfig({
     },
     server: {
         port: 9999,
-        proxy: {
-            '/api': {
-                target: `http://mp-shop-api:8888/`,
-                // changeOrigin: true,
-                rewrite: (path) => path.replace(/^\/api/, ''),
-            },
-            '/uploads': {
-                target: `http://mp-depot:5555/`,
-                // changeOrigin: true,
-                // rewrite: (path) => path.replace(/^\/api/, ''),
-            },
-        },
+        // proxy: {
+        //     '/api': {
+        //         target: `http://mp-shop-api:8888/`,
+        //         // changeOrigin: true,
+        //         rewrite: (path) => path.replace(/^\/api/, ''),
+        //     },
+        //     '/uploads': {
+        //         target: `http://mp-depot:5555/`,
+        //         // changeOrigin: true,
+        //         // rewrite: (path) => path.replace(/^\/api/, ''),
+        //     },
+        // },
     }
 })
