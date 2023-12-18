@@ -103,6 +103,7 @@ services:
       - mp-depot
       - mp-inkasso
       - mp-postamt
+#      - mp-redis
     volumes:
       - ./mp-shop-api/src:/app/src:ro
 
@@ -129,6 +130,7 @@ services:
     container_name: mp-proxy
     volumes:
       - ./mp-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./mp-proxy/cache:/cache
     ports:
       - "8080:80"
     networks:
@@ -138,6 +140,7 @@ services:
       - mp-shop-api
       - mp-shop
       - mp-depot
+
 #volumes:
 #  silo-data:
 
