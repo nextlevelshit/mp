@@ -8,8 +8,10 @@ services:
       - .env
     environment:
       PYTHONUNBUFFERED: true
+      DEBUG_METRICS: true
     ports:
       - "1111:1111"
+    stop_signal: SIGKILL
     networks:
       - internal
     volumes:
@@ -22,32 +24,35 @@ services:
     env_file:
       - .env
     environment:
-      - PYTHONUNBUFFERED=true
+      PYTHONUNBUFFERED: true
+      DEBUG_METRICS: true
     ports:
       - "2222:2222"
+    stop_signal: SIGKILL
     networks:
       - internal
 
-  mp-konsole:
-    container_name: mp-konsole
-    build: ./mp-konsole
-    depends_on:
-      - mp-inkasso
-      - mp-depot
-    ports:
-      - "3333:3333"
-    env_file: .env
-    environment:
-      VITE_DEPOT_API_TOKEN: ${DEPOT_TOKEN}
-      VITE_DEPOT_PORT: ${DEPOT_PORT}
-      VITE_DEPOT_TOKEN: ${DEPOT_TOKEN}
-      VITE_DEPOT_RELATIVE_PATH: ${DEPOT_RELATIVE_PATH}
-      VITE_INKASSO_PORT: ${INKASSO_PORT}
-    networks:
-      - internal
-    volumes:
-      - ./mp-konsole/src:/app/src:ro
-      - ./mp-konsole/vite.config.ts:/app/vite.config.ts:ro
+  #  mp-konsole:
+  #    container_name: mp-konsole
+  #    build: ./mp-konsole
+  #    stop_signal: SIGKILL
+  #    depends_on:
+  #      - mp-inkasso
+  #      - mp-depot
+  #    ports:
+  #      - "3333:3333"
+  #    env_file: .env
+  #    environment:
+  #      VITE_DEPOT_API_TOKEN: ${DEPOT_TOKEN}
+  #      VITE_DEPOT_PORT: ${DEPOT_PORT}
+  #      VITE_DEPOT_TOKEN: ${DEPOT_TOKEN}
+  #      VITE_DEPOT_RELATIVE_PATH: ${DEPOT_RELATIVE_PATH}
+  #      VITE_INKASSO_PORT: ${INKASSO_PORT}
+  #    networks:
+  #      - internal
+  #    volumes:
+  #      - ./mp-konsole/src:/app/src:ro
+  #      - ./mp-konsole/vite.config.ts:/app/vite.config.ts:ro
 
   mp-silo:
     container_name: mp-silo
@@ -76,6 +81,7 @@ services:
       DATABASE_HOST: mp-silo
       DATABASE_SSL: false
       PORT: ${DEPOT_PORT}
+      STRAPI_TELEMETRY_DISABLED: true
     volumes:
       - ./mp-depot/config:/opt/app/config
       - ./mp-depot/src:/opt/app/src
@@ -84,6 +90,7 @@ services:
       - ./mp-depot/public/uploads:/opt/app/public/uploads
     ports:
       - "5555:5555"
+    stop_signal: SIGKILL
     networks:
       - internal
       - data
@@ -96,14 +103,14 @@ services:
     env_file:
       - .env
     ports:
-     - "8888:8888"
+      - "8888:8888"
+    stop_signal: SIGKILL
     networks:
       - internal
     depends_on:
       - mp-depot
       - mp-inkasso
       - mp-postamt
-#      - mp-redis
     volumes:
       - ./mp-shop-api/src:/app/src:ro
 
@@ -113,17 +120,18 @@ services:
     env_file:
       - .env
     ports:
-     - "9999:9999"
+      - "9999:9999"
+    stop_signal: SIGKILL
     depends_on:
       - mp-shop-api
     environment:
-        VITE_SHOP_API_ADYEN_CLIENT_KEY: ${ADYEN_CLIENT_KEY}
-        VITE_SHOP_API_PORT: ${SHOP_API_PORT}
+      VITE_SHOP_API_ADYEN_CLIENT_KEY: ${ADYEN_CLIENT_KEY}
+      VITE_SHOP_API_PORT: ${SHOP_API_PORT}
     networks:
-        - internal
+      - internal
     volumes:
-        - ./mp-shop/src:/app/src:ro
-        - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
+      - ./mp-shop/src:/app/src:ro
+      - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
 
   mp-proxy:
     image: nginx
@@ -133,6 +141,7 @@ services:
       - ./mp-proxy/cache:/cache
     ports:
       - "8080:80"
+    stop_signal: SIGKILL
     networks:
       - public
       - internal
@@ -140,6 +149,39 @@ services:
       - mp-shop-api
       - mp-shop
       - mp-depot
+      - mp-postamt
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus/config.yml:/prometheus/prometheus.yml
+    networks:
+      - internal
+    command: --log.level=warn
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SERVER_ROUTER_LOGGING: false
+      GF_DATABASE_LOG_QUERIES: false
+      GF_LOG_LEVEL: "error"
+      GF_AUTH_ANONYMOUS_ENABLED: true
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_ANONYMOUS_ORG_NAME: "NEXTLEVELSHIT"
+    networks:
+      - internal
+    volumes:
+      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/default.yaml
+      - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/default.yaml
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
 
 #volumes:
 #  silo-data:

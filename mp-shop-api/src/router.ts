@@ -1,4 +1,5 @@
 import express from "express";
+import {Counter, Histogram} from "prom-client";
 import {version} from "../package.json";
 import {depotApi} from "./services/DepotApi";
 import {adyenApi} from "./services/AdyenApi";
@@ -9,8 +10,37 @@ import {adyenClientKey} from "./config/constants";
 const logger = debug("mp:i:shop-api:router");
 const verbose = debug("mp:v:shop-api:router");
 
+// Counter for created orders
+const orderCounter = new Counter({
+	name: "mp_shop_api_order_created_total",
+	help: "Total number of orders created",
+});
+
+// Counter for finalized orders
+const finalizedOrderCounter = new Counter({
+	name: "mp_shop_api_order_finalized_total",
+	help: "Total number of orders finalized",
+});
+
+// Histogram for request duration
+const requestDurationHistogram = new Histogram({
+	name: "mp_shop_api_request_duration_seconds",
+	help: "Histogram of request durations in seconds",
+	labelNames: ["route", "method"],
+	buckets: [0.1, 0.5, 1, 2, 5], // Specify appropriate buckets based on your expected request duration
+});
 
 export const router = express.Router();
+
+// Middleware for tracking request duration
+router.use((req, res, next) => {
+	const start = Date.now();
+	res.on("finish", () => {
+		const duration = (Date.now() - start) / 1000; // Convert to seconds
+		requestDurationHistogram.labels(req.path, req.method).observe(duration);
+	});
+	next();
+});
 
 router.get("/v1", async (req, res) => {
 	const today = new Date().toISOString().split("T")[0];
@@ -21,6 +51,8 @@ router.get("/v1", async (req, res) => {
 router.post("/v1/order/", async (req, res) => {
 	try {
 		const cart = await depotApi.orderFactory().create();
+
+		orderCounter.inc();
 
 		res.status(201).send(cart.attributes.uuid);
 	} catch (e) {
@@ -174,9 +206,15 @@ router.put("/v1/order/:uuid/finalize", async (req, res) => {
 			Date: new Date().toISOString().slice(0, 10),
 		});
 
-		await depotApi.orderFactory().generateInvoiceAndSaveToOrder(uuid);
-		await depotApi.orderFactory().generateDeliveryNoteAndSaveToOrder(uuid);
+		await Promise.all([
+			depotApi.orderFactory().generateInvoiceAndSaveToOrder(uuid),
+			depotApi.orderFactory().generateDeliveryNoteAndSaveToOrder(uuid),
+		]);
+
 		const order = await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid);
+
+		// Increment the finalized order counter
+		finalizedOrderCounter.inc();
 
 		res.status(200).send(new OrderDto(order).dto);
 	} catch (e) {

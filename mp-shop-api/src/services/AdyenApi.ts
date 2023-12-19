@@ -9,9 +9,20 @@ import {OrderDto} from "../dto/OrderDto";
 import {NotificationRequestItem} from "@adyen/api-library/lib/src/typings/notification/notificationRequestItem";
 import EventCodeEnum = NotificationRequestItem.EventCodeEnum;
 import {depotApi} from "./DepotApi";
+import {Counter} from "prom-client";
 
 const logger = debug("mp:i:shop-api:adyen-api");
 const verbose = debug("mp:v:shop-api:adyen-api");
+
+const successfulSessionCreationCounter = new Counter({
+	name: "mp_shop_api_adyen_successful_session_creation_total",
+	help: "Total number of successful Adyen session creations",
+});
+
+const failedSessionCreationCounter = new Counter({
+	name: "mp_shop_api_adyen_failed_session_creation_total",
+	help: "Total number of failed Adyen session creations",
+});
 
 class AdyenApi {
 	private readonly checkout: CheckoutAPI;
@@ -43,7 +54,16 @@ class AdyenApi {
 			returnUrl,
 		};
 
-		return await this.checkout.PaymentsApi.sessions(checkoutConfig);
+		try {
+			const session = await this.checkout.PaymentsApi.sessions(checkoutConfig);
+			successfulSessionCreationCounter.inc();
+			return session;
+		} catch (error) {
+			failedSessionCreationCounter.inc();
+			// Handle errors and potentially increment a counter for failed session creations
+			verbose("Error creating Adyen session:", error);
+			throw error;
+		}
 	}
 
 	async handleShopperRedirect(redirect: any) {

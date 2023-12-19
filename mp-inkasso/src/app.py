@@ -1,22 +1,25 @@
 import html
-import logging
 import time
-from datetime import datetime
-from io import TextIOWrapper
-from pprint import pprint
 from enum import Enum
 from flask import Flask, request, send_file
+from prometheus_flask_exporter import PrometheusMetrics
 import subprocess
 import tempfile
 import os
 import json
 import yaml
 from typing import List, NamedTuple
-# import locale
-# locale.setlocale(locale.LC_ALL, "de_DE")
 
 app = Flask(__name__)
 
+metrics = PrometheusMetrics(app, defaults_prefix="mp_inkasso")
+
+# Define a counter for successful PDF generation
+pdf_generation_counter = metrics.counter(
+    'mp_inkasso_pdf_generation_total',
+    'Total number of PDFs generated',
+	labels={'endpoint': lambda: request.endpoint}
+)
 
 class Template(Enum):
     INVOICE = "/app/data/templates/invoice-scrlttr2.tex"
@@ -71,7 +74,6 @@ def normalize(string: str):
         .replace(' ', '')
     )
 
-
 def generate_pdf(template_path: Template, details_json: Details):
     try:
         print("Starting to generate PDF...")
@@ -123,12 +125,18 @@ def generate_pdf(template_path: Template, details_json: Details):
                 f'template={template_path.value}',
                 f'output={output_path}'
             ])
+
+            # pdf_generation_counter.inc()
+
             return output_path
     except Exception as e:
-        return str(e), 400
+            # Increment the failed PDF generation counter
+            # pdf_generation_failure_counter.inc()
+            return str(e), 400
 
 
 @app.route('/v1/')
+@metrics.do_not_track()
 def info():
     today = time.strftime("%Y-%m-%d")
     url_map = app.url_map
@@ -138,6 +146,7 @@ def info():
 
 
 @app.route('/v1/invoice', methods=['POST'])
+@pdf_generation_counter
 def generate_invoice():
     try:
         details_json = request.json
@@ -154,11 +163,12 @@ def generate_invoice():
 
 
 @app.route('/v1/shipping', methods=['POST'])
+@pdf_generation_counter
 def generate_shipping():
     try:
         details_json = request.json
-        tempalte = Template.INVOICE
-        pdf_content = generate_pdf(tempalte, details_json)
+        template = Template.INVOICE
+        pdf_content = generate_pdf(template, details_json)
         if pdf_content:
             return send_file(pdf_content, mimetype='application/pdf')
         else:
@@ -168,6 +178,7 @@ def generate_shipping():
 
 
 @app.route('/v1/order-confirmation', methods=['POST'])
+@pdf_generation_counter
 def generate_order_confirmation():
     try:
         details_json: Details = request.json
@@ -206,7 +217,6 @@ def delete_all():
     except Exception as e:
         return f"Failed to clean all files: {str(e)}", 500
 
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=1111, debug=True)
+    app.run(host='0.0.0.0', port=1111, debug=False)
     # app.run(host='0.0.0.0', port=80, debug=True)

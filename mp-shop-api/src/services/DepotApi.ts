@@ -272,7 +272,7 @@ class DepotApi {
 
 				const {data} = await updatedOrderResponse.json();
 
-				return data;
+				return data as Order;
 			},
 			sendInvoiceAndUpdateOrder: async (uuid: string) => {
 				const orderResponse = await this.orderFactory().one(uuid);
