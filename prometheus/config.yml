@@ -20,6 +20,7 @@ scrape_configs:
   - job_name: 'mp-depot'
     static_configs:
       - targets: ['mp-depot:5555']
+    # TODO: Move to .env before production
     bearer_token: '66571619f21fb9d986dfec744e63ec21c9d9a5e26927981a22896858415444096b34be28e680f7c699dd35d88f98206372876805c72b08ed6cdb949f4c64db507f4c2db00784c86d5f7b21baac110a26bf2f1623a22c5da698b0425c0c646690c92e0d22afe9c69b5b311eedf3a52ee1a26a7ea322cbb08fc82a8063b993db14'
     metrics_path: '/api/metrics'
 
