@@ -10,19 +10,16 @@ import {adyenClientKey} from "./config/constants";
 const logger = debug("mp:i:shop-api:router");
 const verbose = debug("mp:v:shop-api:router");
 
-// Counter for created orders
 const orderCounter = new Counter({
 	name: "mp_shop_api_order_created_total",
 	help: "Total number of orders created",
 });
 
-// Counter for finalized orders
 const finalizedOrderCounter = new Counter({
 	name: "mp_shop_api_order_finalized_total",
 	help: "Total number of orders finalized",
 });
 
-// Histogram for request duration
 const requestDurationHistogram = new Histogram({
 	name: "mp_shop_api_request_duration_seconds",
 	help: "Histogram of request durations in seconds",
@@ -36,6 +33,11 @@ const requestTotalCounter = new Counter({
 	labelNames: ["path", "method", "status"],
 });
 
+const healthCheckCounter = new Counter({
+	name: "mp_shop_api_health_check_total",
+	help: "Total number of health checks",
+});
+
 export const router = express.Router();
 
 // Middleware for tracking request duration
@@ -43,8 +45,8 @@ router.use((req, res, next) => {
 	const start = Date.now();
 	res.on("finish", () => {
 		const duration = (Date.now() - start) / 1000; // Convert to seconds
-		requestDurationHistogram.labels(req.route.path, req.method, res.statusCode.toString()).observe(duration);
-		requestTotalCounter.labels(req.route.path, req.method, res.statusCode.toString()).inc();
+		requestDurationHistogram.labels(req.route?.path, req.method, res.statusCode.toString()).observe(duration);
+		requestTotalCounter.labels(req.route?.path, req.method, res.statusCode.toString()).inc();
 	});
 	next();
 });
@@ -349,3 +351,8 @@ router.post("/v1/webhooks/notifications", async (req, res) => {
 	res.status(webhookResponse.statusCode).send(webhookResponse.message);
 });
 
+router.get("/health", async (req, res) => {
+	// TODO: Add health check logic
+	healthCheckCounter.inc();
+	res.status(200).json({ status: "ok" });
+});

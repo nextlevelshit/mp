@@ -5,6 +5,7 @@ const router = createRouter({
 	routes: [
 		{
 			path: "/",
+			name: "root",
 			redirect: "/products"
 		},
 		{
@@ -44,7 +45,12 @@ const router = createRouter({
 			name: "checkout-result",
 			props: true,
 			component: () => import("../views/checkout/CheckoutResultView.vue")
-		}
+		},
+		{
+			path: "/health",
+			name: "health",
+			redirect: { name: "root" },
+		},
 	]
 });
 

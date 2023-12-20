@@ -15,6 +15,11 @@ services:
     volumes:
       - ./mp-inkasso/data:/app/data
       - ./mp-inkasso/src:/app/src:ro
+    healthcheck:
+      test: wget --no-verbose --spider -S -T 1 http://mp-inkasso:${INKASSO_PORT:-1111}/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mp-postamt:
     build: ${POSTAMT_PATH_DOCKERFILE:-./mp-postamt}
@@ -31,6 +36,11 @@ services:
     stop_signal: SIGKILL
     networks:
       - internal
+    healthcheck:
+      test: wget --no-verbose --spider -S -T 1 http://mp-postamt:${POSTAMT_PORT:-2222}/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   #  mp-konsole:
   #    container_name: mp-konsole
@@ -63,13 +73,18 @@ services:
       POSTGRES_PASSWORD: ${SILO_DATABASE_PASSWORD}
       POSTGRES_DB: ${SILO_DATABASE_NAME}
     volumes:
-      #      - silo-data:/var/lib/postgresql/data/ #using a volume
       - ./mp-silo/data:/var/lib/postgresql/data/ # if you want to use a bind folder
-    #      - ./mp-silo/seed/backup_2023-03-10_23-44-50.sql:/docker-entrypoint-initdb.d/seed_database.sql
+      # - silo-data:/var/lib/postgresql/data/ #using a volume
+      # - ./mp-silo/seed/backup_2023-03-10_23-44-50.sql:/docker-entrypoint-initdb.d/seed_database.sql
     ports:
       - "${SILO_PORT:-5432}:5432"
     networks:
       - data
+    healthcheck:
+      test: pg_isready -h mp-silo -p ${SILO_PORT:-5432} -U ${SILO_DATABASE_USERNAME} -d ${SILO_DATABASE_NAME}
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mp-depot:
     container_name: mp-depot
@@ -104,7 +119,13 @@ services:
       - internal
       - data
     depends_on:
-      - mp-silo
+      mp-silo:
+        condition: service_healthy
+    healthcheck:
+      test: wget --no-verbose --spider -S -T 1 http://mp-depot:${DEPOT_PORT:-5555}/_health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mp-shop-api:
     container_name: mp-shop-api
@@ -127,11 +148,19 @@ services:
     networks:
       - internal
     depends_on:
-      - mp-depot
-      - mp-inkasso
-      - mp-postamt
+      mp-depot:
+        condition: service_healthy
+      mp-inkasso:
+        condition: service_healthy
+      mp-postamt:
+        condition: service_healthy
     volumes:
       - ./mp-shop-api/src:/app/src:ro
+    healthcheck:
+      test: wget --no-verbose --spider -S -T 1 http://mp-shop-api:${SHOP_API_PORT:-8888}/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mp-shop:
     container_name: mp-shop
@@ -142,12 +171,18 @@ services:
     environment:
       BASE_URL: ${SHOP_BASE_URL:-}
     depends_on:
-      - mp-shop-api
+      mp-shop-api:
+        condition: service_healthy
     networks:
       - internal
     volumes:
       - ./mp-shop/src:/app/src:ro
       - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
+    healthcheck:
+      test: wget --no-verbose --spider -S -T 1 http://mp-shop:${SHOP_PORT:-9999}/health || exit 1
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
   mp-proxy:
     image: nginx
@@ -162,10 +197,14 @@ services:
       - public
       - internal
     depends_on:
-      - mp-shop-api
-      - mp-shop
-      - mp-depot
-      - mp-postamt
+      mp-shop-api:
+        condition: service_healthy
+      mp-shop:
+        condition: service_healthy
+      mp-depot:
+        condition: service_healthy
+      mp-postamt:
+        condition: service_healthy
 
   prometheus:
     image: prom/prometheus
