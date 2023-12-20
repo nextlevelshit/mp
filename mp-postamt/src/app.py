@@ -13,13 +13,11 @@ app = Flask(__name__)
 # Wrap the Flask app with PrometheusMetrics
 metrics = PrometheusMetrics(app, defaults_prefix="mp_postamt")
 
-# Define a counter for successful email sending
 email_sent_counter = metrics.counter(
     'mp_postamt_email_sent_total',
     'Total number of emails sent'
 )
 
-# Define a counter for failed email sending
 pdf_sent_counter = metrics.counter(
     'mp_postamt_pdf_sent_total',
     'Total number of pdfs sent'
@@ -104,13 +102,8 @@ def send_pdf():
         smtp.sendmail(smtp_username, to_email, msg.as_string())
         smtp.quit()
 
-        # Increment the successful email sending counter
-        # email_sent_counter.inc()
-
         return jsonify({"message": "Email sent successfully"}), 200
     except Exception as e:
-        # Increment the failed email sending counter
-        # email_send_failure_counter.inc()
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':

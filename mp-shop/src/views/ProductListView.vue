@@ -35,6 +35,7 @@ export default {
       let cartUuid = localStorage.getItem(localStorageLabelCartUuid);
 
       const result = await shopApi.getOrCreateOrder(cartUuid);
+      // TODO: Fix error handling
       this.cartUuid = result.uuid;
       this.cart = result;
       localStorage.setItem(localStorageLabelCartUuid, this.cartUuid);

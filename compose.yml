@@ -2,15 +2,13 @@ version: "3.9"
 
 services:
   mp-inkasso:
-    build: ./mp-inkasso
+    build: ${INKASSO_PATH_DOCKERFILE:-./mp-inkasso}
     container_name: mp-inkasso
-    env_file:
-      - .env
     environment:
       PYTHONUNBUFFERED: true
-      DEBUG_METRICS: true
+      DEBUG_METRICS: ${INKASSO_DEBUG_METRICS:-false}
     ports:
-      - "1111:1111"
+      - "${INKASSO_PORT:-1111}:1111"
     stop_signal: SIGKILL
     networks:
       - internal
@@ -19,15 +17,17 @@ services:
       - ./mp-inkasso/src:/app/src:ro
 
   mp-postamt:
-    build: ./mp-postamt
+    build: ${POSTAMT_PATH_DOCKERFILE:-./mp-postamt}
     container_name: mp-postamt
-    env_file:
-      - .env
     environment:
       PYTHONUNBUFFERED: true
-      DEBUG_METRICS: true
+      DEBUG_METRICS: ${POSTAMT_DEBUG_METRICS:-false}
+      SMTP_RELAY_HOST: ${POSTAMT_SMTP_RELAY_HOST}
+      SMTP_RELAY_PORT: ${POSTAMT_SMTP_RELAY_PORT}
+      SMTP_RELAY_USERNAME: ${POSTAMT_SMTP_RELAY_USERNAME}
+      SMTP_RELAY_PASSWORD: ${POSTAMT_SMTP_RELAY_PASSWORD}
     ports:
-      - "2222:2222"
+      - "${POSTAMT_PORT:-2222}:2222"
     stop_signal: SIGKILL
     networks:
       - internal
@@ -58,30 +58,39 @@ services:
     container_name: mp-silo
     #    restart: unless-stopped
     image: postgres:alpine
-    env_file: .env
     environment:
-      POSTGRES_USER: ${DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
-      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${SILO_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${SILO_DATABASE_PASSWORD}
+      POSTGRES_DB: ${SILO_DATABASE_NAME}
     volumes:
       #      - silo-data:/var/lib/postgresql/data/ #using a volume
       - ./mp-silo/data:/var/lib/postgresql/data/ # if you want to use a bind folder
     #      - ./mp-silo/seed/backup_2023-03-10_23-44-50.sql:/docker-entrypoint-initdb.d/seed_database.sql
     ports:
-      - "${DATABASE_PORT}:5432"
+      - "${SILO_PORT:-5432}:5432"
     networks:
       - data
 
   mp-depot:
     container_name: mp-depot
-    build: ./mp-depot
+    build: ${DEPOT_PATH_DOCKERFILE:-./mp-depot }
     image: strapi:latest
-    env_file: .env
     environment:
-      DATABASE_HOST: mp-silo
-      DATABASE_SSL: false
       PORT: ${DEPOT_PORT}
+      DATABASE_HOST: ${DEPOT_DATABASE_HOST}
+      DATABASE_SSL: false
+      DATABASE_URL: ${DEPOT_DATABASE_URL:-}
+      DATABASE_PORT: ${SILO_PORT}
+      DATABASE_NAME: ${SILO_DATABASE_NAME:-}
+      DATABASE_USERNAME: ${SILO_DATABASE_USERNAME:-}
+      DATABASE_PASSWORD: ${SILO_DATABASE_PASSWORD:-}
+      DATABASE_CLIENT: ${DEPOT_DATABASE_CLIENT}
       STRAPI_TELEMETRY_DISABLED: true
+      JWT_SECRET: ${DEPOT_JWT_SECRET}
+      API_TOKEN_SALT: ${DEPOT_API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${DEPOT_ADMIN_JWT_SECRET}
+      APP_KEYS: ${DEPOT_APP_KEYS}
+      TRANSFER_TOKEN_SALT: ${DEPOT_TRANSFER_TOKEN_SALT}
     volumes:
       - ./mp-depot/config:/opt/app/config
       - ./mp-depot/src:/opt/app/src
@@ -89,7 +98,7 @@ services:
       - ./.env:/opt/app/.env
       - ./mp-depot/public/uploads:/opt/app/public/uploads
     ports:
-      - "5555:5555"
+      - "${DEPOT_PORT:-5555}:5555"
     stop_signal: SIGKILL
     networks:
       - internal
@@ -99,11 +108,21 @@ services:
 
   mp-shop-api:
     container_name: mp-shop-api
-    build: ./mp-shop-api
-    env_file:
-      - .env
+    build: ${SHOP_API_PATH_DOCKERFILE:-./mp-shop-api }
+    environment:
+      SHOP_API_PORT: ${SHOP_API_PORT}
+      DEPOT_PORT: ${DEPOT_PORT}
+      INKASSO_PORT: ${INKASSO_PORT}
+      POSTAMT_PORT: ${POSTAMT_PORT}
+      ADYEN_MERCHANT_ACCOUNT: ${SHOP_API_ADYEN_MERCHANT_ACCOUNT}
+      ADYEN_HMAC_KEY: ${SHOP_API_ADYEN_HMAC_KEY}
+      ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
+      ADYEN_API_KEY: ${SHOP_API_ADYEN_API_KEY}
+      ADYEN_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
+      DEPOT_TOKEN: ${SHOP_API_DEPOT_TOKEN}
+      EXPRESS_TRUST_TOKEN: ${SHOP_API_EXPRESS_TRUST_TOKEN:-}
     ports:
-      - "8888:8888"
+      - "${SHOP_API_PORT:-8888}:8888"
     stop_signal: SIGKILL
     networks:
       - internal
@@ -116,17 +135,14 @@ services:
 
   mp-shop:
     container_name: mp-shop
-    build: ./mp-shop
-    env_file:
-      - .env
+    build: ${SHOP_PATH_DOCKERFILE:-./mp-shop}
     ports:
-      - "9999:9999"
+      - "${SHOP_PORT:-9999}:9999"
     stop_signal: SIGKILL
+    environment:
+      BASE_URL: ${SHOP_BASE_URL:-}
     depends_on:
       - mp-shop-api
-    environment:
-      VITE_SHOP_API_ADYEN_CLIENT_KEY: ${ADYEN_CLIENT_KEY}
-      VITE_SHOP_API_PORT: ${SHOP_API_PORT}
     networks:
       - internal
     volumes:
@@ -140,7 +156,7 @@ services:
       - ./mp-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./mp-proxy/cache:/cache
     ports:
-      - "8080:80"
+      - "${PROXY_PORT}:80"
     stop_signal: SIGKILL
     networks:
       - public
@@ -155,25 +171,23 @@ services:
     image: prom/prometheus
     container_name: prometheus
     ports:
-      - "9090:9090"
+      - "${PROMETHEUS_PORT:-9090}:9090"
     volumes:
       - ./prometheus/config.yml:/prometheus/prometheus.yml
     networks:
       - internal
-    command: --log.level=warn
+    command: --log.level=error
 
   grafana:
     image: grafana/grafana
     container_name: grafana
     ports:
-      - "3000:3000"
+      - "${GRAFANA_PORT:-3000}:3000"
     environment:
       GF_SERVER_ROUTER_LOGGING: false
       GF_DATABASE_LOG_QUERIES: false
       GF_LOG_LEVEL: "error"
-      GF_AUTH_ANONYMOUS_ENABLED: true
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
-      GF_AUTH_ANONYMOUS_ORG_NAME: "NEXTLEVELSHIT"
+      GF_AUTH_ANONYMOUS_ENABLED: ${GRAFANA_AUTH_ANONYMOUS_ENABLED:-false}
     networks:
       - internal
     volumes:

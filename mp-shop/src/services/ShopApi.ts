@@ -1,4 +1,4 @@
-import type {Order, PdfBody, OrderUpdateBody} from "@/types";
+import type {Order, OrderUpdateBody} from "@/types";
 
 class ShopApi {
 	baseUrl: string;

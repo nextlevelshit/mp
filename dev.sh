@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose up --build --remove-orphans --force-recreate
+docker compose --env-file .env up --build --remove-orphans --force-recreate

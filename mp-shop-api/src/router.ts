@@ -26,8 +26,14 @@ const finalizedOrderCounter = new Counter({
 const requestDurationHistogram = new Histogram({
 	name: "mp_shop_api_request_duration_seconds",
 	help: "Histogram of request durations in seconds",
-	labelNames: ["route", "method"],
+	labelNames: ["path", "method", "status"],
 	buckets: [0.1, 0.5, 1, 2, 5], // Specify appropriate buckets based on your expected request duration
+});
+
+const requestTotalCounter = new Counter({
+	name: "mp_shop_api_request_total",
+	help: "Total number of requests",
+	labelNames: ["path", "method", "status"],
 });
 
 export const router = express.Router();
@@ -37,7 +43,8 @@ router.use((req, res, next) => {
 	const start = Date.now();
 	res.on("finish", () => {
 		const duration = (Date.now() - start) / 1000; // Convert to seconds
-		requestDurationHistogram.labels(req.path, req.method).observe(duration);
+		requestDurationHistogram.labels(req.route.path, req.method, res.statusCode.toString()).observe(duration);
+		requestTotalCounter.labels(req.route.path, req.method, res.statusCode.toString()).inc();
 	});
 	next();
 });
