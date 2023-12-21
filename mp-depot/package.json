@@ -5,8 +5,7 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
-    "strapi": "strapi",
-    "export": "strapi export -- --no-encrypt --file database/export"
+    "strapi": "strapi"
   },
   "dependencies": {
     "@strapi/plugin-i18n": "^4.15.5",
