@@ -118,6 +118,7 @@ services:
       - ./mp-depot/package.json:/opt/package.json
       - ./.env:/opt/app/.env
       - ./mp-depot/public/uploads:/opt/app/public/uploads
+      - ./mp-depot/database:/opt/app/database
     ports:
       - "${DEPOT_PORT:-5555}:5555"
     stop_signal: SIGKILL
