@@ -13,9 +13,9 @@ scrape_configs:
     static_configs:
       - targets: ['mp-shop-api:8888']
 
-  - job_name: 'mp-shop'
-    static_configs:
-      - targets: ['mp-shop:9999']
+#  - job_name: 'mp-shop'
+#    static_configs:
+#      - targets: ['mp-shop:9999']
 
   - job_name: 'mp-depot'
     static_configs:

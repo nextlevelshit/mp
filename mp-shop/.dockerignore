@@ -1,6 +1,5 @@
 .dockerignore
-Dockerfile
+*Dockerfile
 node_modules
 public
-dist
 *.log

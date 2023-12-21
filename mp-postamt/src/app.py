@@ -8,7 +8,7 @@ import os
 import time
 import html
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
 
 # Wrap the Flask app with PrometheusMetrics
 metrics = PrometheusMetrics(app, defaults_prefix="mp_postamt")

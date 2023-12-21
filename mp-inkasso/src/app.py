@@ -10,7 +10,7 @@ import json
 import yaml
 from typing import List, NamedTuple
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder=None)
 
 metrics = PrometheusMetrics(app, defaults_prefix="mp_inkasso")
 

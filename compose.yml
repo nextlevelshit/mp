@@ -2,7 +2,9 @@ version: "3.9"
 
 services:
   mp-inkasso:
-    build: ${INKASSO_PATH_DOCKERFILE:-./mp-inkasso}
+    build:
+      context: ./mp-inkasso
+      dockerfile: ${INKASSO_PATH_DOCKERFILE:-./mp-inkasso/Dockerfile}
     container_name: mp-inkasso
     environment:
       PYTHONUNBUFFERED: true
@@ -22,7 +24,9 @@ services:
       retries: 3
 
   mp-postamt:
-    build: ${POSTAMT_PATH_DOCKERFILE:-./mp-postamt}
+    build:
+      context: ./mp-postamt
+      dockerfile: ${POSTAMT_PATH_DOCKERFILE:-./mp-postamt/Dockerfile}
     container_name: mp-postamt
     environment:
       PYTHONUNBUFFERED: true
@@ -88,7 +92,9 @@ services:
 
   mp-depot:
     container_name: mp-depot
-    build: ${DEPOT_PATH_DOCKERFILE:-./mp-depot }
+    build:
+      context: ./mp-depot
+      dockerfile: ${DEPOT_PATH_DOCKERFILE:-./mp-depot/Dockerfile}
     image: strapi:latest
     environment:
       PORT: ${DEPOT_PORT}
@@ -129,7 +135,9 @@ services:
 
   mp-shop-api:
     container_name: mp-shop-api
-    build: ${SHOP_API_PATH_DOCKERFILE:-./mp-shop-api }
+    build:
+      context: ${SHOP_API_DOCKER_CONTEXT:-./mp-shop-api}
+      dockerfile: ${SHOP_API_PATH_DOCKERFILE:-./mp-shop-api /Dockerfile}
     environment:
       SHOP_API_PORT: ${SHOP_API_PORT}
       DEPOT_PORT: ${DEPOT_PORT}
@@ -164,7 +172,9 @@ services:
 
   mp-shop:
     container_name: mp-shop
-    build: ${SHOP_PATH_DOCKERFILE:-./mp-shop}
+    build:
+      context: ./mp-shop
+      dockerfile: ${SHOP_PATH_DOCKERFILE:-./mp-shop/Dockerfile}
     ports:
       - "${SHOP_PORT:-9999}:9999"
     stop_signal: SIGKILL
@@ -178,11 +188,11 @@ services:
     volumes:
       - ./mp-shop/src:/app/src:ro
       - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
-    healthcheck:
-      test: wget --no-verbose --spider -S -T 1 http://mp-shop:${SHOP_PORT:-9999}/health || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
+#    healthcheck:
+#      test: wget --no-verbose --spider -S -T 1 http://mp-shop:${SHOP_PORT:-9999}/ || exit 1
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
 
   mp-proxy:
     image: nginx
@@ -197,13 +207,15 @@ services:
       - public
       - internal
     depends_on:
-      mp-shop-api:
-        condition: service_healthy
       mp-shop:
+        condition: service_started
+      mp-shop-api:
         condition: service_healthy
       mp-depot:
         condition: service_healthy
       mp-postamt:
+        condition: service_healthy
+      mp-inkasso:
         condition: service_healthy
 
   prometheus:
@@ -216,6 +228,17 @@ services:
     networks:
       - internal
     command: --log.level=error
+    depends_on:
+      mp-shop:
+        condition: service_started
+      mp-shop-api:
+        condition: service_healthy
+      mp-depot:
+        condition: service_healthy
+      mp-postamt:
+        condition: service_healthy
+      mp-inkasso:
+        condition: service_healthy
 
   grafana:
     image: grafana/grafana

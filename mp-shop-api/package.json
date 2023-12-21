@@ -5,7 +5,8 @@
   "private": true,
   "scripts": {
     "start": "npm run dev",
-    "dev": "DEBUG=express:*,app:* nodemon",
+    "dev": "DEBUG=express:*,mp:* nodemon",
+    "production": "DEBUG=express:router:route*,app:* node dist/src/app.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -1,5 +1,4 @@
 .dockerignore
 *Dockerfile
-node_modules
-public
 *.log
+Readme.md
