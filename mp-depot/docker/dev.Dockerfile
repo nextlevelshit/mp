@@ -11,7 +11,7 @@ ENV PORT=${PORT}
 
 WORKDIR /opt/
 
-COPY package.json ./
+COPY ./package.json ./
 
 ENV PATH /opt/node_modules/.bin:$PATH
 

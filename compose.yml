@@ -3,8 +3,8 @@ version: "3.9"
 services:
   mp-inkasso:
     build:
-      context: ./mp-inkasso
-      dockerfile: ${INKASSO_PATH_DOCKERFILE:-./mp-inkasso/Dockerfile}
+      context: ${INKASSO_DOCKER_CONTEXT:-./mp-inkasso}
+      dockerfile: ${INKASSO_PATH_DOCKERFILE:-docker/dev.Dockerfile}
     container_name: mp-inkasso
     environment:
       PYTHONUNBUFFERED: true
@@ -26,7 +26,7 @@ services:
   mp-postamt:
     build:
       context: ./mp-postamt
-      dockerfile: ${POSTAMT_PATH_DOCKERFILE:-./mp-postamt/Dockerfile}
+      dockerfile: ${POSTAMT_PATH_DOCKERFILE:-docker/dev.Dockerfile}
     container_name: mp-postamt
     environment:
       PYTHONUNBUFFERED: true
@@ -94,7 +94,7 @@ services:
     container_name: mp-depot
     build:
       context: ./mp-depot
-      dockerfile: ${DEPOT_PATH_DOCKERFILE:-./mp-depot/Dockerfile}
+      dockerfile: ${DEPOT_PATH_DOCKERFILE:-docker/dev.Dockerfile}
     image: strapi:latest
     environment:
       PORT: ${DEPOT_PORT}
@@ -116,7 +116,6 @@ services:
       - ./mp-depot/config:/opt/app/config
       - ./mp-depot/src:/opt/app/src
       - ./mp-depot/package.json:/opt/package.json
-      - ./.env:/opt/app/.env
       - ./mp-depot/public/uploads:/opt/app/public/uploads
       - ./mp-depot/database:/opt/app/database
     ports:
@@ -138,7 +137,7 @@ services:
     container_name: mp-shop-api
     build:
       context: ${SHOP_API_DOCKER_CONTEXT:-./mp-shop-api}
-      dockerfile: ${SHOP_API_PATH_DOCKERFILE:-./mp-shop-api /Dockerfile}
+      dockerfile: ${SHOP_API_PATH_DOCKERFILE:-docker/dev.Dockerfile}
     environment:
       SHOP_API_PORT: ${SHOP_API_PORT}
       DEPOT_PORT: ${DEPOT_PORT}
@@ -175,7 +174,7 @@ services:
     container_name: mp-shop
     build:
       context: ./mp-shop
-      dockerfile: ${SHOP_PATH_DOCKERFILE:-./mp-shop/Dockerfile}
+      dockerfile: ${SHOP_PATH_DOCKERFILE:-./mp-shop/docker/dev.Dockerfile}
     ports:
       - "${SHOP_PORT:-9999}:9999"
     stop_signal: SIGKILL

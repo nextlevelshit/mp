@@ -11,7 +11,7 @@ ENV PORT=${PORT}
 
 WORKDIR /opt/
 
-COPY package.json ./
+COPY ./package.json ./
 
 ENV PATH /opt/node_modules/.bin:$PATH
 
@@ -28,8 +28,6 @@ RUN chown -R node:node /opt/app
 USER node
 
 RUN npm run build
-
-# ENTRYPOINT ["node"] ?
 
 EXPOSE ${PORT}
 
