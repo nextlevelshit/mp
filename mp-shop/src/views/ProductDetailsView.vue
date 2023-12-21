@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white p-8 shadow-md rounded-md">
+  <div class="bg-white p-8 shadow-md rounded-md" v-if="product">
     <h1 class="text-2xl font-bold mb-4">{{ product.name }} - Product ID: {{ id }}</h1>
 
     <div class="flex gap-36">
@@ -53,14 +53,14 @@
         <!-- Product Price -->
         <div class="mt-8">
           <h2 class="text-xl font-bold mb-2">Price</h2>
-          <p><span class="font-bold">Total Product Price:</span> {{ product.totalProductPrice.toFixed(2) }} €</p>
+          <p><span class="font-bold">Total Product Price:</span> {{ product.totalProductPrice?.toFixed(2) }} €</p>
           <!-- Add more pricing details if needed -->
         </div>
 
       </div>
       <div class="w-1/5 flex-col gap-8">
         <!-- Product Image -->
-        <img :src="product.image.url" :alt="product.image.name" class="mb-4 rounded-md shadow-md" />
+        <img v-if="product.image" :src="product.image.url" :alt="product.image.name" class="mb-4 rounded-md shadow-md" />
 
         <!-- Add to Cart Button -->
         <button @click="addToCart"
