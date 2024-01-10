@@ -176,15 +176,6 @@ services:
         networks:
             - public
             - internal
-        depends_on:
-            certs:
-                condition: service_started
-            mp-shop:
-                condition: service_started
-            mp-shop-api:
-                condition: service_started
-            mp-depot:
-                condition: service_started
 
     certs:
         container_name: certs
