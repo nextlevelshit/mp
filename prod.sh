@@ -1,3 +1,11 @@
 #!/bin/bash
 
-docker compose --env-file .env.prod up --build --remove-orphans --force-recreate
+docker compose -p "muellerprints" down
+
+docker compose -p "muellerprints" \
+		-f compose.yml \
+		--env-file .env.prod \
+		up \
+		--build
+#		--remove-orphans \
+#		--force-recreate

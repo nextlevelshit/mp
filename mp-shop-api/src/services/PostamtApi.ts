@@ -2,8 +2,8 @@ import { postamtPort } from "../config/constants";
 import debug from "debug";
 import {Counter} from "prom-client";
 
-const logger = debug("mp:i:shop-api:postamt-api");
-const verbose = debug("mp:v:shop-api:postamt-api");
+const logger = debug("app:i:shop-api:postamt-api");
+const verbose = debug("app:v:shop-api:postamt-api");
 
 const successfulTextMessageCounter = new Counter({
     name: "mp_shop_api_postamt_successful_text_message_sent_total",

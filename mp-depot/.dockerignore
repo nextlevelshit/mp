@@ -1,7 +1,7 @@
-.tmp/
-.cache/
-.git/
-build/
-node_modules/
+.tmp
+.cache
+.git
+build
+node_modules
 .env
-data/
+public/uploads/*

@@ -143,49 +143,7 @@ export interface Order {
 	cartProducts: CartProduct[] | null;
 	paymentAuthorised: boolean;
 	paymentStatus: string | null;
-}
-
-export interface OrderUpdateBody {
-	email: string;
-	address: string;
-	invoiceAddress: string;
-	delivery: number;
-	payment: number;
-	customer: any;
-	cart: null | {
-		count: number;
-		product: number;
-	}[];
 	acceptedTermsAndConditionsAt: string;
 }
 
-export type PdfBody = {
-	subject: string;
-	date: string;
-	to: {
-		name: string;
-		address: string[];
-	};
-	nr: {
-		customer: string;
-		order: string;
-		shipping: string;
-	};
-	service: {
-		description: string;
-		price: {
-			per_unit: number;
-			total: number;
-		};
-		count: number;
-		nr: string;
-	}[];
-	currency: string;
-	body: string;
-	total: number;
-	subtotal: number;
-	VAT: {
-		rate: number;
-		amount: number;
-	}
-};
+export type OrderUpdateBody = Partial<Order>;

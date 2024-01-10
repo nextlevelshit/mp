@@ -22,8 +22,8 @@ import {OrderDto} from "../dto/OrderDto";
 import {inkassoApi} from "./InkassoApi";
 import {postamtApi} from "./PostamtApi";
 
-const logger = debug("mp:i:shop-api:depot-api");
-const verbose = debug("mp:v:shop-api:depot-api");
+const logger = debug("app:i:shop-api:depot-api");
+const verbose = debug("app:v:shop-api:depot-api");
 
 class DepotApi {
 	readonly host: string;

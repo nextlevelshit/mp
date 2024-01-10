@@ -7,8 +7,8 @@ import debug from "debug";
 import {OrderDto} from "./dto/OrderDto";
 import {adyenClientKey} from "./config/constants";
 
-const logger = debug("mp:i:shop-api:router");
-const verbose = debug("mp:v:shop-api:router");
+const logger = debug("app:i:shop-api:router");
+const verbose = debug("app:v:shop-api:router");
 
 const orderCounter = new Counter({
 	name: "mp_shop_api_order_created_total",

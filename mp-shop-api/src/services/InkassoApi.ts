@@ -3,8 +3,8 @@ import {PdfBody} from "../util/types";
 import {Counter} from "prom-client";
 import debug from "debug";
 
-const logger = debug("mp:i:shop-api:inkasso-api");
-const verbose = debug("mp:v:shop-api:inkasso-api");
+const logger = debug("app:i:shop-api:inkasso-api");
+const verbose = debug("app:v:shop-api:inkasso-api");
 
 
 const successfulInvoiceCounter = new Counter({

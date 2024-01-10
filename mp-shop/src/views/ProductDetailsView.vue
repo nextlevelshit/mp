@@ -87,8 +87,8 @@ import {shopApi} from "@/services/ShopApi";
 import debug from "debug";
 import {cart} from "@/stores/cart";
 
-const logger = debug("mp:i:product-details-view");
-const verbose = debug("mp:v:product-details-view");
+const logger = debug("app:i:product-details-view");
+const verbose = debug("app:v:product-details-view");
 
 export default {
   components: {CodeBlock},

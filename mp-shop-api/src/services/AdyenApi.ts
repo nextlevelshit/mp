@@ -11,8 +11,8 @@ import EventCodeEnum = NotificationRequestItem.EventCodeEnum;
 import {depotApi} from "./DepotApi";
 import {Counter} from "prom-client";
 
-const logger = debug("mp:i:shop-api:adyen-api");
-const verbose = debug("mp:v:shop-api:adyen-api");
+const logger = debug("app:i:shop-api:adyen-api");
+const verbose = debug("app:v:shop-api:adyen-api");
 
 const successfulSessionCreationCounter = new Counter({
 	name: "mp_shop_api_adyen_successful_session_creation_total",

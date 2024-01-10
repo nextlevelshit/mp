@@ -1,269 +1,252 @@
 version: "3.9"
 
 services:
-  mp-inkasso:
-    build:
-      context: ${INKASSO_DOCKER_CONTEXT:-./mp-inkasso}
-      dockerfile: ${INKASSO_PATH_DOCKERFILE:-docker/dev.Dockerfile}
-    container_name: mp-inkasso
-    environment:
-      PYTHONUNBUFFERED: true
-      DEBUG_METRICS: ${INKASSO_DEBUG_METRICS:-false}
-    ports:
-      - "${INKASSO_PORT:-1111}:1111"
-    stop_signal: SIGKILL
-    networks:
-      - internal
-    volumes:
-      - ./mp-inkasso/data:/app/data
-      - ./mp-inkasso/src:/app/src:ro
-    healthcheck:
-      test: wget --no-verbose --spider -S -T 1 http://mp-inkasso:${INKASSO_PORT:-1111}/health || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  mp-postamt:
-    build:
-      context: ./mp-postamt
-      dockerfile: ${POSTAMT_PATH_DOCKERFILE:-docker/dev.Dockerfile}
-    container_name: mp-postamt
-    environment:
-      PYTHONUNBUFFERED: true
-      DEBUG_METRICS: ${POSTAMT_DEBUG_METRICS:-false}
-      SMTP_RELAY_HOST: ${POSTAMT_SMTP_RELAY_HOST}
-      SMTP_RELAY_PORT: ${POSTAMT_SMTP_RELAY_PORT}
-      SMTP_RELAY_USERNAME: ${POSTAMT_SMTP_RELAY_USERNAME}
-      SMTP_RELAY_PASSWORD: ${POSTAMT_SMTP_RELAY_PASSWORD}
-    ports:
-      - "${POSTAMT_PORT:-2222}:2222"
-    stop_signal: SIGKILL
-    networks:
-      - internal
-    healthcheck:
-      test: wget --no-verbose --spider -S -T 1 http://mp-postamt:${POSTAMT_PORT:-2222}/health || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    mp-inkasso:
+        container_name: inkasso
+        build: ./mp-inkasso
+        restart: unless-stopped
+        stop_signal: SIGKILL
+        environment:
+            ENVIRONMENT: production
+            PYTHONUNBUFFERED: true
+            DEBUG_METRICS: ${INKASSO_DEBUG_METRICS:-false}
+        healthcheck:
+            test: wget --no-verbose --spider -S -T 1 http://mp-inkasso:${INKASSO_PORT:-1111}/health || exit 1
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        networks:
+            - internal
+        ports:
+            - "${INKASSO_PORT:-1111}:1111"
 
-  #  mp-konsole:
-  #    container_name: mp-konsole
-  #    build: ./mp-konsole
-  #    stop_signal: SIGKILL
-  #    depends_on:
-  #      - mp-inkasso
-  #      - mp-depot
-  #    ports:
-  #      - "3333:3333"
-  #    env_file: .env
-  #    environment:
-  #      VITE_DEPOT_API_TOKEN: ${DEPOT_TOKEN}
-  #      VITE_DEPOT_PORT: ${DEPOT_PORT}
-  #      VITE_DEPOT_TOKEN: ${DEPOT_TOKEN}
-  #      VITE_DEPOT_RELATIVE_PATH: ${DEPOT_RELATIVE_PATH}
-  #      VITE_INKASSO_PORT: ${INKASSO_PORT}
-  #    networks:
-  #      - internal
-  #    volumes:
-  #      - ./mp-konsole/src:/app/src:ro
-  #      - ./mp-konsole/vite.config.ts:/app/vite.config.ts:ro
+    mp-postamt:
+        container_name: postamt
+        build: ./mp-postamt
+        stop_signal: SIGKILL
+        restart: unless-stopped
+        environment:
+            ENVIRONMENT: production
+            PYTHONUNBUFFERED: true
+            DEBUG_METRICS: ${POSTAMT_DEBUG_METRICS:-false}
+            SMTP_RELAY_HOST: ${POSTAMT_SMTP_RELAY_HOST}
+            SMTP_RELAY_PORT: ${POSTAMT_SMTP_RELAY_PORT}
+            SMTP_RELAY_USERNAME: ${POSTAMT_SMTP_RELAY_USERNAME}
+            SMTP_RELAY_PASSWORD: ${POSTAMT_SMTP_RELAY_PASSWORD}
+        healthcheck:
+            test: wget --no-verbose --spider -S -T 1 http://mp-postamt:${POSTAMT_PORT:-2222}/health || exit 1
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        ports:
+            - "${POSTAMT_PORT:-2222}:2222"
+        networks:
+            - internal
 
-  mp-silo:
-    container_name: mp-silo
-    #    restart: unless-stopped
-    image: postgres:alpine
-    environment:
-      POSTGRES_USER: ${SILO_DATABASE_USERNAME}
-      POSTGRES_PASSWORD: ${SILO_DATABASE_PASSWORD}
-      POSTGRES_DB: ${SILO_DATABASE_NAME}
-    volumes:
-      - ./mp-silo/data:/var/lib/postgresql/data/ # if you want to use a bind folder
-      # - silo-data:/var/lib/postgresql/data/ #using a volume
-      # - ./mp-silo/seed/backup_2023-03-10_23-44-50.sql:/docker-entrypoint-initdb.d/seed_database.sql
-    ports:
-      - "${SILO_PORT:-5432}:5432"
-    networks:
-      - data
-    healthcheck:
-      test: pg_isready -h mp-silo -p ${SILO_PORT:-5432} -U ${SILO_DATABASE_USERNAME} -d ${SILO_DATABASE_NAME}
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    mp-silo:
+        container_name: silo
+        image: postgres:alpine
+        restart: unless-stopped
+        environment:
+            POSTGRES_USER: ${SILO_DATABASE_USERNAME}
+            POSTGRES_PASSWORD: ${SILO_DATABASE_PASSWORD}
+            POSTGRES_DB: ${SILO_DATABASE_NAME}
+        healthcheck:
+            test: pg_isready -h mp-silo -p ${SILO_PORT:-5432} -U ${SILO_DATABASE_USERNAME} -d ${SILO_DATABASE_NAME}
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        volumes:
+            - ./mp-silo/data:/var/lib/postgresql/data
+        ports:
+            - "${SILO_PORT:-5432}:5432"
+        networks:
+            - data
 
-  mp-depot:
-    container_name: mp-depot
-    build:
-      context: ./mp-depot
-      dockerfile: ${DEPOT_PATH_DOCKERFILE:-docker/dev.Dockerfile}
-    image: strapi:latest
-    environment:
-      PORT: ${DEPOT_PORT}
-      DATABASE_HOST: ${DEPOT_DATABASE_HOST}
-      DATABASE_SSL: false
-      DATABASE_URL: ${DEPOT_DATABASE_URL:-}
-      DATABASE_PORT: ${SILO_PORT}
-      DATABASE_NAME: ${SILO_DATABASE_NAME:-}
-      DATABASE_USERNAME: ${SILO_DATABASE_USERNAME:-}
-      DATABASE_PASSWORD: ${SILO_DATABASE_PASSWORD:-}
-      DATABASE_CLIENT: ${DEPOT_DATABASE_CLIENT}
-      STRAPI_TELEMETRY_DISABLED: true
-      JWT_SECRET: ${DEPOT_JWT_SECRET}
-      API_TOKEN_SALT: ${DEPOT_API_TOKEN_SALT}
-      ADMIN_JWT_SECRET: ${DEPOT_ADMIN_JWT_SECRET}
-      APP_KEYS: ${DEPOT_APP_KEYS}
-      TRANSFER_TOKEN_SALT: ${DEPOT_TRANSFER_TOKEN_SALT}
-    volumes:
-      - ./mp-depot/config:/opt/app/config
-      - ./mp-depot/src:/opt/app/src
-      - ./mp-depot/package.json:/opt/package.json
-      - ./mp-depot/public/uploads:/opt/app/public/uploads
-      - ./mp-depot/database:/opt/app/database
-    ports:
-      - "${DEPOT_PORT:-5555}:5555"
-    stop_signal: SIGKILL
-    networks:
-      - internal
-      - data
-    depends_on:
-      mp-silo:
-        condition: service_healthy
-    healthcheck:
-      test: wget --no-verbose --spider -S -T 1 http://mp-depot:${DEPOT_PORT:-5555}/_health || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    mp-depot:
+        container_name: depot
+        build: ./mp-depot
+        restart: unless-stopped
+        stop_signal: SIGKILL
+        environment:
+            NODE_ENV: production
+            PORT: ${DEPOT_PORT}
+            DATABASE_HOST: mp-silo
+            DATABASE_SSL: false
+            DATABASE_URL: ${DEPOT_DATABASE_URL:-}
+            DATABASE_PORT: ${SILO_PORT}
+            DATABASE_NAME: ${SILO_DATABASE_NAME:-}
+            DATABASE_USERNAME: ${SILO_DATABASE_USERNAME:-}
+            DATABASE_PASSWORD: ${SILO_DATABASE_PASSWORD:-}
+            DATABASE_CLIENT: ${DEPOT_DATABASE_CLIENT}
+            STRAPI_TELEMETRY_DISABLED: true
+            JWT_SECRET: ${DEPOT_JWT_SECRET}
+            API_TOKEN_SALT: ${DEPOT_API_TOKEN_SALT}
+            ADMIN_JWT_SECRET: ${DEPOT_ADMIN_JWT_SECRET}
+            APP_KEYS: ${DEPOT_APP_KEYS}
+            TRANSFER_TOKEN_SALT: ${DEPOT_TRANSFER_TOKEN_SALT}
+        healthcheck:
+            test: wget --no-verbose --spider -S -T 1 http://mp-depot:${DEPOT_PORT:-5555}/_health || exit 1
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        volumes:
+            - ./mp-depot/public/uploads:/opt/app/public/uploads
+        ports:
+            - "${DEPOT_PORT:-5555}:5555"
+        networks:
+            - internal
+            - data
+        depends_on:
+            mp-silo:
+                condition: service_healthy
 
-  mp-shop-api:
-    container_name: mp-shop-api
-    build:
-      context: ${SHOP_API_DOCKER_CONTEXT:-./mp-shop-api}
-      dockerfile: ${SHOP_API_PATH_DOCKERFILE:-docker/dev.Dockerfile}
-    environment:
-      SHOP_API_PORT: ${SHOP_API_PORT}
-      DEPOT_PORT: ${DEPOT_PORT}
-      INKASSO_PORT: ${INKASSO_PORT}
-      POSTAMT_PORT: ${POSTAMT_PORT}
-      ADYEN_MERCHANT_ACCOUNT: ${SHOP_API_ADYEN_MERCHANT_ACCOUNT}
-      ADYEN_HMAC_KEY: ${SHOP_API_ADYEN_HMAC_KEY}
-      ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
-      ADYEN_API_KEY: ${SHOP_API_ADYEN_API_KEY}
-      ADYEN_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
-      DEPOT_TOKEN: ${SHOP_API_DEPOT_TOKEN}
-      EXPRESS_TRUST_TOKEN: ${SHOP_API_EXPRESS_TRUST_TOKEN:-}
-    ports:
-      - "${SHOP_API_PORT:-8888}:8888"
-    stop_signal: SIGKILL
-    networks:
-      - internal
-    depends_on:
-      mp-depot:
-        condition: service_healthy
-      mp-inkasso:
-        condition: service_healthy
-      mp-postamt:
-        condition: service_healthy
-    volumes:
-      - ./mp-shop-api/src:/app/src:ro
-    healthcheck:
-      test: wget --no-verbose --spider -S -T 1 http://mp-shop-api:${SHOP_API_PORT:-8888}/health || exit 1
-      interval: 30s
-      timeout: 10s
-      retries: 3
+    mp-shop-api:
+        container_name: shop-api
+        build: ./mp-shop-api
+        restart: unless-stopped
+        stop_signal: SIGKILL
+        environment:
+            NODE_ENV: production
+            SHOP_API_PORT: ${SHOP_API_PORT}
+            DEPOT_PORT: ${DEPOT_PORT}
+            INKASSO_PORT: ${INKASSO_PORT}
+            POSTAMT_PORT: ${POSTAMT_PORT}
+            ADYEN_MERCHANT_ACCOUNT: ${SHOP_API_ADYEN_MERCHANT_ACCOUNT}
+            ADYEN_HMAC_KEY: ${SHOP_API_ADYEN_HMAC_KEY}
+            ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
+            ADYEN_API_KEY: ${SHOP_API_ADYEN_API_KEY}
+            ADYEN_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
+            DEPOT_TOKEN: ${SHOP_API_DEPOT_TOKEN}
+            EXPRESS_TRUST_TOKEN: ${SHOP_API_EXPRESS_TRUST_TOKEN:-}
+        healthcheck:
+            test: wget --no-verbose --spider -S -T 1 http://mp-shop-api:${SHOP_API_PORT:-8888}/health || exit 1
+            interval: 30s
+            timeout: 10s
+            retries: 3
+        ports:
+            - "${SHOP_API_PORT:-8888}:8888"
+        networks:
+            - internal
+        depends_on:
+            mp-depot:
+                condition: service_started
+            mp-inkasso:
+                condition: service_started
+            mp-postamt:
+                condition: service_started
 
-  mp-shop:
-    container_name: mp-shop
-    build:
-      context: ./mp-shop
-      dockerfile: ${SHOP_PATH_DOCKERFILE:-./mp-shop/docker/dev.Dockerfile}
-    ports:
-      - "${SHOP_PORT:-9999}:9999"
-    stop_signal: SIGKILL
-    environment:
-      BASE_URL: ${SHOP_BASE_URL:-}
-    depends_on:
-      mp-shop-api:
-        condition: service_healthy
-    networks:
-      - internal
-    volumes:
-      - ./mp-shop/src:/app/src:ro
-      - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
-#    healthcheck:
-#      test: wget --no-verbose --spider -S -T 1 http://mp-shop:${SHOP_PORT:-9999}/ || exit 1
-#      interval: 30s
-#      timeout: 10s
-#      retries: 3
+    mp-shop:
+        container_name: shop
+        build: ./mp-shop
+        restart: unless-stopped
+        stop_signal: SIGKILL
+        environment:
+            BASE_URL: ${SHOP_BASE_URL:-}
+        volumes:
+            - ./mp-proxy/nginx-template.conf:/etc/nginx/nginx-template.conf:ro
+            - ./mp-proxy/docker-entrypoint.sh/:/etc/nginx/docker-entrypoint.sh:ro
+            - ./mp-proxy/cache:/cache
+        ports:
+            - "${SHOP_PORT:-9999}:9999"
+        networks:
+            - internal
+        depends_on:
+            mp-shop-api:
+                condition: service_healthy
 
-  mp-proxy:
-    image: nginx
-    container_name: mp-proxy
-    volumes:
-      - ./mp-proxy/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./mp-proxy/cache:/cache
-    ports:
-      - "${PROXY_PORT}:80"
-    stop_signal: SIGKILL
-    networks:
-      - public
-      - internal
-    depends_on:
-      mp-shop:
-        condition: service_started
-      mp-shop-api:
-        condition: service_healthy
-      mp-depot:
-        condition: service_healthy
-      mp-postamt:
-        condition: service_healthy
-      mp-inkasso:
-        condition: service_healthy
+    mp-proxy:
+        container_name: proxy
+        build: ./mp-proxy
+        restart: unless-stopped
+        stop_signal: SIGKILL
+        environment:
+            SHOP_ADDRESS: mp-shop:${SHOP_PORT}
+            SHOP_API_ADDRESS: mp-shop-api:${SHOP_API_PORT}
+            DEPOT_ADDRESS: mp-depot:${DEPOT_PORT}
+            CERTS_DOCKER_CONTAINER: certs
+            CERTS_PORT: ${CERTS_PORT:-}
+        volumes:
+            - ./mp-proxy/cache:/cache
+            - certs-data:/etc/nginx/certs:ro
+        ports:
+            - "${PROXY_PORT:-8080}:80"
+            - "${PROXY_SSL_PORT:-8443}:443"
+        networks:
+            - public
+            - internal
+        depends_on:
+            certs:
+                condition: service_started
+            mp-shop:
+                condition: service_started
+            mp-shop-api:
+                condition: service_started
+            mp-depot:
+                condition: service_started
 
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    ports:
-      - "${PROMETHEUS_PORT:-9090}:9090"
-    volumes:
-      - ./prometheus/config.yml:/prometheus/prometheus.yml
-    networks:
-      - internal
-    command: --log.level=error
-    depends_on:
-      mp-shop:
-        condition: service_started
-      mp-shop-api:
-        condition: service_healthy
-      mp-depot:
-        condition: service_healthy
-      mp-postamt:
-        condition: service_healthy
-      mp-inkasso:
-        condition: service_healthy
+    certs:
+        container_name: certs
+        image: certbot/certbot
+        command: >-
+            certonly --standalone --http-01-port 80 --agree-tos --non-interactive --email "${CERTS_EMAIL}" -d "${CERTS_DOMAIN}"
+            --deploy-hook "cp /etc/letsencrypt/live/${CERTS_DOMAIN}/fullchain.pem /etc/letsencrypt/cert.pem && cp /etc/letsencrypt/live/${CERTS_DOMAIN}/privkey.pem /etc/letsencrypt/cert.pem.key"
+        volumes:
+            - certs-data:/etc/letsencrypt
+        ports:
+            - "${CERTS_PORT:-6666}:80"
 
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - "${GRAFANA_PORT:-3000}:3000"
-    environment:
-      GF_SERVER_ROUTER_LOGGING: false
-      GF_DATABASE_LOG_QUERIES: false
-      GF_LOG_LEVEL: "error"
-      GF_AUTH_ANONYMOUS_ENABLED: ${GRAFANA_AUTH_ANONYMOUS_ENABLED:-false}
-    networks:
-      - internal
-    volumes:
-      - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/default.yaml
-      - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/default.yaml
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-    depends_on:
-      - prometheus
+    prometheus:
+        container_name: prometheus
+        image: prom/prometheus
+        command: --log.level=error
+        restart: unless-stopped
+        volumes:
+            - ./prometheus/config.yml:/prometheus/prometheus.yml
+        ports:
+            - "${PROMETHEUS_PORT:-9090}:9090"
+        networks:
+            - internal
+        depends_on:
+            mp-shop:
+                condition: service_started
+            mp-shop-api:
+                condition: service_healthy
+            mp-depot:
+                condition: service_healthy
+            mp-postamt:
+                condition: service_healthy
+            mp-inkasso:
+                condition: service_healthy
 
-#volumes:
-#  silo-data:
+    grafana:
+        container_name: grafana
+        image: grafana/grafana
+        restart: unless-stopped
+        environment:
+            GF_SERVER_ROUTER_LOGGING: false
+            GF_DATABASE_LOG_QUERIES: false
+            GF_LOG_LEVEL: "error"
+            GF_AUTH_ANONYMOUS_ENABLED: ${GRAFANA_AUTH_ANONYMOUS_ENABLED:-false}
+        volumes:
+            - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/default.yaml
+            - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/default.yaml
+            - ./grafana/dashboards:/var/lib/grafana/dashboards
+        ports:
+            - "${GRAFANA_PORT:-3000}:3000"
+        networks:
+            - internal
+        depends_on:
+            - prometheus
+
+volumes:
+    silo-data:
+    depot-data:
+    certs-data:
 
 networks:
-  internal:
-  public:
-    driver: bridge
-  data:
+    internal:
+    public:
+        driver: bridge
+    data:

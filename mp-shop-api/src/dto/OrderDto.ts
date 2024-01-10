@@ -8,8 +8,8 @@ import {CartProductDto, CartProductDtoData} from "./CartProductDto";
 import {depotApi} from "../services/DepotApi";
 
 
-const logger = debug("mp:i:shop-api:order-dto");
-const verbose = debug("mp:v:shop-api:order-dto");
+const logger = debug("app:i:shop-api:order-dto");
+const verbose = debug("app:v:shop-api:order-dto");
 
 export class OrderDto {
 	private readonly order: Order;

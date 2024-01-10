@@ -6,8 +6,8 @@ import { expressTrustProxy, port } from "./config/constants";
 import debug from "debug";
 import { collectDefaultMetrics, register } from "prom-client"; // Import Prometheus-related modules
 
-const logger = debug("mp:i:shop-api:app");
-const verbose = debug("mp:v:shop-api:app");
+const logger = debug("app:i:shop-api:app");
+const verbose = debug("app:v:shop-api:app");
 
 config();
 

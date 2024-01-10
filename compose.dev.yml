@@ -1,0 +1,77 @@
+version: "3.9"
+
+services:
+    mp-inkasso:
+        container_name: inkasso-dev
+        restart: no
+        environment:
+            ENVIRONMENT: development
+        volumes:
+            - ./mp-inkasso/data:/app/data
+            - ./mp-inkasso/src:/app/src:ro
+
+    mp-postamt:
+        container_name: postamt-dev
+        restart: no
+        environment:
+            ENVIRONMENT: development
+
+    mp-silo:
+        container_name: silo-dev
+
+    mp-depot:
+        container_name: depot-dev
+        restart: no
+        environment:
+            NODE_ENV: development
+        volumes:
+            - ./mp-depot/config:/opt/app/config:ro
+            - ./mp-depot/src:/opt/app/src:ro
+            - ./mp-depot/package.json:/opt/package.json:ro
+            - ./mp-depot/database:/opt/app/database
+
+    mp-shop-api:
+        container_name: shop-api-dev
+        restart: no
+        environment:
+            NODE_ENV: development
+        volumes:
+            - ./mp-shop-api/src:/app/src:ro
+
+    mp-shop:
+        container_name: shop-dev
+        restart: no
+        volumes:
+            - ./mp-shop/src:/app/src:ro
+            - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
+
+    mp-proxy:
+        container_name: proxy-dev
+        image: !reset null
+        build: ./mp-proxy
+        environment:
+            NGINX_DEBUG: true
+        depends_on:
+            certs:
+                condition: service_completed_successfully
+
+    certs:
+        container_name: certs-dev
+        image: !reset null
+        command: !reset null
+        build: ./certs
+        environment:
+            HOST: ${CERTS_DOMAIN:-localhost}
+            EMAIL: ${CERTS_EMAIL:-admin@localhost}
+        volumes:
+            - certs-data:/etc/ssl
+        networks:
+            - internal
+
+    prometheus:
+        container_name: prometheus-dev
+        restart: no
+
+    grafana:
+        container_name: grafana-dev
+        restart: no

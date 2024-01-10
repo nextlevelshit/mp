@@ -109,7 +109,6 @@ def send_pdf():
 
 @app.route('/health', methods=['GET'])
 def health_check():
-	# TODO: Add health check logic
 	return jsonify({'status': 'ok'})
 
 

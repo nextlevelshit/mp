@@ -5,12 +5,14 @@
     "develop": "strapi develop",
     "start": "strapi start",
     "build": "strapi build",
-    "strapi": "strapi"
+    "strapi": "strapi",
+    "import": "npm run strapi import -- -f database/export.tar.gz",
+    "export": "npm run strapi export -- --no-encrypt --file database/export_$(date +'%Y%m%d%H%M%S')"
   },
   "dependencies": {
-    "@strapi/plugin-i18n": "^4.15.5",
-    "@strapi/plugin-users-permissions": "^4.15.5",
-    "@strapi/strapi": "^4.15.5",
+    "@strapi/plugin-i18n": "^4.16.2",
+    "@strapi/plugin-users-permissions": "^4.16.2",
+    "@strapi/strapi": "^4.16.2",
     "pg": "^8.11.3",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",

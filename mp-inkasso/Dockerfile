@@ -1,5 +1,8 @@
 FROM rstropek/pandoc-latex:latest
 
+ARG ENVIRONMENT
+ENV ENVIRONMENT=$ENVIRONMENT
+
 ARG PYTHONUNBUFFERED="true"
 ENV PYTHONUNBUFFERED="${PYTHONUNBUFFERED}"
 
@@ -13,7 +16,6 @@ WORKDIR /app
 RUN tlmgr update --self
 RUN tlmgr install ragged2e xltxtra realscripts wallpaper eso-pic \
     titlesec arydshln spreadtab enumitem xstring
-#RUN tlmgr install hhline xcolor
 
 COPY ./requirements.txt /app/requirements.txt
 
@@ -22,9 +24,10 @@ RUN pip install -r requirements.txt
 COPY ./data /app/data
 COPY ./src /app/src
 COPY ./makefile /app/makefile
+COPY ./docker-entrypoint.sh /app/docker-entrypoint.sh
+
+RUN chmod +x /app/docker-entrypoint.sh
+
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 EXPOSE 1111
-
-ENTRYPOINT ["/usr/bin/python3"]
-
-CMD ["src/app.py"]
