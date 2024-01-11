@@ -58,7 +58,7 @@ services:
             timeout: 10s
             retries: 3
         volumes:
-            - ./mp-silo/data:/var/lib/postgresql/data
+            - silo-data:/var/lib/postgresql/data
         ports:
             - "${SILO_PORT:-5432}:5432"
         networks:
@@ -92,7 +92,7 @@ services:
             timeout: 10s
             retries: 3
         volumes:
-            - ./mp-depot/public/uploads:/opt/app/public/uploads
+            - depot-data:/opt/app/public/uploads
         ports:
             - "${DEPOT_PORT:-5555}:5555"
         networks:
@@ -168,7 +168,7 @@ services:
             CERTS_DOCKER_CONTAINER: certs
             CERTS_PORT: ${CERTS_PORT:-}
         volumes:
-            - ./mp-proxy/cache:/cache
+            - cache-data:/cache
             - certs-data:/etc/nginx/certs:ro
         ports:
             - "${PROXY_PORT:-8080}:80"
@@ -244,6 +244,7 @@ volumes:
     silo-data:
     depot-data:
     certs-data:
+    cache-data:
 
 networks:
     internal:
