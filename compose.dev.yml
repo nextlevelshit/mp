@@ -18,6 +18,8 @@ services:
 
     mp-silo:
         container_name: silo-dev
+        volumes:
+            - ./mp-silo/data:/var/lib/postgresql/data
 
     mp-depot:
         container_name: depot-dev
@@ -29,6 +31,7 @@ services:
             - ./mp-depot/src:/opt/app/src:ro
             - ./mp-depot/package.json:/opt/package.json:ro
             - ./mp-depot/database:/opt/app/database
+            - ./mp-depot/public/uploads:/opt/app/public/uploads
 
     mp-shop-api:
         container_name: shop-api-dev
@@ -65,8 +68,6 @@ services:
             EMAIL: ${CERTS_EMAIL:-admin@localhost}
         volumes:
             - certs-data:/etc/ssl
-        networks:
-            - internal
 
     prometheus:
         container_name: prometheus-dev
