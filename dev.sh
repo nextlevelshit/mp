@@ -5,7 +5,7 @@ docker compose -p "muellerprints-dev" down
 docker compose -p "muellerprints-dev" \
 		-f compose.yml \
 		-f compose.dev.yml \
-		--env-file .env \
+		--env-file .env.dev \
 		up \
 		--build \
     	--remove-orphans \

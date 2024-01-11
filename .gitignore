@@ -2,6 +2,6 @@
 .code
 .vscode
 .env
-.env.prod
+.env.dev
 
 mp-silo/data/*
