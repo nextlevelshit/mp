@@ -93,6 +93,7 @@ services:
             retries: 3
         volumes:
             - depot-data:/opt/app/public/uploads
+            - ./mp-depot/database:/opt/app/database
         ports:
             - "${DEPOT_PORT:-5555}:5555"
         networks:
