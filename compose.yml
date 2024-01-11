@@ -176,6 +176,15 @@ services:
         networks:
             - public
             - internal
+        depends_on:
+            certs:
+                condition: service_completed_successfully
+            mp-shop:
+                condition: service_started
+            mp-shop-api:
+                condition: service_started
+            mp-depot:
+                condition: service_started
 
     certs:
         container_name: certs
@@ -186,7 +195,7 @@ services:
         volumes:
             - certs-data:/etc/letsencrypt
         ports:
-            - "${CERTS_PORT:-6666}:80"
+            - "80:80"
 
     prometheus:
         container_name: prometheus
