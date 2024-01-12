@@ -47,7 +47,7 @@ openssl rand -base64 32
    docker exec -it depot-dev sh
    ```
    
-3. Run strapi import command
+3. Run strapi export command
 
    ```shell
    npm run strapi export -- --no-encrypt --file database/export_YYYYMMDDHHMMSS
@@ -68,7 +68,7 @@ Replace `YYYYMMDDHHMMSS` with current date time.
    docker exec -it depot-dev sh
    ```
    
-3. Run strapi export command
+3. Run strapi import command
    ```shell
-   npm run strapi import -- -f export.tar.gz
+   npm run strapi import -- -f database/export.tar.gz
    ```
