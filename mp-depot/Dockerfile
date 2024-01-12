@@ -18,6 +18,7 @@ ENV PATH /opt/node_modules/.bin:$PATH
 
 RUN npm i --no-audit --no-fund --progress=false --no-warnings --log-level=error
 RUN npm i --ignore-scripts=false --foreground-scripts --verbose sharp
+RUN npm i -g pm2
 
 WORKDIR /opt/app
 
