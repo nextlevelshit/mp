@@ -6,7 +6,7 @@
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi",
-    "import": "npm run strapi import -- -f database/export.tar.gz",
+    "import": "npm run strapi import -- -f database/export.tar.gz --force",
     "export": "npm run strapi export -- --no-encrypt --file database/export_$(date +'%Y%m%d%H%M%S')"
   },
   "dependencies": {
