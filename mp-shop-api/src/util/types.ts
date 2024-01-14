@@ -119,8 +119,18 @@ export interface Product {
 		ruling: {
 			data: null | ProductRuling;
 		};
-		image: {
-			data: MediaData;
+		images: {
+			data: null | {
+				id: number;
+				attributes: {
+					createdAt: string;
+					updatedAt: string;
+					name: string;
+					images: {
+						data: null | MediaData[];
+					}
+				}
+			};
 		};
 	};
 }

@@ -270,7 +270,7 @@ router.get("/v1/product/:id", async (req, res) => {
 
 		res.status(200).send(product);
 	} catch (e) {
-		res.status(500).send("Could not fetch cart");
+		res.status(500).send("Could not fetch product");
 	}
 });
 

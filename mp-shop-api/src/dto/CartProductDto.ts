@@ -8,7 +8,6 @@ const verbose = debug("app:v:cart-product-dto");
 export class CartProductDto {
 	private readonly cartProduct: CartProduct;
 	constructor(cartProduct: CartProduct) {
-		verbose(cartProduct);
 		this.cartProduct = cartProduct;
 	}
 

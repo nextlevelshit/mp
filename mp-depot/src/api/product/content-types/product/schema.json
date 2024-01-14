@@ -55,6 +55,12 @@
     "slug": {
       "type": "uid",
       "targetField": "name"
+    },
+    "images": {
+      "type": "relation",
+      "relation": "manyToOne",
+      "target": "api::product-image.product-image",
+      "inversedBy": "products"
     }
   }
 }

@@ -1,27 +1,33 @@
-const fs = require('fs');
-const path = require('path');
+/**
+ *
+ * DEPOT_TOKEN=ece27ebc929e5fe9a7186a420f17672fcd3e60a4b33182b294300c5e7001f01fbeebed3e7503610f4c29cb656f0ecd1caeddfb36e0aacedc9641268da3f3dc230d41e7dcb73be38bda2a2b03e08be1d87fe9960ef939659bd785c28fc99b8799f0220bebda93e2828a53faca6d8c53f68f8d639e18c4e84c78dc9e3726f0977b node seedProducts.js
+ *
+ */
 
-if (!process.env.VITE_DEPOT_API_TOKEN) {
-    console.error("VITE_DEPOT_API_TOKEN is not defined in the .env file.");
+const fs = require("fs");
+const path = require("path");
+
+if (!process.env.DEPOT_TOKEN) {
+    console.error("DEPOT_TOKEN is not defined in the .env file.");
     process.exit(1);
 }
 
 
-const apiUrl = 'http://localhost:5555/api'
+const apiUrl = "http://localhost:5555/api"
 
 
-const rootDirectory = path.join(__dirname, 'products');
+const rootDirectory = path.join(__dirname, "products");
 
 
 function getImageFileNames(directory) {
     return fs.readdirSync(directory).filter(file => {
-        return file.endsWith('.jpg') || file.endsWith('.jpeg') || file.endsWith('.png') || file.endsWith('.gif');
+        return file.endsWith(".jpg") || file.endsWith(".jpeg") || file.endsWith(".png") || file.endsWith(".gif");
     });
 }
 
 const imageFileNames = getImageFileNames(rootDirectory);
 
-const getProductCover = (fileName) => {
+const getProductCoverId = (fileName) => {
     const ids = new Map([
         ["HARD", 1],
         ["SOFT", 2],
@@ -39,7 +45,7 @@ const getProductCoverLabel = (cover) => {
     return ids.get(cover);
 };
 
-const getProductPattern = (fileName) => {
+const getProductPatternId = (fileName) => {
     const idStart = 85;
     const suffixes = ["3D-01",
         "3D-02",
@@ -167,38 +173,63 @@ async function seedProducts() {
         const products = [];
 
         for (const fileName of imageFileNames) {
-            const imagePath = path.join(rootDirectory, fileName);
-            const imageBuffer = fs.readFileSync(imagePath);
-            const imageBlob = new Blob([imageBuffer], {type: getImageType(fileName)})
-            const cover = getProductCover(fileName);
-            const pattern = getProductPattern(fileName);
+			const imagePath = path.join(rootDirectory, fileName);
+			const imageBuffer = fs.readFileSync(imagePath);
+			const imageBlob = new Blob([imageBuffer], {type: getImageType(fileName)})
+
+			const cover = getProductCoverId(fileName);
+			const pattern = getProductPatternId(fileName);
+
+			const body = new FormData();
+			const name = [
+				getProductCoverLabel(cover),
+				getProductPatternLabel(fileName)
+			].join(" – ");
+
+			body.append("files.images", imageBlob, fileName);
+			body.append("data", JSON.stringify({name}));
+
+			const response = await fetch(`${apiUrl}/product-images`, {
+				method: "POST",
+				headers: {
+					"Authorization": `Bearer ${process.env.DEPOT_TOKEN}`,
+				},
+				body
+			});
+
+			if (!response.ok) {
+				throw new Error(`Failed to add image "${fileName}" - Status: ${response.status}`);
+			}
+
+			const {data} = await response.json();
+
+			const images = data.id;
+
             const allPages = getAllProductPages();
-            const allRulings = getAllProductRuling(fileName);
+			const allRulings = getAllProductRuling(fileName);
 
             for (const [pagesLabel, pages] of allPages) {
-                for (const [rulingLabel, ruling] of allRulings) {
-                    const body = new FormData();
-                    const name = [
+				for (const [rulingLabel, ruling] of allRulings) {
+					const name = [
                         getProductCoverLabel(cover),
                         getProductPatternLabel(fileName),
                         pagesLabel,
                         rulingLabel
                     ].join(" – ");
-                    const bodyData = {name, cover, pattern, pages, ruling};
-
-                    body.append("files.image", imageBlob, fileName);
-                    body.append("data", JSON.stringify(bodyData));
 
                     const response = await fetch(`${apiUrl}/products`, {
-                        method: 'POST',
+                        method: "POST",
                         headers: {
-                            'Authorization': `Bearer ${process.env.VITE_DEPOT_API_TOKEN}`,
+                            "Authorization": `Bearer ${process.env.DEPOT_TOKEN}`,
+							"Content-Type": "application/json"
                         },
-                        body
+                        body: JSON.stringify({
+							data: {name, cover, pattern, pages, ruling, images}
+						})
                     })
 
                     if (!response.ok) {
-                        throw new Error(`Failed to add image "${fileName}" - Status: ${response.status}`);
+                        throw new Error(`Failed to add product "${name}" - Status: ${response.status}`);
                     }
 
                     const {data} = JSON.parse(await response.text());
@@ -206,13 +237,11 @@ async function seedProducts() {
                     products.push(data);
                 }
             }
-
-
         }
 
         console.log(`${products.length} entries added to products including image upload and all relations`);
 
-        console.log('Database seeding completed');
+        console.log("Database seeding completed");
 
         const rnd = Math.round(Math.random() * products.length);
 
@@ -222,7 +251,7 @@ async function seedProducts() {
 
         return products;
     } catch (error) {
-        console.error('Error seeding the database:', error.message);
+        console.error("Error seeding the database:", error.message);
     }
 }
 

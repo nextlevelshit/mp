@@ -1,11 +1,9 @@
 import {MediaData, Order, PdfBody} from "../util/types";
-import {ProductDto} from "./ProductDto";
 import {DeliveryMethodDto, DeliveryMethodDtoData} from "./DeliveryMethodDto";
 import {PaymentMethodDto, PaymentMethodDtoData} from "./PaymentMethodDto";
 import debug from "debug";
 import {vatDecimal, vatIncludedDecimal} from "../config/constants";
 import {CartProductDto, CartProductDtoData} from "./CartProductDto";
-import {depotApi} from "../services/DepotApi";
 
 
 const logger = debug("app:i:shop-api:order-dto");
@@ -86,16 +84,7 @@ export class OrderDto {
 		return this.order.attributes.deliveryNote.data;
 	}
 
-	/**
-	 * @deprecated
-	 * Replaced by cartProducts
-	 */
-	get products(): ProductDto[] | null {
-		const products = this.order.attributes.products.data;
-		return products ? products.map(product => new ProductDto(product)) : null;
-	}
 	get cartProducts(): CartProductDto[] | null {
-		verbose(this.order);
 		const cartProducts = this.order.attributes.cart;
 		return cartProducts ? cartProducts.map((cartProduct) => new CartProductDto(cartProduct)) : null;
 	}
@@ -214,10 +203,10 @@ export class OrderDto {
 			VAT,
 			delivery,
 			payment,
+			cartProducts,
 			paymentAuthorised: this.paymentAuthorised,
 			paymentStatus: this.paymentStatus,
 			acceptedTermsAndConditionsAt: this.acceptedTermsAndConditionsAt,
-			cartProducts,
 			date: this.date,
 			email: this.email,
 			emailSent: this.emailSent,

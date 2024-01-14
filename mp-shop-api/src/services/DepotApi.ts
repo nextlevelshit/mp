@@ -45,7 +45,7 @@ class DepotApi {
 
 		verbose(`Querying ${endpoint} with "${query}"`);
 
-		const response = await fetch(`${this.baseUrl}/${endpoint}?${query}&populate=deep,2`, {
+		const response = await fetch(`${this.baseUrl}/${endpoint}?${query}&populate=deep,3`, {
 			method: "GET",
 			headers: this.headers,
 		});
@@ -82,7 +82,7 @@ class DepotApi {
 
 			one: async (uuid: string) => {
 				const response = await fetch(
-					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,4`,
+					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,5`,
 					{
 						method: "GET",
 						headers: this.headers
@@ -98,7 +98,7 @@ class DepotApi {
 				const order = new OrderDto(await this.orderFactory().one(uuid));
 
 				const responseWithoutTotal = await fetch(
-					`${this.baseUrl}/orders/${order.id}?populate=deep,4`,
+					`${this.baseUrl}/orders/${order.id}?populate=deep,5`,
 					{
 						method: "PUT",
 						headers: this.headers,
@@ -121,7 +121,7 @@ class DepotApi {
 				}
 
 				const responseWithTotal = await fetch(
-					`${this.baseUrl}/orders/${order.id}?populate=deep,4`,
+					`${this.baseUrl}/orders/${order.id}?populate=deep,5`,
 					{
 						method: "PUT",
 						headers: this.headers,
@@ -315,7 +315,7 @@ class DepotApi {
 		return {
 			one: async (id: string) => {
 				const response = await fetch(
-					`${this.baseUrl}/products/${id}?populate=deep,2`,
+					`${this.baseUrl}/products/${id}?populate=deep,3`,
 					{
 						method: "GET",
 						headers: this.headers

@@ -28,7 +28,7 @@ services:
             NODE_ENV: development
         volumes:
             - ./mp-depot/config:/opt/app/config:ro
-            - ./mp-depot/src:/opt/app/src:ro
+            - ./mp-depot/src:/opt/app/src
             - ./mp-depot/package.json:/opt/package.json:ro
             - ./mp-depot/database:/opt/app/database
             - ./mp-depot/public/uploads:/opt/app/public/uploads
@@ -43,6 +43,9 @@ services:
 
     mp-shop:
         container_name: shop-dev
+        build:
+            context: ./mp-shop
+            dockerfile: Dockerfile.dev
         restart: no
         volumes:
             - ./mp-shop/src:/app/src:ro
