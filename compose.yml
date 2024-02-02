@@ -12,7 +12,7 @@ services:
             PYTHONUNBUFFERED: true
             DEBUG_METRICS: ${INKASSO_DEBUG_METRICS:-false}
         healthcheck:
-            test: wget --no-verbose --spider -S -T 1 http://mp-inkasso:${INKASSO_PORT:-1111}/health || exit 1
+            test: wget --no-verbose --spider -S -T 1 http://mp-inkasso:1111/health || exit 1
             interval: 30s
             timeout: 10s
             retries: 3
@@ -35,7 +35,7 @@ services:
             SMTP_RELAY_USERNAME: ${POSTAMT_SMTP_RELAY_USERNAME}
             SMTP_RELAY_PASSWORD: ${POSTAMT_SMTP_RELAY_PASSWORD}
         healthcheck:
-            test: wget --no-verbose --spider -S -T 1 http://mp-postamt:${POSTAMT_PORT:-2222}/health || exit 1
+            test: wget --no-verbose --spider -S -T 1 http://mp-postamt:2222/health || exit 1
             interval: 30s
             timeout: 10s
             retries: 3
@@ -53,7 +53,7 @@ services:
             POSTGRES_PASSWORD: ${SILO_DATABASE_PASSWORD}
             POSTGRES_DB: ${SILO_DATABASE_NAME}
         healthcheck:
-            test: pg_isready -h mp-silo -p ${SILO_PORT:-5432} -U ${SILO_DATABASE_USERNAME} -d ${SILO_DATABASE_NAME}
+            test: pg_isready -h mp-silo -p 5432 -U ${SILO_DATABASE_USERNAME} -d ${SILO_DATABASE_NAME}
             interval: 30s
             timeout: 10s
             retries: 3
@@ -81,13 +81,16 @@ services:
             DATABASE_PASSWORD: ${SILO_DATABASE_PASSWORD:-}
             DATABASE_CLIENT: ${DEPOT_DATABASE_CLIENT}
             STRAPI_TELEMETRY_DISABLED: true
+            STRAPI_DISABLE_UPDATE_NOTIFICATION: true
+            STRAPI_HIDE_STARTUP_MESSAGE: true
+            BROWSER: false
             JWT_SECRET: ${DEPOT_JWT_SECRET}
             API_TOKEN_SALT: ${DEPOT_API_TOKEN_SALT}
             ADMIN_JWT_SECRET: ${DEPOT_ADMIN_JWT_SECRET}
             APP_KEYS: ${DEPOT_APP_KEYS}
             TRANSFER_TOKEN_SALT: ${DEPOT_TRANSFER_TOKEN_SALT}
         healthcheck:
-            test: wget --no-verbose --spider -S -T 1 http://mp-depot:${DEPOT_PORT:-5555}/_health || exit 1
+            test: wget --no-verbose --spider -S -T 1 http://mp-depot:5555/_health || exit 1
             interval: 30s
             timeout: 10s
             retries: 3
@@ -110,7 +113,6 @@ services:
         stop_signal: SIGKILL
         environment:
             NODE_ENV: production
-            SHOP_API_PORT: ${SHOP_API_PORT}
             DEPOT_PORT: ${DEPOT_PORT}
             INKASSO_PORT: ${INKASSO_PORT}
             POSTAMT_PORT: ${POSTAMT_PORT}
@@ -122,7 +124,7 @@ services:
             DEPOT_TOKEN: ${SHOP_API_DEPOT_TOKEN}
             EXPRESS_TRUST_TOKEN: ${SHOP_API_EXPRESS_TRUST_TOKEN:-}
         healthcheck:
-            test: wget --no-verbose --spider -S -T 1 http://mp-shop-api:${SHOP_API_PORT:-8888}/health || exit 1
+            test: wget --no-verbose --spider -S -T 1 http://mp-shop-api:8888/health || exit 1
             interval: 30s
             timeout: 10s
             retries: 3
@@ -145,10 +147,6 @@ services:
         stop_signal: SIGKILL
         environment:
             BASE_URL: ${SHOP_BASE_URL:-}
-        volumes:
-            - ./mp-proxy/nginx-template.conf:/etc/nginx/nginx-template.conf:ro
-            - ./mp-proxy/docker-entrypoint.sh/:/etc/nginx/docker-entrypoint.sh:ro
-            - ./mp-proxy/cache:/cache
         ports:
             - "${SHOP_PORT:-9999}:9999"
         networks:
@@ -163,11 +161,10 @@ services:
         restart: unless-stopped
         stop_signal: SIGKILL
         environment:
-            SHOP_ADDRESS: mp-shop:${SHOP_PORT}
-            SHOP_API_ADDRESS: mp-shop-api:${SHOP_API_PORT}
-            DEPOT_ADDRESS: mp-depot:${DEPOT_PORT}
-            CERTS_DOCKER_CONTAINER: certs
-            CERTS_PORT: ${CERTS_PORT:-}
+            SHOP_ADDRESS: mp-shop:9999
+            SHOP_API_ADDRESS: mp-shop-api:8888
+            DEPOT_ADDRESS: mp-depot:5555
+            GRAFANA_ADDRESS: grafana:3000
         volumes:
             - cache-data:/cache
             - certs-data:/etc/nginx/certs:ro

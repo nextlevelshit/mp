@@ -52,6 +52,12 @@
     },
     "price": {
       "type": "decimal"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "cover"
     }
   }
 }

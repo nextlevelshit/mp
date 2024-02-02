@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-if (!process.env.VITE_DEPOT_API_TOKEN) {
-    console.error("VITE_DEPOT_API_TOKEN is not defined in the .env file.");
+if (!process.env.DEPOT_TOKEN) {
+    console.error("DEPOT_TOKEN is not defined in the .env file.");
     process.exit(1);
 }
 
@@ -76,7 +76,7 @@ async function seedPatterns() {
             const response = await fetch(`${apiUrl}/product-patterns`, {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer ${process.env.VITE_DEPOT_API_TOKEN}`,
+                    'Authorization': `Bearer ${process.env.DEPOT_TOKEN}`,
                 },
                 body
             })

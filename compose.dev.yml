@@ -45,7 +45,7 @@ services:
         container_name: shop-dev
         build:
             context: ./mp-shop
-            dockerfile: Dockerfile.dev
+            dockerfile: dev.Dockerfile
         restart: no
         volumes:
             - ./mp-shop/src:/app/src:ro
@@ -53,13 +53,14 @@ services:
 
     mp-proxy:
         container_name: proxy-dev
-        image: !reset null
         build: ./mp-proxy
         environment:
             NGINX_DEBUG: true
         depends_on:
             certs:
                 condition: service_completed_successfully
+        volumes:
+            - ./mp-proxy/nginx-template.conf:/nginx-template.conf:ro
 
     certs:
         container_name: certs-dev

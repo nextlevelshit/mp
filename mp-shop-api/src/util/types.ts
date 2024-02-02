@@ -135,6 +135,11 @@ export interface Product {
 	};
 }
 
+export interface UnsafeProduct {
+	id: number;
+	name: string;
+}
+
 export interface ProductCover {
 	id: number;
 	attributes: {
@@ -185,6 +190,12 @@ export interface ProductPattern {
 		name: string;
 		description: string;
 		price?: number;
+		image: {
+			data: null | MediaData;
+		};
+		products: {
+			data: null | Product[];
+		}
 	};
 }
 

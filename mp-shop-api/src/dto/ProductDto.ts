@@ -61,9 +61,9 @@ export class ProductDto {
 		return productRulingData ? new ProductRulingDto(productRulingData) : null;
 	}
 
-	get image(): MediaDataDtoData | null {
+	get image(): MediaDataDto | null {
 		const images = this.product.attributes.images.data?.attributes.images.data;
-		return images ? new MediaDataDto(images[0]).dto : null;
+		return images ? new MediaDataDto(images[0]) : null;
 	}
 
 	get dto(): ProductDtoData {
@@ -78,7 +78,7 @@ export class ProductDto {
 			pattern: this.pattern ? this.pattern.dto : null,
 			pages: this.pages ? this.pages.dto : null,
 			ruling: this.ruling ? this.ruling.dto : null,
-			image: this.image,
+			image: this.image ? this.image.dto : null,
 			totalProductPrice: this.totalProductPrice()
 		};
 	}

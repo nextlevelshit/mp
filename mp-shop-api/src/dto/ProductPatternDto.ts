@@ -1,4 +1,9 @@
-import { ProductPattern } from "../util/types";
+import {ProductPattern, UnsafeProduct} from "../util/types";
+import debug from "debug";
+import {MediaDataDto, MediaDataDtoData} from "./MediaDataDto";
+
+const logger = debug("app:i:product-pattern-dto");
+const verbose = debug("app:v:product-pattern-dto");
 
 export class ProductPatternDto {
 	private readonly productPattern: ProductPattern;
@@ -23,12 +28,28 @@ export class ProductPatternDto {
 		return this.productPattern.attributes?.price || 0;
 	}
 
+	get products(): UnsafeProduct[] | null {
+		return null;
+		// const products = this.productPattern.attributes.products.data;
+		// return products ? products.map<UnsafeProduct>(product => ({
+		// 	id: product.id,
+		// 	name: product.attributes.name
+		// })) : null;
+	}
+
+	get image(): MediaDataDtoData | null {
+		const image = this.productPattern.attributes.image.data;
+		return image ? new MediaDataDto(image).dto : null;
+	}
+
 	get dto(): ProductPatternDtoData {
 		return {
 			id: this.id,
 			name: this.name,
 			description: this.description,
-			price: this.price
+			price: this.price,
+			products: this.products,
+			image: this.image
 		};
 	}
 }
@@ -38,4 +59,6 @@ export interface ProductPatternDtoData {
 	name: string;
 	description: string;
 	price: number;
+	products: null | UnsafeProduct[];
+	image: null | MediaDataDtoData;
 }

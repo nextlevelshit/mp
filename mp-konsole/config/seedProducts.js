@@ -46,8 +46,9 @@ const getProductCoverLabel = (cover) => {
 };
 
 const getProductPatternId = (fileName) => {
-    const idStart = 85;
-    const suffixes = ["3D-01",
+    const idStart = 156;
+    const suffixes = [
+		"3D-01",
         "3D-02",
         "3D-03",
         "3D-04",

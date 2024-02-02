@@ -23,23 +23,27 @@
     },
     "cover": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::product-cover.product-cover"
+      "relation": "manyToOne",
+      "target": "api::product-cover.product-cover",
+      "inversedBy": "products"
     },
     "pattern": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::product-pattern.product-pattern"
+      "relation": "manyToOne",
+      "target": "api::product-pattern.product-pattern",
+      "inversedBy": "products"
     },
     "pages": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::product-page.product-page"
+      "relation": "manyToOne",
+      "target": "api::product-page.product-page",
+      "inversedBy": "products"
     },
     "ruling": {
       "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::product-ruling.product-ruling"
+      "relation": "manyToOne",
+      "target": "api::product-ruling.product-ruling",
+      "inversedBy": "products"
     },
     "image": {
       "type": "media",

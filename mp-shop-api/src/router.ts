@@ -352,7 +352,6 @@ router.post("/v1/webhooks/notifications", async (req, res) => {
 });
 
 router.get("/health", async (req, res) => {
-	// TODO: Add health check logic
 	healthCheckCounter.inc();
 	res.status(200).json({ status: "ok" });
 });

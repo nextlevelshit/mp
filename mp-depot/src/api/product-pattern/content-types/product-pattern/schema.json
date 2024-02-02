@@ -26,6 +26,12 @@
     },
     "description": {
       "type": "string"
+    },
+    "products": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::product.product",
+      "mappedBy": "pattern"
     }
   }
 }

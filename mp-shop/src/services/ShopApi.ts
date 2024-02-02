@@ -1,4 +1,8 @@
-import type {Order, OrderUpdateBody} from "@/types";
+import type {Order, OrderUpdateBody, Product} from "@/types";
+import debug from "debug";
+
+const logger = debug("app:i:shop-api");
+const verbose = debug("app:v:shop-api");
 
 class ShopApi {
 	baseUrl: string;
@@ -86,55 +90,15 @@ class ShopApi {
 		return this.handleResponse<any>(response);
 	}
 
-	/**
-	 * @deprecated
-	 */
-    async generateInvoice(uuid: string): Promise<Order> {
-        const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/generate-invoice`, {
-            method: "PUT"
-        });
-        return this.handleResponse<Order>(response);
-    }
-
-	/**
-	 * @deprecated
-	 */
-    async generateDeliveryNote(uuid: string): Promise<Order> {
-        const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/generate-delivery-note`, {
-            method: "PUT"
-        });
-        return this.handleResponse<Order>(response);
-    }
-
-	/**
-	 * @deprecated
-	 */
-	async sendInvoice(uuid: string): Promise<Order> {
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/send-invoice`, {
-			method: "PUT"
-		});
-		return this.handleResponse<Order>(response);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	async handleRedirect(uuid: string, method: string, data: any): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/redirect`, {
-			method,
-			body: data,
-		});
-		return this.handleResponse<any>(response);
-	}
-
-	async getProducts(): Promise<any> {
+	async getProducts(): Promise<Product[]> {
 		const response = await fetch(`${this.baseUrl}/v1/product`);
-		return this.handleResponse<any>(response);
+		return this.handleResponse<Product[]>(response);
 	}
 
-	async getProductById(id: string): Promise<any> {
+	async getProductById(id: string): Promise<Product> {
+		logger(`Requestion product from ${this.baseUrl}/v1/product/${id}`);
 		const response = await fetch(`${this.baseUrl}/v1/product/${id}`);
-		return this.handleResponse<any>(response);
+		return this.handleResponse<Product>(response);
 	}
 
 	async getProductRulings(): Promise<any> {

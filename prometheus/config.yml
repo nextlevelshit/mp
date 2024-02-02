@@ -22,7 +22,7 @@ scrape_configs:
 
   - job_name: 'mp-proxy'
     static_configs:
-      - targets: ['mp-proxy:8080']
+      - targets: ['mp-proxy:80']
 
   - job_name: 'mp-inkasso'
     static_configs:

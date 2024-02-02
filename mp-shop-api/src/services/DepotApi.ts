@@ -39,13 +39,14 @@ class DepotApi {
 	private async fetchEntity<T>(
 		endpoint: string,
 		mapDto: (item: T) => any,
+		depth = 3,
 		filter?: any
 	): Promise<any[]> {
 		const query = filter ? qs.stringify(filter, {encode: false}) : "";
 
 		verbose(`Querying ${endpoint} with "${query}"`);
 
-		const response = await fetch(`${this.baseUrl}/${endpoint}?${query}&populate=deep,3`, {
+		const response = await fetch(`${this.baseUrl}/${endpoint}?${query}&populate=deep,${depth}`, {
 			method: "GET",
 			headers: this.headers,
 		});
@@ -55,6 +56,7 @@ class DepotApi {
 		}
 
 		const {data} = await response.json();
+
 		return (data as T[]).map((item) => mapDto(item).dto);
 	}
 
@@ -315,7 +317,7 @@ class DepotApi {
 		return {
 			one: async (id: string) => {
 				const response = await fetch(
-					`${this.baseUrl}/products/${id}?populate=deep,3`,
+					`${this.baseUrl}/products/${id}?populate=deep,4`,
 					{
 						method: "GET",
 						headers: this.headers
@@ -334,6 +336,7 @@ class DepotApi {
 				return this.fetchEntity<Product>(
 					"products",
 					(product) => new ProductDto(product),
+					4,
 					filter
 				);
 			},
