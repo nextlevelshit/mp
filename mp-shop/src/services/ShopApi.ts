@@ -101,6 +101,12 @@ class ShopApi {
 		return this.handleResponse<Product>(response);
 	}
 
+	async getProductVariantsByProductId(id: string): Promise<Product> {
+		logger(`Requestion product variants from ${this.baseUrl}/v1/product/${id}/variants`);
+		const response = await fetch(`${this.baseUrl}/v1/product/${id}/variants`);
+		return this.handleResponse<Product>(response);
+	}
+
 	async getProductRulings(): Promise<any> {
 		const response = await fetch(`${this.baseUrl}/v1/product-ruling`);
 		return this.handleResponse<any>(response);

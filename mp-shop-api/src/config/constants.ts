@@ -1,4 +1,4 @@
-import {AdyenEnvironment} from "../util/types";
+import {AdyenEnvironment} from "../types";
 
 export const adyenApiKey = process.env.ADYEN_API_KEY!;
 export const adyenMerchantAccount = process.env.ADYEN_MERCHANT_ACCOUNT!;

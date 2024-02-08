@@ -1,4 +1,4 @@
-import { ProductPages } from "../util/types";
+import { ProductPages } from "../types";
 
 export class ProductPagesDto {
 	private readonly productPages: ProductPages;

@@ -8,15 +8,15 @@ import {
 	PaymentMethod,
 	DeliveryMethod,
 	ProductPattern,
-	ProductPages, ProductCover, OrderUpdate, OrderUpdatedTotalRequest
-} from "../util/types";
+	ProductPages, ProductCover, OrderUpdate, OrderUpdatedTotalRequest, UnsafeProduct, ProductVariant
+} from "../types";
 import {ProductDto} from "../dto/ProductDto";
-import {ProductRulingDto} from "../dto/ProductRulingDto";
+import {ProductRulingDto, ProductRulingDtoData} from "../dto/ProductRulingDto";
 import {DeliveryMethodDto} from "../dto/DeliveryMethodDto";
 import {PaymentMethodDto} from "../dto/PaymentMethodDto";
-import {ProductPatternDto} from "../dto/ProductPatternDto";
-import {ProductPagesDto} from "../dto/ProductPagesDto";
-import {ProductCoverDto} from "../dto/ProductCoverDto";
+import {ProductPatternDto, ProductPatternDtoData} from "../dto/ProductPatternDto";
+import {ProductPagesDto, ProductPagesDtoData} from "../dto/ProductPagesDto";
+import {ProductCoverDto, ProductCoverDtoData} from "../dto/ProductCoverDto";
 import debug from "debug";
 import {OrderDto} from "../dto/OrderDto";
 import {inkassoApi} from "./InkassoApi";
@@ -116,7 +116,7 @@ class DepotApi {
 
 				const orderAfterUpdate = new OrderDto(orderUpdatedWithoutTotal.data).dto;
 
-				const data : OrderUpdatedTotalRequest = {
+				const data: OrderUpdatedTotalRequest = {
 					VAT: orderAfterUpdate.VAT,
 					total: orderAfterUpdate.total,
 					subtotal: orderAfterUpdate.subtotal
@@ -332,6 +332,141 @@ class DepotApi {
 
 				return new ProductDto(data).dto;
 			},
+			variants: async (id: string) => {
+				const transformToProductVariant = (product: Partial<Product>) => {
+					return {
+						id: product?.id,
+						name: product.attributes?.name,
+						cover: product.attributes?.cover.data?.id,
+						ruling: product.attributes?.ruling.data?.id,
+						pages: product.attributes?.pages.data?.id,
+						pattern: product.attributes?.pattern.data?.id,
+					} as ProductVariant;
+				};
+				const getProduct = async () => {
+					const query = qs.stringify({
+						fields: ["id", "name"],
+						populate: {
+							pattern: {
+								fields: ["id"]
+							},
+							cover: {
+								fields: ["id"]
+							},
+							ruling: {
+								fields: ["id"]
+							},
+							pages: {
+								fields: ["id"]
+							}
+						}
+					}, {encode: false});
+
+					const response = await fetch(
+						`${this.baseUrl}/products/${id}?${query}`,
+						{
+							method: "GET",
+							headers: this.headers
+						}
+					);
+
+					if (!response.ok) {
+						throw new Error(`Could not find product with ID ${id}`);
+					}
+
+					const {data} = await response.json();
+
+					return transformToProductVariant(data);
+				}
+
+				const [
+					product,
+					allProductPages,
+					allProductRulings,
+					allProductCovers
+				] = await Promise.all([
+					getProduct(),
+					this.productPages(),
+					this.productRuling(),
+					this.productCover({fields: ["id", "name", "binding", "price"]})
+				]);
+
+				const query = qs.stringify({
+					pagination: {
+						start: 0,
+						limit: 999
+					},
+					fields: ["id", "name"],
+					populate: {
+						pattern: {
+							fields: ["id"]
+						},
+						cover: {
+							fields: ["id"]
+						},
+						ruling: {
+							fields: ["id"]
+						},
+						pages: {
+							fields: ["id"]
+						}
+					},
+					filters: {
+						pattern: {
+							id: {
+								$eq: product.pattern
+							}
+						}
+					}
+				}, {encode: false});
+
+				const response = await fetch(
+					`${this.baseUrl}/products/?${query}`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				if (!response.ok) {
+					verbose(response.statusText);
+					throw new Error(`Could not find product with ID ${id}`);
+				}
+
+				const {data} = await response.json();
+
+				const allProductVariants = (data as Product[])
+					.map(transformToProductVariant);
+
+				return {
+					allProductVariants,
+					pages: allProductPages.map(pages => {
+						return {
+							...pages,
+							productVariant: allProductVariants.find(variant => {
+								return variant.pages === pages.id && variant.cover === product.cover && variant.ruling === product.ruling
+							})
+						}
+					}),
+					cover: allProductCovers.map(cover => {
+						return {
+							...cover,
+							productVariant: allProductVariants.find(variant => {
+								return variant.cover === cover.id && variant.pages === product.pages && variant.ruling === product.ruling
+							})
+						}
+					}),
+					ruling: allProductRulings.map(ruling => {
+						return {
+							...ruling,
+							productVariant: allProductVariants.find(variant => {
+								return variant.ruling === ruling.id && variant.pages === product.pages && variant.cover === product.cover
+							})
+						}
+					})
+				}
+			},
+
 			all: async (filter?: any) => {
 				return this.fetchEntity<Product>(
 					"products",
@@ -343,39 +478,45 @@ class DepotApi {
 		}
 	}
 
-	async productRuling(filter?: any) {
+	async productRuling(filter?: any): Promise<ProductRulingDtoData[]> {
 		return this.fetchEntity<ProductRuling>(
 			"product-rulings",
 			(productRuling) => new ProductRulingDto(productRuling),
+			1,
 			filter
 		);
 	}
 
-	async productPattern() {
+	async productPattern(): Promise<ProductPatternDtoData[]> {
 		return this.fetchEntity<ProductPattern>(
 			"product-patterns",
-			(pattern) => new ProductPatternDto(pattern)
+			(pattern) => new ProductPatternDto(pattern),
+			1
 		);
 	}
 
-	async productPages() {
+	async productPages(): Promise<ProductPagesDtoData[]> {
 		return this.fetchEntity<ProductPages>(
 			"product-pages",
-			(pages) => new ProductPagesDto(pages)
+			(pages) => new ProductPagesDto(pages),
+			1
 		);
 	}
 
-	async productCover() {
+	async productCover(filter?: any): Promise<ProductCoverDtoData[]> {
 		return this.fetchEntity<ProductCover>(
 			"product-covers",
-			(cover) => new ProductCoverDto(cover)
+			(cover) => new ProductCoverDto(cover),
+			1,
+			filter
 		);
 	}
 
 	async deliveryMethod() {
 		return this.fetchEntity<DeliveryMethod>(
 			"deliveries",
-			(deliveryMethod) => new DeliveryMethodDto(deliveryMethod)
+			(deliveryMethod) => new DeliveryMethodDto(deliveryMethod),
+			1
 		);
 	}
 

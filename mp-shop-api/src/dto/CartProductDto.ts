@@ -1,4 +1,4 @@
-import {CartProduct} from "../util/types";
+import {CartProduct} from "../types";
 import {ProductDto, ProductDtoData} from "./ProductDto";
 import debug from "debug";
 

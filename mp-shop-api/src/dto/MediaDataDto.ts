@@ -1,4 +1,4 @@
-import {MediaData} from "../util/types";
+import {MediaData} from "../types";
 import {depotApi} from "../services/DepotApi";
 
 export class MediaDataDto {

@@ -54,6 +54,7 @@ services:
     mp-proxy:
         container_name: proxy-dev
         build: ./mp-proxy
+        restart: no
         environment:
             NGINX_DEBUG: true
         depends_on:

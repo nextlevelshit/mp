@@ -1,5 +1,5 @@
 import {inkassoPort} from "../config/constants";
-import {PdfBody} from "../util/types";
+import {PdfBody} from "../types";
 import {Counter} from "prom-client";
 import debug from "debug";
 

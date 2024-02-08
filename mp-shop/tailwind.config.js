@@ -7,6 +7,11 @@ export default {
   theme: {
     extend: {},
   },
+  safelist: [
+    {
+      pattern: /(bg|shadow)-+/,
+    },
+  ],
   plugins: [
     import('@tailwindcss/forms'),
   ],

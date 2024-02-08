@@ -1,4 +1,4 @@
-import {MediaData, Order, PdfBody} from "../util/types";
+import {MediaData, Order, PdfBody} from "../types";
 import {DeliveryMethodDto, DeliveryMethodDtoData} from "./DeliveryMethodDto";
 import {PaymentMethodDto, PaymentMethodDtoData} from "./PaymentMethodDto";
 import debug from "debug";

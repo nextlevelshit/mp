@@ -1,4 +1,4 @@
-import { ProductCover } from "../util/types";
+import { ProductCover } from "../types";
 
 export class ProductCoverDto {
 	private readonly productCover: ProductCover;

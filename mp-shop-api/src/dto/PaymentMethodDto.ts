@@ -1,4 +1,4 @@
-import { PaymentMethod } from "../util/types";
+import { PaymentMethod } from "../types";
 
 export class PaymentMethodDto {
 	private readonly paymentMethod: PaymentMethod;

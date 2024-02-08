@@ -1,4 +1,4 @@
-import {DeliveryMethod} from "../util/types";
+import {DeliveryMethod} from "../types";
 
 export class DeliveryMethodDto {
 	private readonly deliveryMethod: DeliveryMethod;

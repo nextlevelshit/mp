@@ -138,6 +138,28 @@ export interface Product {
 export interface UnsafeProduct {
 	id: number;
 	name: string;
+	attributes?: {
+		cover: {
+			data: {
+				id: number;
+			}
+		},
+		pattern: {
+			data: {
+				id: number;
+			}
+		},
+		ruling: {
+			data: {
+				id: number;
+			}
+		},
+		pages: {
+			data: {
+				id: number;
+			}
+		}
+	}
 }
 
 export interface ProductCover {
@@ -248,3 +270,12 @@ export type PdfBody = {
 		amount: number;
 	}
 };
+
+export interface ProductVariant {
+	id?: number;
+	name?: string;
+	cover?: number;
+	ruling?: number;
+	pages?: number;
+	pattern?: number;
+}

@@ -1,4 +1,4 @@
-import {ProductPattern, UnsafeProduct} from "../util/types";
+import {ProductPattern, UnsafeProduct} from "../types";
 import debug from "debug";
 import {MediaDataDto, MediaDataDtoData} from "./MediaDataDto";
 

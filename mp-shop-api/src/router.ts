@@ -241,18 +241,23 @@ router.get("/v1/product", async (req, res) => {
 				start: 0,
 				limit: 200
 			},
-			// filters: {
-			// 	ruling: {
-			// 		id: {
-			// 			$eq: 3
-			// 		}
-			// 	},
-			// 	cover: {
-			// 		id: {
-			// 			$eq: 1
-			// 		}
-			// 	}
-			// }
+			filters: {
+				ruling: {
+					id: {
+						$eq: 1
+					}
+				},
+				pages: {
+					id:  {
+						$eq: 1
+					}
+				},
+				cover: {
+					id: {
+						$eq: 3
+					}
+				}
+			}
 		});
 
 		res.status(200).send(productList);
@@ -267,6 +272,19 @@ router.get("/v1/product/:id", async (req, res) => {
 		verbose(`Querying product with ID ${req.get("id")}`);
 
 		const product = await depotApi.productFactory().one(id);
+
+		res.status(200).send(product);
+	} catch (e) {
+		res.status(500).send("Could not fetch product");
+	}
+});
+
+router.get("/v1/product/:id/variants", async (req, res) => {
+	try {
+		const {id} = req.params;
+		verbose(`Querying variants of product with ID ${req.get("id")}`);
+
+		const product = await depotApi.productFactory().variants(id);
 
 		res.status(200).send(product);
 	} catch (e) {

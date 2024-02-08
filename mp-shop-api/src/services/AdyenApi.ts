@@ -1,6 +1,6 @@
 import {Client, Config, CheckoutAPI} from "@adyen/api-library";
 import {adyenApiKey, adyenEnvironment, adyenMerchantAccount, adyenClientKey, adyenHmacKey} from "../config/constants";
-import {AdyenEnvironment} from "../util/types";
+import {AdyenEnvironment} from "../types";
 import debug from "debug";
 import {PaymentCompletionDetails} from "@adyen/api-library/lib/src/typings/checkout/paymentCompletionDetails";
 import HmacValidator from "@adyen/api-library/lib/src/utils/hmacValidator";

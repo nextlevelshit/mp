@@ -1,4 +1,4 @@
-import { ProductRuling } from "../util/types";
+import { ProductRuling } from "../types";
 
 export class ProductRulingDto {
 	private readonly productRuling: ProductRuling;

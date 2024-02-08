@@ -1,4 +1,4 @@
-import {Product } from "../util/types";
+import {Product } from "../types";
 import {ProductPagesDto, ProductPagesDtoData} from "./ProductPagesDto";
 import {ProductCoverDto, ProductCoverDtoData} from "./ProductCoverDto";
 import {ProductRulingDto, ProductRulingDtoData} from "./ProductRulingDto";
