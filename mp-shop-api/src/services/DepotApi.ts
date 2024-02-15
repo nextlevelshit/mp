@@ -8,7 +8,7 @@ import {
 	PaymentMethod,
 	DeliveryMethod,
 	ProductPattern,
-	ProductPages, ProductCover, OrderUpdate, OrderUpdatedTotalRequest, UnsafeProduct, ProductVariant
+	ProductPages, ProductCover, OrderUpdate, OrderUpdatedTotalRequest, ProductVariant
 } from "../types";
 import {ProductDto} from "../dto/ProductDto";
 import {ProductRulingDto, ProductRulingDtoData} from "../dto/ProductRulingDto";
@@ -402,10 +402,10 @@ class DepotApi {
 							fields: ["id"]
 						},
 						cover: {
-							fields: ["id"]
+							fields: ["id", "icon"]
 						},
 						ruling: {
-							fields: ["id"]
+							fields: ["id", "icon"]
 						},
 						pages: {
 							fields: ["id"]
@@ -482,7 +482,7 @@ class DepotApi {
 		return this.fetchEntity<ProductRuling>(
 			"product-rulings",
 			(productRuling) => new ProductRulingDto(productRuling),
-			1,
+			2,
 			filter
 		);
 	}
@@ -507,7 +507,7 @@ class DepotApi {
 		return this.fetchEntity<ProductCover>(
 			"product-covers",
 			(cover) => new ProductCoverDto(cover),
-			1,
+			2,
 			filter
 		);
 	}

@@ -1,4 +1,5 @@
 import { ProductCover } from "../types";
+import {MediaDataDto, MediaDataDtoData} from "./MediaDataDto";
 
 export class ProductCoverDto {
 	private readonly productCover: ProductCover;
@@ -23,6 +24,11 @@ export class ProductCoverDto {
 		return this.productCover.attributes.price;
 	}
 
+	get icon(): MediaDataDto | null {
+		const icon = this.productCover.attributes.icon.data;
+		return icon ? new MediaDataDto(icon) : null;
+	}
+
 	get copyText(): {
 		text: string;
 		cover: string;
@@ -42,6 +48,7 @@ export class ProductCoverDto {
 			binding: this.binding,
 			price: this.price,
 			copyText: this.copyText,
+			icon: this.icon ? this.icon.dto : null,
 		};
 	}
 }
@@ -60,4 +67,5 @@ export interface ProductCoverDtoData {
 		details: string;
 		banderole: string;
 	};
+	icon: MediaDataDtoData | null;
 }

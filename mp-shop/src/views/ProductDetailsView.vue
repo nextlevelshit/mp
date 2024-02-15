@@ -1,84 +1,76 @@
 <template>
-	<div :class="bgColor">
+	<div :class="bgColor" itemscope itemtype="https://schema.org/Product">
 		<main class="pt-4 container mx-auto">
 			<div v-if="product">
 				<!--    <h1 class="text-2xl font-bold mb-4">{{ product.name }} - Product ID: {{ id }}</h1>-->
-				<div class="flex gap-36">
-					<div class="w-2/5 flex-col gap-8">
+				<div class="flex gap-32">
+					<div class="w-1/2 px-40 pt-8">
 						<!-- Product Image -->
-						<div :class="bgColor" class="px-40 py-8 rounded-md">
-							<img v-if="product.image" :src="product.image.url" :alt="product.name"
-								 class="w-full object-cover"/>
-						</div>
-						<!-- Add to Cart Button -->
-						<button @click="addToCart"
-								:disabled="isAddingToCart"
-								:class="{ 'opacity-50': isAddingToCart }"
-								class="mt-8 bg-blue-500 text-white px-4 py-2 rounded-md w-full">
-							<span v-if="isAddingToCart">Adding...</span>
-							<span v-else>Add to Cart</span>
-						</button>
+						<VueMagnifier v-if="product.image" mg-height="300" mg-width="300"  :src="product.image.url" :alt="product.name"  class-name="w-full object-cover" itemprop="image" />
 					</div>
-					<div class="w-3/5">
-
-						<!-- Product Description -->
-						<div v-if="product.description" class="mb-6">
-							<h2 class="text-xl font-bold mb-2">Description</h2>
-							<p>{{ product.description }}</p>
-						</div>
-
-						<!-- Product Details -->
-						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-							<!-- Product Cover Details -->
-							<div>
-								<h2 class="text-xl font-bold mb-2">Cover Details</h2>
-								<p><span class="font-bold">Name:</span> {{ product.cover?.name }}</p>
-								<p><span class="font-bold">Binding:</span> {{ product.cover?.binding }}</p>
-								<!-- Add more cover details if needed -->
-							</div>
-
-							<!-- Product Pattern Details -->
-							<div>
-								<h2 class="text-xl font-bold mb-2">Pattern Details</h2>
-								<p><span class="font-bold">Name:</span> {{ product.pattern?.name }}</p>
-								<p><span class="font-bold">Description:</span> {{ product.pattern?.description }}</p>
-								<!-- Add more pattern details if needed -->
-							</div>
-
-							<!-- Product Pages and Ruling Details -->
-							<div>
-								<h2 class="text-xl font-bold mb-2">Pages and Ruling Details</h2>
-								<p><span class="font-bold">Pages:</span> {{ product.pages?.name }}</p>
-								<p><span class="font-bold">Ruling:</span> {{ product.ruling?.name }}</p>
-								<!-- Add more pages and ruling details if needed -->
-							</div>
+					<div class="w-1/2 pt-16">
+						<div class="rounded-lg bg-white shadow-xl mb-16">
+							<section class="flex py-6 px-8">
+								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Einband</h2>
+								<div class="flex gap-4">
+									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
+												  :path="`/details/${cover.productId}`"
+												  :is-active="cover.productId === product.id">
+										<img v-if="cover.iconUrl" :alt="cover.name" :src="cover.iconUrl"/>
+									</SelectionBox>
+								</div>
+							</section>
+							<hr class="border-t-[1px] border-gray-300"/>
+							<section class="flex py-6 px-8">
+								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Layout</h2>
+								<div class="flex gap-4">
+									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
+												  :path="`/details/${ruling.productId}`"
+												  :is-active="ruling.productId === product.id">
+										<img v-if="ruling.iconUrl" :alt="ruling.name" :src="ruling.iconUrl"/>
+									</SelectionBox>
+								</div>
+							</section>
+							<hr class="border-t-[1px] border-gray-300"/>
+							<section class="flex py-6 px-8">
+								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
+								<div class="flex gap-4">
+									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
+												  :path="`/details/${pages.productId}`"
+												  :is-active="pages.productId === product.id"/>
+								</div>
+							</section>
+							<hr class="border-t-[1px] border-gray-300"/>
+							<section class="flex gap-12 py-6 px-8 items-center">
+								<div class="w-1/3" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+									<meta itemprop="priceCurrency" content="EUR"/>
+									<span itemprop="price" class="oldstyle-nums text-3xl tracking-tight font-bold">
+										{{ numberFormatter(product.totalProductPrice) }} €
+									</span>
+								</div>
+								<div class="w-2/3">
+									<button @click="addToCart"
+											:disabled="isAddingToCart"
+											:class="{ 'opacity-50': isAddingToCart }"
+											class="bg-black text-white px-3 py-4 shadow-md hover:shadow-sm rounded-full w-full uppercase font-thin tracking-wide">
+										<span v-if="isAddingToCart">Wird hinzugefügt...</span>
+										<span v-else>In den Warenkorb</span>
+									</button>
+								</div>
+							</section>
 						</div>
 
 						<!-- CopyText Details -->
-						<div v-if="product.cover?.copyText" class="mt-8">
-							<h2 class="text-xl font-bold mb-2">CopyText Details</h2>
+						<div v-if="product.cover?.copyText" class="my-16 px-4 flex flex-col gap-y-6">
+							<p class="text-2xl" v-html="product.cover.copyText.details"></p>
 							<div v-html="product.cover.copyText.text"></div>
-							<p><span class="font-bold">Cover:</span> {{ product.cover.copyText.cover }}</p>
-							<p><span class="font-bold">Paper:</span> {{ product.cover.copyText.paper }}</p>
+							<p><span class="font-bold">Einband:</span> {{ product.cover.copyText.cover }}</p>
+							<p><span class="font-bold">Papier:</span> {{ product.cover.copyText.paper }}</p>
 							<p><span class="font-bold">Format:</span> {{ product.cover.copyText.format }}</p>
-							<p><span class="font-bold">Content:</span> {{ product.cover.copyText.content }}</p>
-							<p><span class="font-bold">Details:</span> {{ product.cover.copyText.details }}</p>
 							<p><span class="font-bold">Banderole:</span> {{ product.cover.copyText.banderole }}</p>
 						</div>
-
-						<!-- Product Price -->
-						<div class="mt-8">
-							<h2 class="text-xl font-bold mb-2">Price</h2>
-							<p><span class="font-bold">Total Product Price:</span> {{
-									product.totalProductPrice?.toFixed(2)
-								}} €
-							</p>
-							<!-- Add more pricing details if needed -->
-						</div>
-
 					</div>
 				</div>
-				<CodeBlock class="mt-8">{{ {product, productVariants} }}</CodeBlock>
 			</div>
 		</main>
 	</div>
@@ -86,18 +78,22 @@
 
 <script lang="ts">
 import CodeBlock from "@/components/CodeBlock.vue";
-import type {Product} from "@/types";
+import type {Product, ProductVariantResponse} from "@/types";
 import {shopApi} from "@/services/ShopApi";
 import debug from "debug";
 import {cart} from "@/stores/cart";
 import {randomTailwindColor} from "@/util/randomTailwindColor";
 import Header from "@/components/Header.vue";
+import {numberFormatter} from "@/util/numberFormatter";
+import SelectionBox from "@/components/SelectionBox.vue";
+import VueMagnifier from "@websitebeaver/vue-magnifier";
+import '@websitebeaver/vue-magnifier/styles.css';
 
 const logger = debug("app:i:product-details-view");
 const verbose = debug("app:v:product-details-view");
 
 export default {
-	components: {Header, CodeBlock},
+	components: {SelectionBox, Header, CodeBlock, VueMagnifier},
 	props: ["id"],
 	computed: {
 		uuid() {
@@ -105,16 +101,48 @@ export default {
 		},
 		bgColor() {
 			if (this.product.pattern) {
-				return randomTailwindColor(this.product.pattern.id);
+				return randomTailwindColor(this.product.pattern.id, "bg", 100);
 			} else {
 				return "bg-gray-200";
 			}
+		},
+		productVariantsRuling() {
+			if (!this.productVariants.ruling) return;
+
+			return this.productVariants.ruling.map(({name, icon, productVariant}) => {
+				return {
+					name,
+					iconUrl: icon?.url,
+					productId: productVariant?.id
+				}
+			});
+		},
+		productVariantsPages() {
+			if (!this.productVariants.pages) return;
+
+			return this.productVariants.pages.map(({name, productVariant}) => {
+				return {
+					name,
+					productId: productVariant?.id
+				}
+			});
+		},
+		productVariantsCover() {
+			if (!this.productVariants.cover) return;
+
+			return this.productVariants.cover.map(({name, icon, productVariant}) => {
+				return {
+					name,
+					iconUrl: icon?.url,
+					productId: productVariant?.id
+				}
+			});
 		}
 	},
 	data() {
 		return {
 			product: {} as Product,
-			productVariants: {},
+			productVariants: {} as ProductVariantResponse,
 			isAddingToCart: false
 		}
 	},
@@ -127,12 +155,14 @@ export default {
 		}
 		try {
 			this.productVariants = await shopApi.getProductVariantsByProductId(this.id);
+			logger(this.productVariants);
 		} catch (e) {
 			logger("Could not fetch product variants");
 			verbose(e);
 		}
 	},
 	methods: {
+		numberFormatter,
 		async addToCart() {
 			verbose(`Adding product with ID ${this.product.id} to cart`);
 

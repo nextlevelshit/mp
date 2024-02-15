@@ -1,6 +1,6 @@
 <template>
 	<a :href="`/details/${product.id}`" class="gap-2 flex flex-col group">
-		<div :class="[bgColor, shadowColor]" class="p-12 rounded-sm shadow-xl group-active:shadow-none">
+		<div :class="[bgColor, shadowColor]" class="p-12 rounded-sm shadow-2xl group-active:shadow-none group-hover:opacity-70 group-focus:opacity-70">
 			<img :src="product.image.url" :alt="product.name" class="w-full object-cover">
 		</div>
 		<div class="flex flex-col justify-between">
@@ -8,15 +8,6 @@
 				<p class="text-gray-900">{{ product.pattern.name }}</p>
 				<p class="text-gray-600">ab {{ product.totalProductPrice.toFixed(2) }} €</p>
 			</div>
-			<!--			<button-->
-			<!--				@click="addToCart(product.id)"-->
-			<!--				:disabled="isAddingToCart"-->
-			<!--				:class="{ "opacity-50": isAddingToCart }"-->
-			<!--				class="mt-4 bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 cursor-pointer"-->
-			<!--			>-->
-			<!--				<span v-if="isAddingToCart">Adding...</span>-->
-			<!--				<span v-else>Add to Cart</span>-->
-			<!--			</button>-->
 		</div>
 	</a>
 </template>

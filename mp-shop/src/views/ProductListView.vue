@@ -4,11 +4,14 @@
 			<div class="w-1/4">
 				<div class="sticky top-4">
 					<h1 class="text-2xl pb-4">Notizbücher und Notizhefte</h1>
-					<p>Alle Notizhefte sind von uns selbst gestaltet, gedruckt und in Handarbeit gebunden. Das
+					<p class="tracking-tight">
+						Alle Notizhefte sind von uns selbst gestaltet, gedruckt und in Handarbeit gebunden. Das
 						eingesetzte, matte Recyclingpapier mit feiner Textur sorgt für angenehmes Schreiben und
-						Skizzieren. Um den Inhalt liegt ein Matelbogen aus rot durchgefärbtem Papier, was einen
+						Skizzieren.<br/>
+						Um den Inhalt liegt ein Matelbogen aus rot durchgefärbtem Papier, was einen
 						dezenten, farbigen Kontrast zu dem ansonsten absichtlich, schwarz-weiß gehaltenen Design
-						setzt.</p>
+						setzt.
+					</p>
 				</div>
 			</div>
 

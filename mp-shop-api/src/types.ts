@@ -179,6 +179,9 @@ export interface ProductCover {
 			details: string;
 			banderole: string;
 		};
+		icon: {
+			data: null | MediaData;
+		}
 	};
 }
 
@@ -187,6 +190,9 @@ export interface ProductRuling {
 	attributes: {
 		name: string;
 		price: number;
+		icon: {
+			data: null | MediaData;
+		}
 	};
 }
 

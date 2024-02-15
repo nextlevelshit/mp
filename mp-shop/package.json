@@ -16,6 +16,7 @@
     "@adyen/adyen-web": "^5.55.0",
     "@headlessui/vue": "^1.7.16",
     "@tailwindcss/forms": "^0.5.6",
+    "@websitebeaver/vue-magnifier": "^1.1.0",
     "autoprefixer": "^10.4.15",
     "debug": "^4.3.4",
     "postcss": "^8.4.29",

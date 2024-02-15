@@ -147,3 +147,88 @@ export interface Order {
 }
 
 export type OrderUpdateBody = Partial<Order>;
+
+export interface ProductVariantResponse {
+	allProductVariants: {
+		id: number;
+		name: string;
+		cover: number;
+		ruling: number;
+		pages: number;
+		pattern: number;
+	}[];
+	pages: {
+		id: number;
+		name: string;
+		price: number;
+		productVariant: {
+			id: number;
+			name: string;
+			cover: number;
+			ruling: number;
+			pages: number;
+			pattern: number;
+		};
+	}[];
+	cover: {
+		id: number;
+		name: string;
+		binding: string;
+		price: number;
+		icon: {
+			id: number;
+			name: string;
+			alternativeText: string | null;
+			caption: string | null;
+			width: number;
+			height: number;
+			formats: string | null;
+			hash: string;
+			ext: string;
+			mime: string;
+			size: number;
+			url: string;
+			previewUrl: string | null;
+			provider: string;
+			providerMetadata: string | null;
+		};
+		productVariant: {
+			id: number;
+			name: string;
+			cover: number;
+			ruling: number;
+			pages: number;
+			pattern: number;
+		};
+	}[];
+	ruling: {
+		id: number;
+		name: string;
+		price: number;
+		icon: {
+			id: number;
+			name: string;
+			alternativeText: string | null;
+			caption: string | null;
+			width: number;
+			height: number;
+			formats: string | null;
+			hash: string;
+			ext: string;
+			mime: string;
+			size: number;
+			url: string;
+			previewUrl: string | null;
+			provider: string;
+			providerMetadata: string | null;
+		} | null;
+		productVariant: {
+			id: number;
+			name: string;
+			cover: number;
+			ruling: number;
+			pages: number;
+			pattern: number;
+		};
+	}[];
+};

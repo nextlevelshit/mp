@@ -24,6 +24,13 @@
       "relation": "oneToMany",
       "target": "api::product.product",
       "mappedBy": "ruling"
+    },
+    "icon": {
+      "allowedTypes": [
+        "images"
+      ],
+      "type": "media",
+      "multiple": false
     }
   }
 }
