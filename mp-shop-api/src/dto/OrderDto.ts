@@ -185,7 +185,7 @@ export class OrderDto {
 		let VAT = -1;
 
 		if (cartProducts) {
-			const productsTotal = cartProducts.reduce((v, p) => (v + p.product.totalProductPrice * p.count), 0);
+			const productsTotal = cartProducts.reduce((v, p) => (v + (p.product.totalProductPrice ?? 0) * p.count), 0);
 			const deliveryPrice = delivery ? delivery.price : 0;
 			const paymentPrice = payment ? payment.price : 0;
 

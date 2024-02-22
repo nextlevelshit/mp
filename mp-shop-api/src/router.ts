@@ -79,7 +79,7 @@ router.all("/v1/order/:uuid", async (req, res) => {
 			case "GET":
 				verbose(`Querying order with UUID ${uuid}`);
 
-				const fetchedOrder = new OrderDto(await depotApi.orderFactory().one(uuid));
+				let fetchedOrder = new OrderDto(await depotApi.orderFactory().one(uuid));
 
 				res.status(200).send(fetchedOrder.dto);
 				break;
@@ -88,7 +88,7 @@ router.all("/v1/order/:uuid", async (req, res) => {
 
 				if (!req.body) res.status(422).send("Missing data to be updated");
 
-				const updatedOrder = new OrderDto(await depotApi.orderFactory().update(uuid, req.body));
+				let updatedOrder = new OrderDto(await depotApi.orderFactory().update(uuid, req.body));
 
 				res.status(200).send(updatedOrder.dto);
 				break;

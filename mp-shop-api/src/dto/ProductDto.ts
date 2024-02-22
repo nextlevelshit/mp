@@ -83,7 +83,7 @@ export class ProductDto {
 		};
 	}
 
-	totalProductPrice(): number {
+	totalProductPrice(): number | null {
 		let totalPrice = 0;
 
 		const cover = this.cover;
@@ -107,7 +107,7 @@ export class ProductDto {
 			totalPrice += ruling.price;
 		}
 
-		return totalPrice;
+		return totalPrice ?? null;
 	}
 }
 
@@ -123,5 +123,5 @@ export interface ProductDtoData {
 	pages: ProductPagesDtoData | null;
 	ruling: ProductRulingDtoData | null;
 	image: MediaDataDtoData | null;
-	totalProductPrice: number
+	totalProductPrice: number | null
 }

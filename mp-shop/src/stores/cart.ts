@@ -13,9 +13,9 @@ export const cart = reactive({
 	uuid: "",
 	products: [] as CartProduct[] | null,
 	productsCount: 0,
-	total: "",
-	subtotal: "",
-	VAT: "",
+	total: 0,
+	subtotal: 0,
+	VAT: 0,
 	fetch() {
 		verbose("Updating cart store");
 		const uuidFromLocalStorage = localStorage.getItem(localStorageLabelCartUuid);
@@ -30,9 +30,9 @@ export const cart = reactive({
 	overwrite(order: Order) {
 		this.products = order.cartProducts;
 		this.productsCount = calculateCount(this.products);
-		this.total = order.total?.toFixed(2);
-		this.subtotal = order.subtotal?.toFixed(2);
-		this.VAT = order.VAT?.toFixed(2);
+		this.total = order.total;
+		this.subtotal = order.subtotal;
+		this.VAT = order.VAT;
 		this.uuid = order.uuid;
 		localStorage.setItem(localStorageLabelCartUuid, String(order.uuid));
 	}

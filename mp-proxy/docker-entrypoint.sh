@@ -10,6 +10,10 @@ echo "Generated nginx.conf:"
 echo ""
 cat /etc/nginx/nginx.conf
 
+mkdir -p /cache/shop
+mkdir -p /cache/uploads
+mkdir -p /cache/api
+
 echo "Starting nginx"
 # Start Nginx
 if [ "$NGINX_DEBUG" = "true" ]; then

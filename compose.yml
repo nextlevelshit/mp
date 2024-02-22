@@ -18,8 +18,6 @@ services:
             retries: 3
         networks:
             - internal
-        ports:
-            - "${INKASSO_PORT:-1111}:1111"
 
     mp-postamt:
         container_name: postamt
@@ -39,8 +37,6 @@ services:
             interval: 30s
             timeout: 10s
             retries: 3
-        ports:
-            - "${POSTAMT_PORT:-2222}:2222"
         networks:
             - internal
 
@@ -59,8 +55,6 @@ services:
             retries: 3
         volumes:
             - silo-data:/var/lib/postgresql/data
-        ports:
-            - "${SILO_PORT:-5432}:5432"
         networks:
             - data
 
@@ -97,8 +91,6 @@ services:
         volumes:
             - depot-data:/opt/app/public
             - ./mp-depot/database:/opt/app/database
-        ports:
-            - "${DEPOT_PORT:-5555}:5555"
         networks:
             - internal
             - data
@@ -113,9 +105,9 @@ services:
         stop_signal: SIGKILL
         environment:
             NODE_ENV: production
-            DEPOT_PORT: ${DEPOT_PORT}
-            INKASSO_PORT: ${INKASSO_PORT}
-            POSTAMT_PORT: ${POSTAMT_PORT}
+            DEPOT_PORT: 5555
+            INKASSO_PORT: 1111
+            POSTAMT_PORT: 2222
             ADYEN_MERCHANT_ACCOUNT: ${SHOP_API_ADYEN_MERCHANT_ACCOUNT}
             ADYEN_HMAC_KEY: ${SHOP_API_ADYEN_HMAC_KEY}
             ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
@@ -128,8 +120,6 @@ services:
             interval: 30s
             timeout: 10s
             retries: 3
-        ports:
-            - "${SHOP_API_PORT:-8888}:8888"
         networks:
             - internal
         depends_on:
@@ -147,8 +137,6 @@ services:
         stop_signal: SIGKILL
         environment:
             BASE_URL: ${SHOP_BASE_URL:-}
-        ports:
-            - "${SHOP_PORT:-9999}:9999"
         networks:
             - internal
         depends_on:
@@ -169,8 +157,8 @@ services:
             - cache-data:/cache
             - certs-data:/etc/nginx/certs:ro
         ports:
-            - "${PROXY_PORT:-8080}:80"
-            - "${PROXY_SSL_PORT:-8443}:443"
+            - "${PROXY_PORT:-80}:80"
+            - "${PROXY_SSL_PORT:-443}:443"
         networks:
             - public
             - internal
@@ -204,8 +192,6 @@ services:
         restart: unless-stopped
         volumes:
             - ./prometheus/config.yml:/prometheus/prometheus.yml
-        ports:
-            - "${PROMETHEUS_PORT:-9090}:9090"
         networks:
             - internal
         depends_on:
@@ -235,8 +221,6 @@ services:
             - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/default.yaml
             - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/default.yaml
             - ./grafana/dashboards:/var/lib/grafana/dashboards
-        ports:
-            - "${GRAFANA_PORT:-3000}:3000"
         networks:
             - internal
         depends_on:

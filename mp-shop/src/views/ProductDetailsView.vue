@@ -6,7 +6,7 @@
 				<div class="flex gap-32">
 					<div class="w-1/2 px-40 pt-8">
 						<!-- Product Image -->
-						<VueMagnifier v-if="product.image" mg-height="300" mg-width="300"  :src="product.image.url" :alt="product.name"  class-name="w-full object-cover" itemprop="image" />
+						<VueMagnifier v-if="product.image" zoom-factor="1.2" mg-height="300" mg-width="300"  :src="product.image.url" :alt="product.name"  class-name="w-full object-cover" itemprop="image" />
 					</div>
 					<div class="w-1/2 pt-16">
 						<div class="rounded-lg bg-white shadow-xl mb-16">
@@ -87,7 +87,7 @@ import Header from "@/components/Header.vue";
 import {numberFormatter} from "@/util/numberFormatter";
 import SelectionBox from "@/components/SelectionBox.vue";
 import VueMagnifier from "@websitebeaver/vue-magnifier";
-import '@websitebeaver/vue-magnifier/styles.css';
+import "@websitebeaver/vue-magnifier/styles.css";
 
 const logger = debug("app:i:product-details-view");
 const verbose = debug("app:v:product-details-view");

@@ -10,7 +10,7 @@ import {
 	ProductPattern,
 	ProductPages, ProductCover, OrderUpdate, OrderUpdatedTotalRequest, ProductVariant
 } from "../types";
-import {ProductDto} from "../dto/ProductDto";
+import {ProductDto, ProductDtoData} from "../dto/ProductDto";
 import {ProductRulingDto, ProductRulingDtoData} from "../dto/ProductRulingDto";
 import {DeliveryMethodDto} from "../dto/DeliveryMethodDto";
 import {PaymentMethodDto} from "../dto/PaymentMethodDto";
@@ -36,12 +36,12 @@ class DepotApi {
 		this.headers = options.defaultHeaders ?? {};
 	}
 
-	private async fetchEntity<T>(
+	private async fetchEntity<T, U = any>(
 		endpoint: string,
 		mapDto: (item: T) => any,
 		depth = 3,
 		filter?: any
-	): Promise<any[]> {
+	): Promise<U[]> {
 		const query = filter ? qs.stringify(filter, {encode: false}) : "";
 
 		verbose(`Querying ${endpoint} with "${query}"`);
@@ -467,13 +467,65 @@ class DepotApi {
 				}
 			},
 
-			all: async (filter?: any) => {
-				return this.fetchEntity<Product>(
-					"products",
-					(product) => new ProductDto(product),
-					4,
-					filter
-				);
+			all: async (filter?: any): Promise<Partial<ProductDtoData>> => {
+				const defaultFilter = {
+					fields: ["id", "name"],
+					populate: {
+						images: {
+							populate: {
+								images: {
+									fields: ["url"]
+								}
+							}
+						},
+						cover: {
+							fields: ["price"]
+						},
+						pattern: {
+							fields: ["id", "name", "price"]
+						},
+						pages: {
+							fields: ["price"]
+						},
+						ruling: {
+							fields: ["price"]
+						}
+					}
+				};
+				const query = qs.stringify({
+					...defaultFilter,
+					...filter
+				}, {encode: false});
+
+				verbose(`Querying products with "${query}"`);
+
+				const response = await fetch(`${this.baseUrl}/products?${query}`, {
+					method: "GET",
+					headers: this.headers,
+				});
+
+				if (!response.ok) {
+					throw new Error(`Request failed with status ${response.status}`);
+				}
+
+				const {data} = await response.json();
+
+				return data.map((product: Product) => {
+					const dto = new ProductDto(product);
+
+					return {
+						id: dto.id,
+						name: dto.name,
+						pattern: {
+							id: dto.pattern?.id,
+							name: dto.pattern?.name
+						},
+						image: {
+							url: dto.image?.url
+						},
+						totalProductPrice: dto.totalProductPrice()
+					}
+				});
 			},
 		}
 	}

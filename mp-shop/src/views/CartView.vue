@@ -1,6 +1,12 @@
 <template>
 	<main class="pt-4 container mx-auto">
-		<h1 class="text-2xl font-bold mb-4">Shopping Cart (UUID: {{ uuid }})</h1>
+		<h1 class="text-2xl font-bold mb-4 text-center">Im Warenkorb gesamt: {{numberFormatter(cart.total)}} €</h1>
+
+		<div class="flex items-center">
+			<a href="/checkout" class="flex-grow-0 bg-black text-white px-3 py-4 shadow-md hover:shadow-sm rounded-full w-full uppercase font-thin tracking-wide">
+				Bezahlen
+			</a>
+		</div>
 
 		<div v-if="cartProducts">
 			<ul class="divide-y divide-gray-300">
@@ -53,6 +59,7 @@ import CodeBlock from "@/components/CodeBlock.vue";
 import debug from "debug";
 import {cart} from "@/stores/cart";
 import Header from "@/components/Header.vue";
+import {numberFormatter} from "@/util/numberFormatter";
 
 const logger = debug("app:i:cart-view");
 const verbose = debug("app:v:cart-view");
@@ -71,6 +78,7 @@ export default {
 		}
 	},
 	methods: {
+		numberFormatter,
 		async removeFromCart(productId: number, count = 1) {
 			verbose(`Removing ${count} product with ID ${productId} from cart`);
 
