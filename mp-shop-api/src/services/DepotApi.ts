@@ -147,9 +147,45 @@ class DepotApi {
 
 			update: async (uuid: string, orderUpdates: Partial<OrderUpdate>) => {
 				const order = new OrderDto(await this.orderFactory().one(uuid));
+				const query = qs.stringify({
+					populate: {
+						delivery: true,
+						payment: true,
+						invoice: true,
+						deliveryNote: true,
+						cart: {
+							populate: {
+								count: true,
+								product: {
+									populate: {
+										cover: {
+											fields: ["price"]
+										},
+										pages: {
+											fields: ["price"]
+										},
+										ruling: {
+											fields: ["price"]
+										},
+										pattern: {
+											fields: ["price"]
+										},
+										images: {
+											populate: {
+												images: {
+													fields: ["url"]
+												}
+											}
+										},
+									}
+								}
+							}
+						}
+					}
+				}, {encode: false});
 
 				const responseWithoutTotal = await fetch(
-					`${this.baseUrl}/orders/${order.id}?populate=deep,5`,
+					`${this.baseUrl}/orders/${order.id}?${query}`,
 					{
 						method: "PUT",
 						headers: this.headers,
@@ -172,7 +208,7 @@ class DepotApi {
 				}
 
 				const responseWithTotal = await fetch(
-					`${this.baseUrl}/orders/${order.id}?populate=deep,5`,
+					`${this.baseUrl}/orders/${order.id}?${query}`,
 					{
 						method: "PUT",
 						headers: this.headers,
@@ -190,10 +226,8 @@ class DepotApi {
 			},
 			addProduct: async (uuid: string, productId: string, count: number = 1) => {
 				const order = new OrderDto(await this.orderFactory().one(uuid));
-				const product = await this.productFactory().one(productId);
 
 				if (!order) throw new Error(`Could not find order with UUID ${uuid}`);
-				if (!product) throw new Error(`Could not find product with ID ${productId}`);
 
 				const currentCartProducts = order.cartProducts || [];
 				const updatedCartProducts = currentCartProducts.map(cartProduct => {
@@ -225,10 +259,8 @@ class DepotApi {
 			},
 			removeProduct: async (uuid: string, productId: string, count: number = 1) => {
 				const order = new OrderDto(await this.orderFactory().one(uuid));
-				const product = await this.productFactory().one(productId);
 
 				if (!order) throw new Error(`Could not find order with UUID ${uuid}`);
-				if (!product) throw new Error(`Could not find product with ID ${productId}`);
 
 				const currentCartProducts = order.cartProducts || [];
 
