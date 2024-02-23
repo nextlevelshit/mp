@@ -54,7 +54,6 @@ import AdyenCheckout from "@adyen/adyen-web";
 import "@adyen/adyen-web/dist/adyen.css";
 import CodeBlock from "@/components/CodeBlock.vue";
 import {shopApi} from "@/services/ShopApi";
-import {localStorageLabelCartUuid} from "@/config/constants";
 import type {Order} from "@/types";
 import {cart} from "@/stores/cart";
 import Stepper from "@/components/Stepper.vue";
