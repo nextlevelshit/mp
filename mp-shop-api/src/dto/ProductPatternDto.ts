@@ -38,7 +38,7 @@ export class ProductPatternDto {
 	}
 
 	get image(): MediaDataDtoData | null {
-		const image = this.productPattern.attributes.image.data;
+		const image = this.productPattern.attributes.image?.data;
 		return image ? new MediaDataDto(image).dto : null;
 	}
 

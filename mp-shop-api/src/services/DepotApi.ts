@@ -83,8 +83,50 @@ class DepotApi {
 			},
 
 			one: async (uuid: string) => {
+				const query = qs.stringify({
+					filters: {
+						uuid: {
+							$eq: uuid
+						}
+					},
+					populate: {
+						delivery: true,
+						payment: true,
+						invoice: true,
+						deliveryNote: true,
+						cart: {
+							populate: {
+								count: true,
+								product: {
+									populate: {
+										cover: {
+											fields: ["price"]
+										},
+										pages: {
+											fields: ["price"]
+										},
+										ruling: {
+											fields: ["price"]
+										},
+										pattern: {
+											fields: ["price"]
+										},
+										images: {
+											populate: {
+												images: {
+													fields: ["url"]
+												}
+											}
+										},
+									}
+								}
+							}
+						}
+					}
+				}, {encode: false});
+
 				const response = await fetch(
-					`${this.baseUrl}/orders?filters[uuid][$eq]=${uuid}&populate=deep,5`,
+					`${this.baseUrl}/orders?${query}`,
 					{
 						method: "GET",
 						headers: this.headers

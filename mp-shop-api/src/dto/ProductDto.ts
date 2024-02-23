@@ -62,7 +62,7 @@ export class ProductDto {
 	}
 
 	get image(): MediaDataDto | null {
-		const images = this.product.attributes.images.data?.attributes.images.data;
+		const images = this.product.attributes.images?.data?.attributes.images.data;
 		return images ? new MediaDataDto(images[0]) : null;
 	}
 

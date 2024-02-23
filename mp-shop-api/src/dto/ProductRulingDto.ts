@@ -25,7 +25,7 @@ export class ProductRulingDto {
 	}
 
 	get icon(): MediaDataDto | null {
-		const icon = this.productRuling.attributes.icon.data;
+		const icon = this.productRuling.attributes.icon?.data;
 		return icon ? new MediaDataDto(icon) : null;
 	}
 

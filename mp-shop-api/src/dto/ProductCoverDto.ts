@@ -25,7 +25,7 @@ export class ProductCoverDto {
 	}
 
 	get icon(): MediaDataDto | null {
-		const icon = this.productCover.attributes.icon.data;
+		const icon = this.productCover.attributes.icon?.data;
 		return icon ? new MediaDataDto(icon) : null;
 	}
 

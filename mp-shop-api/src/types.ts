@@ -119,7 +119,7 @@ export interface Product {
 		ruling: {
 			data: null | ProductRuling;
 		};
-		images: {
+		images?: {
 			data: null | {
 				id: number;
 				attributes: {
@@ -179,7 +179,7 @@ export interface ProductCover {
 			details: string;
 			banderole: string;
 		};
-		icon: {
+		icon?: {
 			data: null | MediaData;
 		}
 	};
@@ -190,7 +190,7 @@ export interface ProductRuling {
 	attributes: {
 		name: string;
 		price: number;
-		icon: {
+		icon?: {
 			data: null | MediaData;
 		}
 	};
@@ -218,10 +218,10 @@ export interface ProductPattern {
 		name: string;
 		description: string;
 		price?: number;
-		image: {
+		image?: {
 			data: null | MediaData;
 		};
-		products: {
+		products?: {
 			data: null | Product[];
 		}
 	};
