@@ -64,10 +64,13 @@ class DepotApi {
 		return {
 			create: async () => {
 				const uuid = generateUuid();
+				const query = qs.stringify({
+					fields: ["uuid"],
+				});
 
 				verbose(`Creating cart with UUID ${uuid}`);
 
-				const response = await fetch(`${this.baseUrl}/orders?populate=uuid`, {
+				const response = await fetch(`${this.baseUrl}/orders?${query}`, {
 					method: "POST",
 					headers: this.headers,
 					body: JSON.stringify({
@@ -78,6 +81,10 @@ class DepotApi {
 				});
 
 				const {data} = await response.json();
+
+				if (uuid !== data.attributes.uuid) {
+					throw new Error(`Expected UUID ${uuid}, got ${data.uuid}`);
+				}
 
 				return data as Order;
 			},
