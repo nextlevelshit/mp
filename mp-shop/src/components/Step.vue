@@ -1,23 +1,28 @@
 <template>
-  <div class="relative">
-    <div
-        class="flex items-center justify-center h-12 w-12 rounded-full border-2 border-gray-200"
-        :class="{ 'bg-blue-500 text-white': active, 'bg-green-500 text-white': completed }"
-    >
-      <span v-if="completed">&#10003;</span>
-      <span v-else>{{ number }}</span>
-    </div>
-    <div
-        class="absolute top-16 left-1/2 transform -translate-x-1/2 text-sm text-center"
-        :class="{ 'text-blue-500': active || completed }"
-    >
-      {{ text }}
-    </div>
-  </div>
+	<li :class="{ 'text-black': active }" class="flex items-center">
+		<span class="flex items-center justify-center w-5 h-5 me-2 text-xs border rounded-full shrink-0"
+			  :class="{ 'border-black': active, 'border-gray-500': !active }">
+		  {{ number }}
+		</span>
+		<span>{{ text }}</span>
+	</li>
 </template>
 
-<script lang="ts">
+<script>
 export default {
-  props: ["number", "active", "completed", "text"],
+	props: {
+		number: {
+			type: Number,
+			required: true
+		},
+		active: {
+			type: Boolean,
+			default: false
+		},
+		text: {
+			type: String,
+			required: true
+		}
+	}
 };
 </script>

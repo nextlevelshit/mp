@@ -1,33 +1,34 @@
 <template>
-
-	<main class="pt-4 container mx-auto">
+	<div class="container mx-auto">
 		<Stepper :step="1"/>
 
-		<div v-if="uuid">
-			<h2 class="text-xl mb-4">Checkout - Step 1</h2>
+		<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-lg mx-auto">
 
-			<!-- Address Form -->
-			<form @submit.prevent="submit">
-				<label class="block mb-2">
-					E-Mail Address:
-					<input v-model="emailAddress" required class="border p-2 w-full" placeholder=""/>
-				</label>
+			<h2 class="text-2xl font-bold">Wie lauten deine Kontaktinformationen?</h2>
 
-				<label class="block mb-2">
-					<input v-model="acceptedTermsAndConditions" required type="checkbox"/>
-					Mit der Anmeldung bestätige ich, die AGB und Datenschutzerklärung gelesen und verstanden zu haben
-					und stimme diesen zu.
-				</label>
+			<div v-if="uuid" class="max-w-screen-md">
+				<!-- Address Form -->
+				<form @submit.prevent="submit" class="flex flex-col gap-12">
+					<label class="flex flex-col">
+						<span>E-Mail-Address:</span>
+						<input v-model="emailAddress" required class="border p-2 w-1/2 rounded-sm" placeholder=""/>
+					</label>
 
-				<button type="submit" class="bg-blue-500 text-white px-4 py-2">Gehe zur Rechnungsanschrift</button>
-			</form>
-		</div>
-		<div v-else>
-			Loading cart ...
-		</div>
+					<label class="flex gap-4 text-sm cursor-pointer">
+						<input v-model="acceptedTermsAndConditions" required type="checkbox"/>
+						<span>
+						Mit der Anmeldung bestätige ich, die <a href="/terms" target="_blank" class="underline">AGB</a> und <a href="/privacy" target="_blank" class="underline">Datenschutzerklärung</a> gelesen und verstanden zu haben
+						und stimme diesen zu.
+					</span>
+					</label>
 
-		<CodeBlock>{{ {uuid, emailAddress, acceptedTermsAndConditions} }}</CodeBlock>
-	</main>
+					<hr />
+
+					<button type="submit" class="bg-black text-white py-4 shadow-md hover:shadow-sm rounded-full w-full uppercase font-thin tracking-wide px-10">Weiter zur Lieferadresse</button>
+				</form>
+			</div>
+		</main>
+	</div>
 </template>
 
 <script lang="ts">

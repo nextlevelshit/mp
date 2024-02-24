@@ -1,37 +1,40 @@
 <template>
-	<main class="pt-4 container mx-auto">
+	<div class="container mx-auto">
 		<Stepper :step="2"/>
 
-		<div v-if="uuid">
-			<h2 class="text-xl mb-4">Checkout - Step 2</h2>
+		<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-lg mx-auto">
 
-			<form @submit.prevent="submit">
-				<label class="block mb-2">
-					Address:
-					<textarea v-model="address" required class="border p-2 w-full"
-							  placeholder="Straße 123&#10;012345 Stadt" rows="3"></textarea>
-				</label>
+			<div v-if="uuid">
+				<h2 class="text-2xl font-bold mb-4">Gib deinen Namen und Adresse ein:</h2>
 
-				<label class="block mb-2">
-					<input type="checkbox" v-model="showOptionalDeliveryAddress"> Abweichende Lieferadresse
-				</label>
-
-				<div v-if="showOptionalDeliveryAddress">
+				<form @submit.prevent="submit">
 					<label class="block mb-2">
-						Delivery Address:
-						<textarea v-model="deliveryAddress" class="border p-2 w-full"></textarea>
+						Address:
+						<textarea v-model="address" required class="border p-2 w-full"
+								  placeholder="Straße 123&#10;012345 Stadt" rows="3"></textarea>
 					</label>
-				</div>
 
-				<button type="submit" class="bg-blue-500 text-white px-4 py-2">Submit Address</button>
-			</form>
-		</div>
-		<div v-else>
-			Loading cart ...
-		</div>
+					<label class="block mb-2">
+						<input type="checkbox" v-model="showOptionalDeliveryAddress"> Abweichende Lieferadresse
+					</label>
 
-		<CodeBlock>{{ {uuid, address, deliveryAddress} }}</CodeBlock>
-	</main>
+					<div v-if="showOptionalDeliveryAddress">
+						<label class="block mb-2">
+							Delivery Address:
+							<textarea v-model="deliveryAddress" class="border p-2 w-full"></textarea>
+						</label>
+					</div>
+
+					<button type="submit" class="bg-blue-500 text-white px-4 py-2">Submit Address</button>
+				</form>
+			</div>
+			<div v-else>
+				Loading cart ...
+			</div>
+
+			<CodeBlock>{{ {uuid, address, deliveryAddress} }}</CodeBlock>
+		</main>
+	</div>
 </template>
 
 <script lang="ts">
