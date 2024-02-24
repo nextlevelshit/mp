@@ -14,8 +14,7 @@
 								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Einband</h2>
 								<div class="flex gap-4">
 									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
-												  :path="`/details/${cover.productId}`"
-												  :is-active="cover.productId === product.id">
+												  :path="cover.productId &&`/details/${cover.productId}`">
 										<img v-if="cover.iconUrl" :alt="cover.name" :src="cover.iconUrl"/>
 									</SelectionBox>
 								</div>
@@ -25,8 +24,7 @@
 								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Layout</h2>
 								<div class="flex gap-4">
 									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
-												  :path="`/details/${ruling.productId}`"
-												  :is-active="ruling.productId === product.id">
+												  :path="ruling.productId && `/details/${ruling.productId}`">
 										<img v-if="ruling.iconUrl" :alt="ruling.name" :src="ruling.iconUrl"/>
 									</SelectionBox>
 								</div>
@@ -36,8 +34,7 @@
 								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
 								<div class="flex gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
-												  :path="`/details/${pages.productId}`"
-												  :is-active="pages.productId === product.id"/>
+												  :path="pages.productId && `/details/${pages.productId}`" />
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>

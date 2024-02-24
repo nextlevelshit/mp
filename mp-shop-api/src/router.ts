@@ -269,7 +269,7 @@ router.get("/v1/product", async (req, res) => {
 router.get("/v1/product/:id", async (req, res) => {
 	try {
 		const {id} = req.params;
-		verbose(`Querying product with ID ${req.get("id")}`);
+		verbose(`Querying product with ID ${id}`);
 
 		const product = await depotApi.productFactory().one(id);
 
@@ -279,16 +279,29 @@ router.get("/v1/product/:id", async (req, res) => {
 	}
 });
 
+router.get("/v1/product/:id/all-variants", async (req, res) => {
+	try {
+		const {id} = req.params;
+		verbose(`Querying variants of product with ID ${id}`);
+
+		const variants = await depotApi.productFactory().allVariants(id);
+
+		res.status(200).send(variants);
+	} catch (e) {
+		res.status(500).send("Could not fetch product");
+	}
+});
+
 router.get("/v1/product/:id/variants", async (req, res) => {
 	try {
 		const {id} = req.params;
-		verbose(`Querying variants of product with ID ${req.get("id")}`);
+		verbose(`Querying variants of product with ID ${id}`);
 
-		const product = await depotApi.productFactory().variants(id);
+		const variants = await depotApi.productFactory().variants(id);
 
-		res.status(200).send(product);
+		res.status(200).send(variants);
 	} catch (e) {
-		res.status(500).send("Could not fetch product");
+		res.status(500).send("Could not fetch product variants");
 	}
 });
 

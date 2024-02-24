@@ -8,7 +8,11 @@ import {
 	PaymentMethod,
 	DeliveryMethod,
 	ProductPattern,
-	ProductPages, ProductCover, OrderUpdate, OrderUpdatedTotalRequest, ProductVariant
+	ProductPages,
+	ProductCover,
+	OrderUpdate,
+	OrderUpdatedTotalRequest,
+	ProductVariant
 } from "../types";
 import {ProductDto, ProductDtoData} from "../dto/ProductDto";
 import {ProductRulingDto, ProductRulingDtoData} from "../dto/ProductRulingDto";
@@ -414,6 +418,163 @@ class DepotApi {
 				return new ProductDto(data).dto;
 			},
 			variants: async (id: string) => {
+				// Step 1: Fetch product by id
+				const transformToProductVariant = (product: Partial<Product>) => {
+					return {
+						id: product?.id,
+						name: product.attributes?.name,
+						cover: product.attributes?.cover.data?.id,
+						ruling: product.attributes?.ruling.data?.id,
+						pages: product.attributes?.pages.data?.id,
+						pattern: product.attributes?.pattern.data?.id,
+					} as ProductVariant;
+				};
+				const getProductDetails = async () => {
+					const query = qs.stringify({
+						fields: ["id", "name"],
+						populate: {
+							pattern: {
+								fields: ["id"]
+							},
+							cover: {
+								fields: ["id"]
+							},
+							ruling: {
+								fields: ["id"]
+							},
+							pages: {
+								fields: ["id"]
+							}
+						}
+					}, {encode: false});
+
+					const response = await fetch(
+						`${this.baseUrl}/products/${id}?${query}`,
+						{
+							method: "GET",
+							headers: this.headers
+						}
+					);
+
+					if (!response.ok) {
+						throw new Error(`Could not find product with ID ${id}`);
+					}
+
+					const {data} = await response.json();
+
+					return transformToProductVariant(data);
+				};
+
+				const product = await getProductDetails();
+
+				const { pattern, cover, ruling, pages } = product;
+
+				// Step 2: Fetch products with the same pattern but different pages, cover, or ruling
+				const query = qs.stringify({
+					fields: ["id", "name"],
+					filters: {
+						$and: [
+							{
+								pattern: {
+									id: {
+										$eq: pattern
+									}
+								}
+							},
+							{
+								cover: {
+									id: {
+										$ne: cover
+									}
+								}
+							},
+							{
+								ruling: {
+									id: {
+										$ne: ruling
+									}
+								}
+							},
+							{
+								pages: {
+									id: {
+										$ne: pages
+									}
+								}
+							}
+						]
+					},
+					populate: {
+						pattern: {
+							fields: ["id"]
+						},
+						cover: {
+							fields: ["id"]
+						},
+						ruling: {
+							fields: ["id"]
+						},
+						pages: {
+							fields: ["id"]
+						}
+					}
+				}, {encode: false});
+
+				const response = await fetch(
+					`${this.baseUrl}/products/?${query}`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				if (!response.ok) {
+					verbose(response.statusText);
+					throw new Error(`Could not find products with pattern ${pattern}`);
+				}
+
+				const { data: products } = await response.json();
+
+				const productVariants = products.map(transformToProductVariant) as ProductVariant[];
+
+				const [
+					allProductPages,
+					allProductRulings,
+					allProductCovers
+				] = await Promise.all([
+					this.productPages(),
+					this.productRuling({populate: {icon: {fields: ["url"]}}}),
+					this.productCover({fields: ["id", "name", "binding", "price"], populate: {icon: {fields: ["url"]}}})
+				]);
+
+				return {
+					pages: allProductPages.map(pages => {
+						return {
+							...pages,
+							productVariant: productVariants.find(variant => {
+								return variant.pages === pages.id;
+							})
+						}
+					}),
+					cover: allProductCovers.map(cover => {
+						return {
+							...cover,
+							productVariant: productVariants.find(variant => {
+								return variant.cover === cover.id;
+							})
+						}
+					}),
+					ruling: allProductRulings.map(ruling => {
+						return {
+							...ruling,
+							productVariant: productVariants.find(variant => {
+								return variant.ruling === ruling.id;
+							})
+						}
+					})
+				}
+			},
+			allVariants: async (id: string) => {
 				const transformToProductVariant = (product: Partial<Product>) => {
 					return {
 						id: product?.id,
@@ -460,17 +621,7 @@ class DepotApi {
 					return transformToProductVariant(data);
 				}
 
-				const [
-					product,
-					allProductPages,
-					allProductRulings,
-					allProductCovers
-				] = await Promise.all([
-					getProduct(),
-					this.productPages(),
-					this.productRuling(),
-					this.productCover({fields: ["id", "name", "binding", "price"]})
-				]);
+				const product = await getProduct();
 
 				const query = qs.stringify({
 					pagination: {
@@ -516,36 +667,8 @@ class DepotApi {
 
 				const {data} = await response.json();
 
-				const allProductVariants = (data as Product[])
-					.map(transformToProductVariant);
-
-				return {
-					allProductVariants,
-					pages: allProductPages.map(pages => {
-						return {
-							...pages,
-							productVariant: allProductVariants.find(variant => {
-								return variant.pages === pages.id && variant.cover === product.cover && variant.ruling === product.ruling
-							})
-						}
-					}),
-					cover: allProductCovers.map(cover => {
-						return {
-							...cover,
-							productVariant: allProductVariants.find(variant => {
-								return variant.cover === cover.id && variant.pages === product.pages && variant.ruling === product.ruling
-							})
-						}
-					}),
-					ruling: allProductRulings.map(ruling => {
-						return {
-							...ruling,
-							productVariant: allProductVariants.find(variant => {
-								return variant.ruling === ruling.id && variant.pages === product.pages && variant.cover === product.cover
-							})
-						}
-					})
-				}
+				return (data as Product[])
+					.map(transformToProductVariant)
 			},
 
 			all: async (filter?: any): Promise<Partial<ProductDtoData>> => {
