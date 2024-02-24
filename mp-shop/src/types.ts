@@ -231,4 +231,12 @@ export interface ProductVariantResponse {
 			pattern: number;
 		};
 	}[];
-};
+}
+
+export interface Address {
+	name: string;
+	surname: string;
+	street: string;
+	postalCode: string;
+	city: string;
+}

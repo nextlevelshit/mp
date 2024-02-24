@@ -2,17 +2,14 @@
 	<div class="container mx-auto">
 		<Stepper :step="1"/>
 
-		<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-lg mx-auto">
+		<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-md mx-auto">
 
 			<h2 class="text-2xl font-bold">Wie lauten deine Kontaktinformationen?</h2>
 
-			<div v-if="uuid" class="max-w-screen-md">
+			<div v-if="uuid">
 				<!-- Address Form -->
 				<form @submit.prevent="submit" class="flex flex-col gap-12">
-					<label class="flex flex-col">
-						<span>E-Mail-Address:</span>
-						<input v-model="emailAddress" required class="border p-2 w-1/2 rounded-sm" placeholder=""/>
-					</label>
+					<Input label="E-Mail-Address" v-model="emailAddress" :value="emailAddress" :required="true"/>
 
 					<label class="flex gap-4 text-sm cursor-pointer">
 						<input v-model="acceptedTermsAndConditions" required type="checkbox"/>
@@ -38,12 +35,13 @@ import debug from "debug";
 import {cart} from "@/stores/cart";
 import Stepper from "@/components/Stepper.vue";
 import Header from "@/components/Header.vue";
+import Input from "@/components/Input.vue";
 
 const logger = debug("app:i:checkout-email-view");
 const verbose = debug("app:v:checkout-email-view");
 
 export default {
-	components: {Header, Stepper, CodeBlock},
+	components: {Input, Header, Stepper, CodeBlock},
 	computed: {
 		uuid() {
 			return cart.uuid

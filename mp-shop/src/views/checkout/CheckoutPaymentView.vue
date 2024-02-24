@@ -1,11 +1,9 @@
 <template>
-	<main class="pt-4 container mx-auto">
+	<main class="container mx-auto">
 		<Stepper :step="3"/>
 
 		<div v-if="cart">
-			<h2 class="text-xl mb-4">Checkout - Step 3</h2>
-
-			<div class="flex gap-6">
+			<div class="mt-8 mb-12 flex gap-8 max-w-screen-lg mx-auto">
 				<div class="payment w-2/3" ref="payment"></div>
 				<div class="w-1/3">
 					<h3 class="text-lg font-semibold mb-2">Cart Summary</h3>
