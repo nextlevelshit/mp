@@ -49,7 +49,7 @@
 									<button @click="addToCart"
 											:disabled="isAddingToCart"
 											:class="{ 'opacity-50': isAddingToCart }"
-											class="bg-black text-white px-3 py-4 shadow-md hover:shadow-sm rounded-full w-full uppercase font-thin tracking-wide">
+											class="bg-black text-white px-3 py-4 shadow-md hover:shadow-sm rounded-lg w-full uppercase font-thin tracking-wide">
 										<span v-if="isAddingToCart">Wird hinzugefügt...</span>
 										<span v-else>In den Warenkorb</span>
 									</button>

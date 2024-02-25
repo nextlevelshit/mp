@@ -1,11 +1,11 @@
 <template>
 	<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-lg mx-auto">
-		<h1 class="text-2xl font-bold mb-4 text-center">Im Warenkorb gesamt: {{numberFormatter(cart.total)}} €</h1>
+		<Title :level="2" html-tag="h1" classes="text-center">Im Warenkorb gesamt: {{numberFormatter(cart.total)}} €</Title>
 
 		<div class="grid place-content-center">
-			<a href="/checkout" class="flex-grow-0 bg-black text-white py-4 shadow-md hover:shadow-sm rounded-full w-full uppercase font-thin tracking-wide px-10">
-				Bezahlen
-			</a>
+			<Button href="/checkout">
+				Jetzt bezahlen
+			</Button>
 		</div>
 
 		<hr />
@@ -34,10 +34,6 @@
 			<hr />
 
 			<div>
-<!--				<div class="flex justify-between mb-2">-->
-<!--					<span class="text-2xl">Zwischensumme</span>-->
-<!--					<span class="text-2xl">{{ numberFormatter(cart.total) }} €</span>-->
-<!--				</div>-->
 				<div class="flex justify-between mb-2">
 					<span class="text-2xl font-bold">Deine Gesamtsumme</span>
 					<div class="flex flex-col flex-end">
@@ -48,9 +44,9 @@
 			</div>
 
 			<div class="grid place-content-end">
-				<a href="/checkout" class="bg-black text-white py-4 shadow-md hover:shadow-sm rounded-full w-full uppercase font-thin tracking-wide px-28">
-					Bezahlen
-				</a>
+				<Button href="/checkout" classes="w-full">
+					Jetzt bezahlen
+				</Button>
 			</div>
 		</div>
 
@@ -68,12 +64,14 @@ import {cart} from "@/stores/cart";
 import Header from "@/components/Header.vue";
 import {numberFormatter} from "@/util/numberFormatter";
 import type {Product, CartProduct} from "@/types";
+import Title from "@/components/Title.vue";
+import Button from "@/components/Button.vue";
 
 const logger = debug("app:i:cart-view");
 const verbose = debug("app:v:cart-view");
 
 export default {
-	components: {Header, CodeBlock},
+	components: {Button, Title, Header, CodeBlock},
 	computed: {
 		cart() {
 			return cart

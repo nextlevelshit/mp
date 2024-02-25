@@ -1,7 +1,7 @@
 import { reactive } from "vue";
 import {shopApi} from "@/services/ShopApi";
 import {localStorageLabelCartUuid} from "@/config/constants";
-import type {CartProduct, Order} from "@/types";
+import type {CartProduct, Order, Address} from "@/types";
 import debug from "debug";
 
 const logger = debug("app:i:cart-store");
@@ -16,6 +16,7 @@ export const cart = reactive({
 	total: 0,
 	subtotal: 0,
 	VAT: 0,
+	emailAddress: "",
 	fetch() {
 		verbose("Updating cart store");
 		const uuidFromLocalStorage = localStorage.getItem(localStorageLabelCartUuid);
@@ -30,10 +31,11 @@ export const cart = reactive({
 	overwrite(order: Order) {
 		this.products = order.cartProducts;
 		this.productsCount = calculateCount(this.products);
-		this.total = order.total;
+		this.total = order.delivery?.price ? Math.round(order.total + order.delivery.price) : order.total;
 		this.subtotal = order.subtotal;
 		this.VAT = order.VAT;
 		this.uuid = order.uuid;
+		this.emailAddress = order.email ?? "";
 		localStorage.setItem(localStorageLabelCartUuid, String(order.uuid));
 	}
 })

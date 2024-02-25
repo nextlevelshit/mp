@@ -3,45 +3,99 @@
 		<Stepper :step="3"/>
 
 		<div v-if="cart">
-			<div class="mt-8 mb-12 flex gap-8 max-w-screen-lg mx-auto">
-				<div class="payment w-2/3" ref="payment"></div>
-				<div class="w-1/3">
-					<h3 class="text-lg font-semibold mb-2">Cart Summary</h3>
-					<p>Total: {{ cart.total?.toFixed(2) }} €</p>
-					<p>Subtotal: {{ cart.subtotal?.toFixed(2) }} €</p>
-					<p>VAT: {{ cart.VAT?.toFixed(2) }} €</p>
+			<div class="mt-8 mb-12 flex gap-8 mx-auto relative">
+				<div class="w-1/2">
+					<div v-if="!hasPaymentError" class="payment sticky top-4" ref="payment"></div>
+					<div v-else class="p-8 text-center mx-auto rounded-md bg-rose-100 b">
+						<span class="text-rose-800">Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</span>
+					</div>
+				</div>
+				<div class="w-1/2">
+					<div v-if="cartProducts" class="flex flex-col gap-8">
+						<ul class="divide-y divide-gray-300">
+							<li v-for="(position, index) in cartProducts" :key="index"
+								class="py-6 gap-6 flex items-center justify-between">
 
-					<h3 class="text-lg font-semibold mb-2 mt-4">Products</h3>
-					<ul>
-						<li v-for="(cartProduct, index) in cart.cartProducts" :key="index">
-							{{ cartProduct.product.name }} ({{ cartProduct.count }} items) -
-							{{ cartProduct.product.totalProductPrice.toFixed(2) }} €
-						</li>
-					</ul>
+								<img :src="position.product.image.url" :alt="position.product.name"
+									 class="w-6 object-cover">
 
-					<h3 class="text-lg font-semibold mb-2 mt-4">Customer Information</h3>
-					<p>Email: {{ cart.email }}</p>
-					<p>Address: {{ cart.address }}</p>
+								<span class="text-sm flex-grow">{{ position.product.name }}</span>
 
-					<div class="bg-gray-100 mt-10 p-8 text-xs text-gray-700">
-						<p>Mit dem Kauf akzeptiere ich die AGB und Nutzungsbedingungen.</p>
-						<p class="text-sm mt-4">
-							Sicherheitsabfrage bei Kreditkartenzahlung
-						</p>
-						<p class="mt-4">Möglicherweise werden Sie im nächsten Schritt von Ihrer Bank gebeten, Ihre
-							Kreditkarte zu verifizieren (3-D Secure).</p>
-						<p class="text-sm mt-4">Hinweise zum Datenschutz</p>
-						<p class="mt-2">Die personenbezogenen Daten werden für die Abwicklung der Bestellung
-							automatisiert verarbeitet. Der Schutz Ihrer persönlichen Daten ist uns wichtig. Daher
-							verwenden wir bei der Übertragung moderne Verschlüsselungstechnologien. Weiteres entnehmen
-							Sie bitte unseren Datenschutzhinweisen.</p>
+								<div
+									class="block text-center bg-white border border-gray-300 px-4 py-2 rounded shadow leading-tight">
+									{{ position.count }}
+								</div>
+
+								<div class="flex flex-col gap-2 flex-end w-24">
+									<span class="text-sm font-bold text-right">{{
+											numberFormatter(position.product.totalProductPrice * position.count)
+										}} €</span>
+								</div>
+							</li>
+						</ul>
+
+						<hr/>
+
+						<div>
+							<div class="flex justify-between mb-2">
+								<span class="text-2xl">Zwischensumme</span>
+								<span class="text-2xl">{{ numberFormatter(cart.total) }} €</span>
+							</div>
+							<div class="flex justify-between mb-2">
+								<span class="text-2xl">Versand</span>
+								<span class="text-2xl">{{ cart.delivery?.price ? numberFormatter(cart.delivery.price, "€") : "KOSTENFREI" }}</span>
+							</div>
+							<div class="flex justify-between mb-2">
+								<span class="text-2xl font-bold">Gesamtsumme</span>
+								<div class="flex flex-col flex-end">
+									<span class="text-2xl font-bold text-right">
+										{{ numberFormatter(cart.total) }} €
+									</span>
+									<span class="text-gray-600 text-sm text-right">
+										inkl. MwSt. {{ numberFormatter(cart.VAT) }} €
+									</span>
+								</div>
+							</div>
+						</div>
+					</div>
+
+
+					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg">
+						<div class="text-lg">
+							<Title :level="3">E-Mail-Adresse:</Title>
+							<p>{{ cart.email }}</p>
+						</div>
+
+						<div class="mt-4">
+							<Title :level="3">Rechnungsadresse:</Title>
+							<p class="text-lg whitespace-pre-line" v-html="cart.invoiceAddress"/>
+						</div>
+
+						<div v-if="cart.address" class="mt-4">
+							<Title :level="3">Lieferadresse:</Title>
+							<p class="text-lg whitespace-pre-line" v-html="cart.address"/>
+						</div>
+					</div>
+
+
+					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg">
+						<div>
+							<Title :level="4">
+								Sicherheitsabfrage bei Kreditkartenzahlung
+							</Title>
+							<p class="text-sm mt-1">Möglicherweise werden Sie im nächsten Schritt von Ihrer Bank gebeten, Ihre
+								Kreditkarte zu verifizieren (3-D Secure).</p>
+							<Title :level="4">Hinweise zum Datenschutz</Title>
+							<p class="mt-1 text-sm">Die personenbezogenen Daten werden für die Abwicklung der Bestellung
+								automatisiert verarbeitet. Der Schutz Ihrer persönlichen Daten ist uns wichtig. Daher
+								verwenden wir bei der Übertragung moderne Verschlüsselungstechnologien. Weiteres entnehmen
+								Sie bitte unseren <a href="/privacy" target="_blank" class="underline">Datenschutzhinweisen</a>.</p>
+						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-		<div v-else>
-			Loading cart ...
-		</div>
+
 		<CodeBlock>{{ cart }}</CodeBlock>
 	</main>
 </template>
@@ -56,22 +110,26 @@ import type {Order} from "@/types";
 import {cart} from "@/stores/cart";
 import Stepper from "@/components/Stepper.vue";
 import Header from "@/components/Header.vue";
+import Title from "@/components/Title.vue";
+import {numberFormatter} from "@/util/numberFormatter";
 
 const logger = debug("app:i:checkout-view");
 const verbose = debug("app:v:checkout-view");
 
 export default {
-	components: {Header, Stepper, CodeBlock},
+	components: {Header, Stepper, CodeBlock, Title},
 	computed: {
 		uuid() {
 			return cart.uuid
+		},
+		cartProducts() {
+			return this.cart?.cartProducts;
 		}
 	},
 	data() {
 		return {
 			cart: {} as Order | null,
-			address: "Hans Wurst\nStraße 123\n012345 Stadt",
-			deliveryAddress: "",
+			hasPaymentError: false
 		}
 	},
 	async mounted() {
@@ -97,15 +155,23 @@ export default {
 		}
 	},
 	methods: {
+		numberFormatter,
 		async startCheckout() {
 			verbose("SessionId not found, initilizing checkout");
 			if (!this.cart) {
 				verbose("Cart not found, cannot initilize checkout");
 				return;
 			}
-			const {session, clientKey} = await shopApi.checkoutOrder(this.cart.uuid);
-			const checkout = await this.createAdyenCheckout(session, clientKey);
-			checkout.create("dropin").mount(this.$refs["payment"]);
+			this.hasPaymentError = false;
+			try  {
+				const {session, clientKey} = await shopApi.checkoutOrder(this.cart.uuid);
+				const checkout = await this.createAdyenCheckout(session, clientKey);
+				checkout.create("dropin").mount(this.$refs["payment"]);
+			} catch (error) {
+				verbose("Error initializing checkout:", error);
+				this.hasPaymentError = true;
+
+			}
 		},
 		async finalizeCheckout(id: string, details: string) {
 			verbose("SessionId found, finilizing checkout");

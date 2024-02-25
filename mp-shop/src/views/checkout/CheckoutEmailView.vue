@@ -4,7 +4,7 @@
 
 		<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-md mx-auto">
 
-			<h2 class="text-2xl font-bold">Wie lauten deine Kontaktinformationen?</h2>
+			<Title :level="2" html-tag="h1">Wie lauten deine Kontaktinformationen?</Title>
 
 			<div v-if="uuid">
 				<!-- Address Form -->
@@ -12,7 +12,7 @@
 					<Input label="E-Mail-Address" v-model="emailAddress" :value="emailAddress" :required="true"/>
 
 					<label class="flex gap-4 text-sm cursor-pointer">
-						<input v-model="acceptedTermsAndConditions" required type="checkbox"/>
+						<input v-model="acceptedTermsAndConditions" required type="checkbox" class="w-4 cursor-pointer"/>
 						<span>
 						Mit der Anmeldung bestätige ich, die <a href="/terms" target="_blank" class="underline">AGB</a> und <a href="/privacy" target="_blank" class="underline">Datenschutzerklärung</a> gelesen und verstanden zu haben
 						und stimme diesen zu.
@@ -21,7 +21,7 @@
 
 					<hr />
 
-					<button type="submit" class="bg-black text-white py-4 shadow-md hover:shadow-sm rounded-full w-full uppercase font-thin tracking-wide px-10">Weiter zur Lieferadresse</button>
+					<Button type="submit" classes="w-full">Weiter zur Lieferadresse</Button>
 				</form>
 			</div>
 		</main>
@@ -29,19 +29,20 @@
 </template>
 
 <script lang="ts">
-import CodeBlock from "@/components/CodeBlock.vue";
-import {shopApi} from "@/services/ShopApi";
 import debug from "debug";
+import Button from "@/components/Button.vue";
+import {shopApi} from "@/services/ShopApi";
 import {cart} from "@/stores/cart";
 import Stepper from "@/components/Stepper.vue";
 import Header from "@/components/Header.vue";
 import Input from "@/components/Input.vue";
+import Title from "@/components/Title.vue";
 
 const logger = debug("app:i:checkout-email-view");
 const verbose = debug("app:v:checkout-email-view");
 
 export default {
-	components: {Input, Header, Stepper, CodeBlock},
+	components: {Title, Input, Header, Stepper, Button},
 	computed: {
 		uuid() {
 			return cart.uuid
@@ -49,7 +50,7 @@ export default {
 	},
 	data() {
 		return {
-			emailAddress: "spam@dailysh.it",
+			emailAddress: "",
 			acceptedTermsAndConditions: false
 		}
 	},
@@ -71,6 +72,13 @@ export default {
 			});
 
 			window.location.assign("/checkout/2");
+		}
+	},
+	watch: {
+		emailAddress: {
+			handler(newValue) {
+				logger("Email address changed to", newValue);
+			}
 		}
 	}
 }
