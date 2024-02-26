@@ -19,15 +19,12 @@
 				<ProductCard v-for="(item, i) in list" :key="i" :product="item" :cartUuid="cartUuid"/>
 			</div>
 		</div>
-
-		<CodeBlock class="mt-8">{{ JSON.stringify(list, null, 2) }}</CodeBlock>
 	</main>
 </template>
 <script>
 import debug from "debug";
 import {shopApi} from "@/services/ShopApi";
 import {localStorageLabelCartUuid} from "@/config/constants";
-import CodeBlock from "@/components/CodeBlock.vue";
 import ProductCard from "@/components/ProductCard.vue";
 import Header from "@/components/Header.vue";
 import Title from "@/components/Title.vue";
@@ -36,7 +33,7 @@ const logger = debug("app:i:product-list-view");
 const verbose = debug("app:v:product-list-view");
 
 export default {
-	components: {Title, Header, ProductCard, CodeBlock},
+	components: {Title, Header, ProductCard},
 	data() {
 		return {
 			list: null,

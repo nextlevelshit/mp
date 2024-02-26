@@ -77,7 +77,6 @@
 						</div>
 					</div>
 
-
 					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg">
 						<div>
 							<Title :level="4">
