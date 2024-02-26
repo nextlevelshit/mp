@@ -3,7 +3,7 @@
 		<div class="flex gap-12 relative">
 			<div class="w-1/4">
 				<div class="sticky top-4">
-					<h1 class="text-2xl pb-4">Notizbücher und Notizhefte</h1>
+					<Title :level="2" html-tag="h1">Notizbücher und Notizhefte</Title>
 					<p class="tracking-tight">
 						Alle Notizhefte sind von uns selbst gestaltet, gedruckt und in Handarbeit gebunden. Das
 						eingesetzte, matte Recyclingpapier mit feiner Textur sorgt für angenehmes Schreiben und
@@ -30,12 +30,13 @@ import {localStorageLabelCartUuid} from "@/config/constants";
 import CodeBlock from "@/components/CodeBlock.vue";
 import ProductCard from "@/components/ProductCard.vue";
 import Header from "@/components/Header.vue";
+import Title from "@/components/Title.vue";
 
 const logger = debug("app:i:product-list-view");
 const verbose = debug("app:v:product-list-view");
 
 export default {
-	components: {Header, ProductCard, CodeBlock},
+	components: {Title, Header, ProductCard, CodeBlock},
 	data() {
 		return {
 			list: null,

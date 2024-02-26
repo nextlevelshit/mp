@@ -6,7 +6,7 @@
 		<div class="flex flex-col justify-between">
 			<div class="px-2 py-4">
 				<p class="text-gray-900">{{ product.pattern?.name }}</p>
-				<p class="text-gray-600">ab {{ product.totalProductPrice.toFixed(2) }} €</p>
+				<p class="text-gray-600">ab {{ numberFormatter(product.totalProductPrice, "€") }}</p>
 			</div>
 		</div>
 	</a>
@@ -19,6 +19,7 @@ import {cart} from "@/stores/cart";
 import {randomTailwindColor} from "@/util/randomTailwindColor";
 import type {Product} from "@/types";
 import type {PropType} from "vue";
+import {numberFormatter} from "@/util/numberFormatter";
 
 const logger = debug("app:i:product-card");
 const verbose = debug("app:v:product-card");
@@ -48,6 +49,7 @@ export default {
 		}
 	},
 	methods: {
+		numberFormatter,
 		async addToCart(productId) {
 			verbose(`Adding product with ID ${productId} to cart`);
 

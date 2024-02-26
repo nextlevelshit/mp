@@ -6,7 +6,9 @@
 				<div class="flex gap-32">
 					<div class="w-1/2 px-40 pt-8">
 						<!-- Product Image -->
-						<VueMagnifier v-if="product.image" zoom-factor="1.2" mg-height="300" mg-width="300"  :src="product.image.url" :alt="product.name"  class-name="w-full object-cover" itemprop="image" />
+						<VueMagnifier v-if="product.image" zoom-factor="1.2" mg-height="300" mg-width="300"
+									  :src="product.image.url" :alt="product.name" class-name="w-full object-cover"
+									  itemprop="image"/>
 					</div>
 					<div class="w-1/2 pt-16">
 						<div class="rounded-lg bg-white shadow-xl mb-16">
@@ -34,7 +36,7 @@
 								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
 								<div class="flex gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
-												  :path="pages.productId && `/details/${pages.productId}`" />
+												  :path="pages.productId && `/details/${pages.productId}`"/>
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
@@ -46,13 +48,12 @@
 									</span>
 								</div>
 								<div class="w-2/3">
-									<button @click="addToCart"
-											:disabled="isAddingToCart"
-											:class="{ 'opacity-50': isAddingToCart }"
-											class="bg-black text-white px-3 py-4 shadow-md hover:shadow-sm rounded-lg w-full uppercase font-thin tracking-wide">
+									<Button @click="addToCart"
+											:is-pending="isAddingToCart"
+											classes="w-full">
 										<span v-if="isAddingToCart">Wird hinzugefügt...</span>
 										<span v-else>In den Warenkorb</span>
-									</button>
+									</Button>
 								</div>
 							</section>
 						</div>
@@ -85,12 +86,13 @@ import {numberFormatter} from "@/util/numberFormatter";
 import SelectionBox from "@/components/SelectionBox.vue";
 import VueMagnifier from "@websitebeaver/vue-magnifier";
 import "@websitebeaver/vue-magnifier/styles.css";
+import Button from "@/components/Button.vue";
 
 const logger = debug("app:i:product-details-view");
 const verbose = debug("app:v:product-details-view");
 
 export default {
-	components: {SelectionBox, Header, CodeBlock, VueMagnifier},
+	components: {Button, SelectionBox, Header, CodeBlock, VueMagnifier},
 	props: ["id"],
 	computed: {
 		uuid() {
@@ -170,7 +172,7 @@ export default {
 				logger(`Could not add product ${this.product.id} to cart:`, error);
 			} finally {
 				this.isAddingToCart = false;
-				cart.fetch();
+				window.location.assign("/cart");
 			}
 		}
 	},

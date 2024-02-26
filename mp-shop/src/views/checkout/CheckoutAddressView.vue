@@ -7,15 +7,15 @@
 
 			<form @submit.prevent="submit" v-if="uuid">
 				<div class="flex flex-col gap-4 max-w-screen-md">
-					<Input label="Vorname" v-model="address.name" :required="true"/>
-					<Input label="Nachname" v-model="address.surname" :required="true"/>
+					<Input label="Vorname" v-model="address.name" :required="true" autocomplete="given-name" />
+					<Input label="Nachname" v-model="address.surname" :required="true" autocomplete="family-name"/>
 					<Input label="Straße und Hausnummer:" v-model="address.street"
-						   :required="true"/>
+						   :required="true" autocomplete="street-address"/>
 					<div class="flex gap-4">
 						<Input label="PLZ" v-model="address.postalCode" :required="true"
-							   label-class="w-1/2"/>
+							   label-class="w-1/2" autocomplete="postal-code"/>
 						<Input label="Ort" v-model="address.city" :required="true"
-							   label-class="w-1/2"/>
+							   label-class="w-1/2" autocomplete="on"/>
 					</div>
 
 					<label class="flex items-center gap-2 my-4 cursor-pointer">
@@ -40,12 +40,13 @@
 					</div>
 				</div>
 
-				<div class="mt-20">
-					<Button classes="w-full" type="submit">
+				<hr class="my-12"/>
+
+				<div class="mt-12">
+					<Button classes="w-full" type="submit" :is-pending="formSubmitIsPending">
 						Weiter zur Zahlung
 					</Button>
 				</div>
-
 			</form>
 		</main>
 	</div>
@@ -89,27 +90,35 @@ export default {
 				street: "",
 				postalCode: "",
 				city: ""
-			} as Address
+			} as Address,
+			formSubmitIsPending: false
 		}
 	},
 	methods: {
 		async submit() {
+
 			if (!this.uuid) {
-				logger("Warenkorb nicht gefunden, kann das Formular nicht absenden");
+				logger("Cart not found, cannot submit address form");
 				return;
 			}
 
 			const invoiceAddress = this.addressToString(this.address);
 			const address = this.showOptionalDeliveryAddress ? this.addressToString(this.deliveryAddress) : invoiceAddress;
 
-			verbose(JSON.stringify(this.address), invoiceAddress);
+			try {
+				this.formSubmitIsPending = true;
 
-			await shopApi.updateOrder(this.uuid, {
-				invoiceAddress,
-				address
-			});
+				await shopApi.updateOrder(this.uuid, {
+					invoiceAddress,
+					address
+				});
 
-			window.location.assign("/checkout/3");
+				window.location.assign("/checkout/3");
+			} catch (error) {
+				logger("Error submitting address form:", error);
+			} finally {
+				this.formSubmitIsPending = false;
+			}
 		},
 		addressToString(address: Address) {
 			return `${address.name} ${address.surname}\n${address.street}\n${address.postalCode} ${address.city}`;

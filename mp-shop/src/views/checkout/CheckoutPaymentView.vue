@@ -95,8 +95,6 @@
 				</div>
 			</div>
 		</div>
-
-		<CodeBlock>{{ cart }}</CodeBlock>
 	</main>
 </template>
 

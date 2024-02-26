@@ -9,7 +9,7 @@
 			<div v-if="uuid">
 				<!-- Address Form -->
 				<form @submit.prevent="submit" class="flex flex-col gap-12">
-					<Input label="E-Mail-Address" v-model="emailAddress" :value="emailAddress" :required="true"/>
+					<Input label="E-Mail-Address" v-model="emailAddress" :value="emailAddress" :required="true" autocomplete="email"/>
 
 					<label class="flex gap-4 text-sm cursor-pointer">
 						<input v-model="acceptedTermsAndConditions" required type="checkbox" class="w-4 cursor-pointer"/>
@@ -21,7 +21,7 @@
 
 					<hr />
 
-					<Button type="submit" classes="w-full">Weiter zur Lieferadresse</Button>
+					<Button type="submit" classes="w-full" :is-pending="formSubmitIsPending">Weiter zur Lieferadresse</Button>
 				</form>
 			</div>
 		</main>
@@ -51,7 +51,8 @@ export default {
 	data() {
 		return {
 			emailAddress: "",
-			acceptedTermsAndConditions: false
+			acceptedTermsAndConditions: false,
+			formSubmitIsPending: false
 		}
 	},
 	methods: {
@@ -66,12 +67,21 @@ export default {
 				return;
 			}
 
-			await shopApi.updateOrder(this.uuid, {
-				email: this.emailAddress,
-				acceptedTermsAndConditionsAt: new Date().toISOString()
-			});
+			try {
+				this.formSubmitIsPending = true;
 
-			window.location.assign("/checkout/2");
+				await shopApi.updateOrder(this.uuid, {
+					email: this.emailAddress,
+					acceptedTermsAndConditionsAt: new Date().toISOString()
+				});
+
+				window.location.assign("/checkout/2");
+			} catch (error) {
+				logger("Error submitting email address", error);
+			} finally {
+				this.formSubmitIsPending = false;
+			}
+
 		}
 	},
 	watch: {
