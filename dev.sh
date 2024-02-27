@@ -8,5 +8,5 @@ docker compose -p "muellerprints-dev" \
 		--env-file .env.dev \
 		up \
 		--build \
-    	--remove-orphans \
-    	--force-recreate
+    	--remove-orphans
+#    	--force-recreate

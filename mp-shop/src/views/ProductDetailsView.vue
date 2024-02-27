@@ -1,5 +1,5 @@
 <template>
-	<div :class="bgColor" itemscope itemtype="https://schema.org/Product">
+	<article :class="bgColor" itemscope itemtype="https://schema.org/Product">
 		<main class="pt-4 container mx-auto">
 			<div v-if="product">
 				<!--    <h1 class="text-2xl font-bold mb-4">{{ product.name }} - Product ID: {{ id }}</h1>-->
@@ -16,7 +16,8 @@
 								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Einband</h2>
 								<div class="flex gap-4">
 									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
-												  :path="cover.productId &&`/details/${cover.productId}`">
+												  :path="cover.productId &&`/details/${cover.productId}`"
+												  :is-active="cover.productId === product.id">
 										<img v-if="cover.iconUrl" :alt="cover.name" :src="cover.iconUrl"/>
 									</SelectionBox>
 								</div>
@@ -26,7 +27,8 @@
 								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Layout</h2>
 								<div class="flex gap-4">
 									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
-												  :path="ruling.productId && `/details/${ruling.productId}`">
+												  :path="ruling.productId && `/details/${ruling.productId}`"
+												  :is-active="ruling.productId === product.id">
 										<img v-if="ruling.iconUrl" :alt="ruling.name" :src="ruling.iconUrl"/>
 									</SelectionBox>
 								</div>
@@ -36,7 +38,8 @@
 								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
 								<div class="flex gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
-												  :path="pages.productId && `/details/${pages.productId}`"/>
+												  :path="pages.productId && `/details/${pages.productId}`"
+												  :is-active="pages.productId === product.id"/>
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
@@ -71,12 +74,26 @@
 				</div>
 			</div>
 		</main>
-	</div>
+	</article>
+	<section class="flex flex-col gap-8 container mx-auto items-center my-10" v-if="patternVariants.patterns">
+		<div class="">
+			<Title :level="1" html-tag="h2">Erhältlich in {{ patternVariants.patterns.length }} weiteren Mustern</Title>
+		</div>
+
+		<ul class="grid grid-cols-4 gap-12">
+			<li v-for="(pattern, i) in patternVariants.patterns" :key="i">
+				<a :href="pattern.productVariant?.id ? `/details/${pattern.productVariant.id}` : ``"
+				   class="block hover:opacity-40 h-60 w-60 rounded-full shadow-lg border-6 border-white"
+				   :style="`background: url(${pattern.image.url}) no-repeat; background-size: cover;`">
+				</a>
+			</li>
+		</ul>
+	</section>
 </template>
 
 <script lang="ts">
 import CodeBlock from "@/components/CodeBlock.vue";
-import type {Product, ProductVariantResponse} from "@/types";
+import type {Product, ProductVariantResponse, PatternVariantsResponse} from "@/types";
 import {shopApi} from "@/services/ShopApi";
 import debug from "debug";
 import {cart} from "@/stores/cart";
@@ -87,12 +104,13 @@ import SelectionBox from "@/components/SelectionBox.vue";
 import VueMagnifier from "@websitebeaver/vue-magnifier";
 import "@websitebeaver/vue-magnifier/styles.css";
 import Button from "@/components/Button.vue";
+import Title from "@/components/Title.vue";
 
 const logger = debug("app:i:product-details-view");
 const verbose = debug("app:v:product-details-view");
 
 export default {
-	components: {Button, SelectionBox, Header, CodeBlock, VueMagnifier},
+	components: {Button, SelectionBox, Header, CodeBlock, VueMagnifier, Title},
 	props: ["id"],
 	computed: {
 		uuid() {
@@ -142,6 +160,7 @@ export default {
 		return {
 			product: {} as Product,
 			productVariants: {} as ProductVariantResponse,
+			patternVariants: {} as PatternVariantsResponse,
 			isAddingToCart: false
 		}
 	},
@@ -154,6 +173,13 @@ export default {
 		}
 		try {
 			this.productVariants = await shopApi.getProductVariantsByProductId(this.id);
+			logger(this.productVariants);
+		} catch (e) {
+			logger("Could not fetch product variants");
+			verbose(e);
+		}
+		try {
+			this.patternVariants = await shopApi.getPatternVariantsByProductId(this.id);
 			logger(this.productVariants);
 		} catch (e) {
 			logger("Could not fetch product variants");

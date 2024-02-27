@@ -14,11 +14,6 @@ const logger = debug("app:i:selection-box");
 const verbose = debug("app:v:selection-box");
 
 export default {
-	props: [ "label", "path"],
-	computed: {
-		isActive() {
-			return !this.path;
-		}
-	}
+	props: [ "label", "path", "isActive"],
 }
 </script>

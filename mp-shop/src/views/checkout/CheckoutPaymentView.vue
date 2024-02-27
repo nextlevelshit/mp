@@ -7,7 +7,7 @@
 				<div class="w-1/2">
 					<div v-if="!hasPaymentError" class="payment sticky top-4" ref="payment"></div>
 					<div v-else class="p-8 text-center mx-auto rounded-md bg-rose-100 b">
-						<span class="text-rose-800">Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.</span>
+						<span class="text-rose-800">Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</span>
 					</div>
 				</div>
 				<div class="w-1/2">
@@ -109,6 +109,7 @@ import Stepper from "@/components/Stepper.vue";
 import Header from "@/components/Header.vue";
 import Title from "@/components/Title.vue";
 import {numberFormatter} from "@/util/numberFormatter";
+import {paymentEnvironment} from "@/config/constants";
 
 const logger = debug("app:i:checkout-view");
 const verbose = debug("app:v:checkout-view");
@@ -133,6 +134,8 @@ export default {
 		const urlParams = new URLSearchParams(window.location.search);
 		const sessionId = urlParams.get("sessionId");
 		const redirectResult = urlParams.get("redirectResult");
+
+		logger(paymentEnvironment);
 
 		try {
 			this.cart = await shopApi.getOrder(this.uuid);
@@ -187,7 +190,7 @@ export default {
 					enabled: false
 				},
 				locale: "de_DE",
-				environment: "test", // change to live for production
+				environment: paymentEnvironment,
 				showPayButton: true,
 				paymentMethodsConfiguration: {
 					card: {
@@ -204,7 +207,7 @@ export default {
 							currency: session.amount.currency || "EUR",
 							value: session.amount.value || Math.round(this.cart.total * 100)
 						},
-						environment: "test",
+						environment: paymentEnvironment,
 						countryCode: "DE"   // Only needed for test. This will be automatically retrieved when you are in production.
 					}
 				},

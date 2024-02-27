@@ -417,6 +417,166 @@ class DepotApi {
 
 				return new ProductDto(data).dto;
 			},
+			variantsByPattern: async (id: string) => {
+				// Step 1: Fetch product by id
+				const transformToProductVariant = (product: Partial<Product>) => {
+					return {
+						id: product?.id,
+						name: product.attributes?.name,
+						cover: product.attributes?.cover.data?.id,
+						ruling: product.attributes?.ruling.data?.id,
+						pages: product.attributes?.pages.data?.id,
+						pattern: product.attributes?.pattern.data?.id,
+					} as ProductVariant;
+				};
+				const getProductDetails = async () => {
+					const query = qs.stringify({
+						fields: ["id", "name"],
+						populate: {
+							pattern: {
+								fields: ["id"]
+							},
+							cover: {
+								fields: ["id"]
+							},
+							ruling: {
+								fields: ["id"]
+							},
+							pages: {
+								fields: ["id"]
+							}
+						}
+					}, {encode: false});
+
+					const response = await fetch(
+						`${this.baseUrl}/products/${id}?${query}`,
+						{
+							method: "GET",
+							headers: this.headers
+						}
+					);
+
+					if (!response.ok) {
+						throw new Error(`Could not find product with ID ${id}`);
+					}
+
+					const {data} = await response.json();
+
+					return transformToProductVariant(data);
+				};
+
+				const product = await getProductDetails();
+
+				const {pattern, cover, ruling, pages} = product;
+
+				// Step 2: Fetch products with same pages, cover and ruling
+				const query = qs.stringify({
+					fields: ["id", "name"],
+					filters: {
+						$and: [
+							{
+								id: {
+									$ne: product.id
+								}
+							},
+							{
+								pattern: {
+									id: {
+										$ne: pattern
+									}
+								}
+							},
+							{
+								cover: {
+									id: {
+										$eq: cover
+									}
+								}
+							},
+							{
+								ruling: {
+									id: {
+										$eq: ruling
+									}
+								}
+							},
+							{
+								pages: {
+									id: {
+										$eq: pages
+									}
+								}
+							}
+						]
+					},
+					populate: {
+						pattern: {
+							fields: ["id"]
+						},
+						cover: {
+							fields: ["id"]
+						},
+						ruling: {
+							fields: ["id"]
+						},
+						pages: {
+							fields: ["id"]
+						}
+					},
+					pagination: {
+						limit: 100
+					}
+				}, {encode: false});
+
+				const response = await fetch(
+					`${this.baseUrl}/products/?${query}`,
+					{
+						method: "GET",
+						headers: this.headers
+					}
+				);
+
+				if (!response.ok) {
+					verbose(response.statusText);
+					throw new Error(`Could not find products with pattern ${pattern}`);
+				}
+
+				const {data: products} = await response.json();
+
+				const productVariants = products.map(transformToProductVariant) as ProductVariant[];
+
+				const allProductPattern = await this.productPattern({
+					fields: ["id", "name", "description"],
+					populate: {
+						image: {
+							fields: ["url"]
+						}
+					},
+					filters: {
+						id: {
+							$ne: product.pattern
+						}
+					},
+					pagination: {
+						limit: 100
+					}
+				});
+
+				return {
+					allProductPattern,
+					productVariants,
+					patterns: allProductPattern
+						// .filter(({id}) => id !== product.pattern)
+						.map(pattern => {
+							return {
+								...pattern,
+								productVariant: productVariants.find(variant => {
+									return variant.pattern === pattern.id;
+								})
+							}
+						}),
+				}
+			},
 			variants: async (id: string) => {
 				// Step 1: Fetch product by id
 				const transformToProductVariant = (product: Partial<Product>) => {
@@ -467,7 +627,7 @@ class DepotApi {
 
 				const product = await getProductDetails();
 
-				const { pattern, cover, ruling, pages } = product;
+				const {pattern, cover, ruling, pages} = product;
 
 				// Step 2: Fetch products with the same pattern but different pages, cover, or ruling
 				const query = qs.stringify({
@@ -481,27 +641,27 @@ class DepotApi {
 									}
 								}
 							},
-							{
-								cover: {
-									id: {
-										$ne: cover
-									}
-								}
-							},
-							{
-								ruling: {
-									id: {
-										$ne: ruling
-									}
-								}
-							},
-							{
-								pages: {
-									id: {
-										$ne: pages
-									}
-								}
-							}
+							// {
+							// 	cover: {
+							// 		id: {
+							// 			$ne: cover
+							// 		}
+							// 	}
+							// },
+							// {
+							// 	ruling: {
+							// 		id: {
+							// 			$ne: ruling
+							// 		}
+							// 	}
+							// },
+							// {
+							// 	pages: {
+							// 		id: {
+							// 			$ne: pages
+							// 		}
+							// 	}
+							// }
 						]
 					},
 					populate: {
@@ -533,7 +693,7 @@ class DepotApi {
 					throw new Error(`Could not find products with pattern ${pattern}`);
 				}
 
-				const { data: products } = await response.json();
+				const {data: products} = await response.json();
 
 				const productVariants = products.map(transformToProductVariant) as ProductVariant[];
 
@@ -552,7 +712,7 @@ class DepotApi {
 						return {
 							...pages,
 							productVariant: productVariants.find(variant => {
-								return variant.pages === pages.id;
+								return variant.pages === pages.id && variant.cover === cover && variant.ruling === ruling
 							})
 						}
 					}),
@@ -560,7 +720,7 @@ class DepotApi {
 						return {
 							...cover,
 							productVariant: productVariants.find(variant => {
-								return variant.cover === cover.id;
+								return variant.cover === cover.id && variant.pages === pages && variant.ruling === ruling;
 							})
 						}
 					}),
@@ -568,7 +728,7 @@ class DepotApi {
 						return {
 							...ruling,
 							productVariant: productVariants.find(variant => {
-								return variant.ruling === ruling.id;
+								return variant.ruling === ruling.id && variant.pages === pages && variant.cover === cover;
 							})
 						}
 					})
@@ -743,11 +903,12 @@ class DepotApi {
 		);
 	}
 
-	async productPattern(): Promise<ProductPatternDtoData[]> {
+	async productPattern(filter?: any): Promise<ProductPatternDtoData[]> {
 		return this.fetchEntity<ProductPattern>(
 			"product-patterns",
 			(pattern) => new ProductPatternDto(pattern),
-			1
+			1,
+			filter
 		);
 	}
 

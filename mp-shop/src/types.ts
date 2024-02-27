@@ -149,14 +149,6 @@ export interface Order {
 export type OrderUpdateBody = Partial<Order>;
 
 export interface ProductVariantResponse {
-	allProductVariants: {
-		id: number;
-		name: string;
-		cover: number;
-		ruling: number;
-		pages: number;
-		pattern: number;
-	}[];
 	pages: {
 		id: number;
 		name: string;
@@ -223,6 +215,26 @@ export interface ProductVariantResponse {
 			providerMetadata: string | null;
 		} | null;
 		productVariant: {
+			id: number;
+			name: string;
+			cover: number;
+			ruling: number;
+			pages: number;
+			pattern: number;
+		};
+	}[];
+}
+
+export interface PatternVariantsResponse {
+	patterns: {
+		id: number;
+		name: string;
+		description: string;
+		image: {
+			id: number;
+			url: string;
+		};
+		productVariant?: {
 			id: number;
 			name: string;
 			cover: number;

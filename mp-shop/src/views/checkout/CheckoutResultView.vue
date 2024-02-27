@@ -66,22 +66,22 @@
 					</div>
 
 
-					<div class="bg-gray-100 mt-2 p-8 text-gray-700 rounded-lg">
-						<div class="text-lg">
-							<Title :level="3">E-Mail-Adresse:</Title>
-							<p>{{ order.email }}</p>
-						</div>
+<!--					<div class="bg-gray-100 mt-2 p-8 text-gray-700 rounded-lg">-->
+<!--						<div class="text-lg">-->
+<!--							<Title :level="3">E-Mail-Adresse:</Title>-->
+<!--							<p>{{ order.email }}</p>-->
+<!--						</div>-->
 
-						<div class="mt-4">
-							<Title :level="3">Rechnungsadresse:</Title>
-							<p class="text-lg whitespace-pre-line" v-html="order.invoiceAddress"/>
-						</div>
+<!--						<div class="mt-4">-->
+<!--							<Title :level="3">Rechnungsadresse:</Title>-->
+<!--							<p class="text-lg whitespace-pre-line" v-html="order.invoiceAddress"/>-->
+<!--						</div>-->
 
-						<div v-if="order.address" class="mt-4">
-							<Title :level="3">Lieferadresse:</Title>
-							<p class="text-lg whitespace-pre-line" v-html="order.address"/>
-						</div>
-					</div>
+<!--						<div v-if="order.address" class="mt-4">-->
+<!--							<Title :level="3">Lieferadresse:</Title>-->
+<!--							<p class="text-lg whitespace-pre-line" v-html="order.address"/>-->
+<!--						</div>-->
+<!--					</div>-->
 				</div>
 			</div>
 		</div>

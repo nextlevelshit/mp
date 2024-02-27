@@ -1,4 +1,4 @@
-import type {Order, OrderUpdateBody, Product, ProductVariantResponse} from "@/types";
+import type {Order, OrderUpdateBody, Product, ProductVariantResponse, PatternVariantsResponse} from "@/types";
 import debug from "debug";
 
 const logger = debug("app:i:shop-api");
@@ -105,6 +105,12 @@ class ShopApi {
 		logger(`Requestion product variants from ${this.baseUrl}/v1/product/${id}/variants`);
 		const response = await fetch(`${this.baseUrl}/v1/product/${id}/variants`);
 		return this.handleResponse<ProductVariantResponse>(response);
+	}
+
+	async getPatternVariantsByProductId(id: string): Promise<PatternVariantsResponse> {
+		logger(`Requestion pattern variants from ${this.baseUrl}/v1/product/${id}/variants/pattern`);
+		const response = await fetch(`${this.baseUrl}/v1/product/${id}/variants/pattern`);
+		return this.handleResponse<PatternVariantsResponse>(response);
 	}
 
 	async getProductRulings(): Promise<any> {
