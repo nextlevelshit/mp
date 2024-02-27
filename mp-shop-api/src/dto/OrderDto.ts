@@ -112,7 +112,7 @@ export class OrderDto {
 			subject: "RECHNUNG",
 			date,
 			to: {
-				name: email || "",
+				name: "",
 				address: invoiceAddress ? invoiceAddress.split("\n") : [],
 			},
 			nr: {
@@ -147,7 +147,7 @@ export class OrderDto {
 			subject: "LIEFERSCHEIN",
 			date,
 			to: {
-				name: email || "",
+				name: "",
 				address: address ? address.split("\n") : []
 			},
 			nr: {
