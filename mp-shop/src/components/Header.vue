@@ -7,7 +7,7 @@
 						MUELLERPRINTS.<br/>Paperwork
 					</h1>
 				</router-link>
-				<div v-if="$route" role="navigation" class="grow w-3/4">
+				<div v-if="$route.name" role="navigation" class="grow w-3/4">
 					<nav class="flex justify-end" v-if="isCheckoutRoute" aria-label="Navigation">
 						<router-link class="hover:text-gray-400" to="/cart">
 							Zurück zum Warenkorb

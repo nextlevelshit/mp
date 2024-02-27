@@ -46,6 +46,8 @@
 						</li>
 					</ul>
 				</div>
+
+				<ConfettiExplosion :colors="['#2563eb', '#ec4899', '#16a34a']" />
 			</div>
 
 		</div>
@@ -56,6 +58,7 @@
 <script lang="ts">
 import {shopApi} from "@/services/ShopApi";
 import debug from "debug";
+import ConfettiExplosion from "vue-confetti-explosion";
 import CodeBlock from "@/components/CodeBlock.vue";
 import type {Order} from "@/types";
 import Header from "@/components/Header.vue";
@@ -68,7 +71,7 @@ const logger = debug("app:i:checkout-result-view");
 const verbose = debug("app:v:checkout-result-view");
 
 export default {
-	components: {Button, Title, Stepper, Header, CodeBlock},
+	components: {Button, Title, Stepper, Header, CodeBlock, ConfettiExplosion},
 	props: ["uuid"],
 	data() {
 		return {
