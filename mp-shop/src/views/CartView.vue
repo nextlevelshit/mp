@@ -21,7 +21,7 @@
 							<img :src="position.product.image.url" :alt="position.product.name"
 								 class="w-12 object-cover">
 
-							<span class="text-xl font-bold flex-grow">{{ position.product.name }}</span>
+							<a :href="`/details/${position.product.id}`" class="text-xl font-bold flex-grow">{{ position.product.name }}</a>
 
 							<select
 								@change="changeCountCart(position, parseInt(($event.target as HTMLInputElement).value))"

@@ -43,7 +43,9 @@
 							</div>
 							<div class="flex justify-between mb-2">
 								<span class="text-2xl">Versand</span>
-								<span class="text-2xl">{{ cart.delivery?.price ? numberFormatter(cart.delivery.price, "€") : "KOSTENFREI" }}</span>
+								<span class="text-2xl">{{
+										cart.delivery?.price ? numberFormatter(cart.delivery.price, "€") : "KOSTENFREI"
+									}}</span>
 							</div>
 							<div class="flex justify-between mb-2">
 								<span class="text-2xl font-bold">Gesamtsumme</span>
@@ -60,21 +62,24 @@
 					</div>
 
 
-					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg">
+					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg relative">
 						<div class="text-lg">
-							<Title :level="3">E-Mail-Adresse:</Title>
+							<Title :level="3">Kontaktinformationen</Title>
 							<p>{{ cart.email }}</p>
 						</div>
+						<a href="/checkout/1" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
+					</div>
 
-						<div class="mt-4">
-							<Title :level="3">Rechnungsadresse:</Title>
-							<p class="text-lg whitespace-pre-line" v-html="cart.invoiceAddress"/>
-						</div>
+					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg relative">
+						<Title :level="3">Rechnungsadresse:</Title>
+						<p class="text-lg whitespace-pre-line" v-html="cart.invoiceAddress"/>
+						<a href="/checkout/2" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
+					</div>
 
-						<div v-if="cart.address" class="mt-4">
-							<Title :level="3">Lieferadresse:</Title>
-							<p class="text-lg whitespace-pre-line" v-html="cart.address"/>
-						</div>
+					<div v-if="cart.address" class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg relative">
+						<Title :level="3">Lieferadresse:</Title>
+						<p class="text-lg whitespace-pre-line" v-html="cart.address"/>
+						<a href="/checkout/2" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
 					</div>
 
 					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg">
@@ -82,13 +87,16 @@
 							<Title :level="4">
 								Sicherheitsabfrage bei Kreditkartenzahlung
 							</Title>
-							<p class="text-sm mt-1">Möglicherweise werden Sie im nächsten Schritt von Ihrer Bank gebeten, Ihre
+							<p class="text-sm mt-1">Möglicherweise werden Sie im nächsten Schritt von Ihrer Bank
+								gebeten, Ihre
 								Kreditkarte zu verifizieren (3-D Secure).</p>
 							<Title :level="4">Hinweise zum Datenschutz</Title>
 							<p class="mt-1 text-sm">Die personenbezogenen Daten werden für die Abwicklung der Bestellung
 								automatisiert verarbeitet. Der Schutz Ihrer persönlichen Daten ist uns wichtig. Daher
-								verwenden wir bei der Übertragung moderne Verschlüsselungstechnologien. Weiteres entnehmen
-								Sie bitte unseren <a href="/privacy" target="_blank" class="underline">Datenschutzhinweisen</a>.</p>
+								verwenden wir bei der Übertragung moderne Verschlüsselungstechnologien. Weiteres
+								entnehmen
+								Sie bitte unseren <a href="/privacy" target="_blank" class="underline">Datenschutzhinweisen</a>.
+							</p>
 						</div>
 					</div>
 				</div>
@@ -163,7 +171,7 @@ export default {
 				return;
 			}
 			this.hasPaymentError = false;
-			try  {
+			try {
 				const {session, clientKey} = await shopApi.checkoutOrder(this.cart.uuid);
 				const checkout = await this.createAdyenCheckout(session, clientKey);
 				checkout.create("dropin").mount(this.$refs["payment"]);

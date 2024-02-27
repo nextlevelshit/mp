@@ -1,20 +1,15 @@
 <template>
 	<article :class="bgColor" itemscope itemtype="https://schema.org/Product">
-		<main class="pt-4 container mx-auto">
+		<main class="pt-12 container mx-auto">
 			<div v-if="product">
+				<p class="text-3xl font-semibold mb-4 w-2/3" v-html="product.cover?.copyText?.details"></p>
 				<!--    <h1 class="text-2xl font-bold mb-4">{{ product.name }} - Product ID: {{ id }}</h1>-->
-				<div class="flex gap-32">
-					<div class="w-1/2 px-40 pt-8">
-						<!-- Product Image -->
-						<VueMagnifier v-if="product.image" zoom-factor="1.2" mg-height="300" mg-width="300"
-									  :src="product.image.url" :alt="product.name" class-name="w-full object-cover"
-									  itemprop="image"/>
-					</div>
-					<div class="w-1/2 pt-16">
+				<div class="flex gap-12 relative">
+					<div class="w-2/5 pt-8">
 						<div class="rounded-lg bg-white shadow-xl mb-16">
-							<section class="flex py-6 px-8">
-								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Einband</h2>
-								<div class="flex gap-4">
+							<section class="flex gap-12 py-6 px-8">
+								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Einband</h2>
+								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
 												  :path="cover.productId &&`/details/${cover.productId}`"
 												  :is-active="cover.productId === product.id">
@@ -23,9 +18,9 @@
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
-							<section class="flex py-6 px-8">
-								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Layout</h2>
-								<div class="flex gap-4">
+							<section class="flex gap-12 py-6 px-8">
+								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Layout</h2>
+								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
 												  :path="ruling.productId && `/details/${ruling.productId}`"
 												  :is-active="ruling.productId === product.id">
@@ -34,9 +29,9 @@
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
-							<section class="flex py-6 px-8">
-								<h2 class="pt-3 w-36 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
-								<div class="flex gap-4">
+							<section class="flex gap-12 py-6 px-8">
+								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
+								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
 												  :path="pages.productId && `/details/${pages.productId}`"
 												  :is-active="pages.productId === product.id"/>
@@ -63,12 +58,19 @@
 
 						<!-- CopyText Details -->
 						<div v-if="product.cover?.copyText" class="my-16 px-4 flex flex-col gap-y-6">
-							<p class="text-2xl" v-html="product.cover.copyText.details"></p>
 							<div v-html="product.cover.copyText.text"></div>
 							<p><span class="font-bold">Einband:</span> {{ product.cover.copyText.cover }}</p>
 							<p><span class="font-bold">Papier:</span> {{ product.cover.copyText.paper }}</p>
 							<p><span class="font-bold">Format:</span> {{ product.cover.copyText.format }}</p>
 							<p><span class="font-bold">Banderole:</span> {{ product.cover.copyText.banderole }}</p>
+						</div>
+					</div>
+					<div class="flex justify-center w-3/5 pt-8 mx-auto">
+						<!-- Product Image -->
+						<div class="w-2/5">
+							<VueMagnifier v-if="product.image" zoom-factor="1" mg-height="300" mg-width="300"
+										  :src="product.image.url" :alt="product.name" class-name="w-full object-cover"
+										  itemprop="image"/>
 						</div>
 					</div>
 				</div>
@@ -80,7 +82,7 @@
 			<Title :level="1" html-tag="h2">Erhältlich in {{ patternVariants.patterns.length }} weiteren Mustern</Title>
 		</div>
 
-		<ul class="grid grid-cols-4 gap-12">
+		<ul class="grid grid-cols-5 gap-12">
 			<li v-for="(pattern, i) in patternVariants.patterns" :key="i">
 				<a :href="pattern.productVariant?.id ? `/details/${pattern.productVariant.id}` : ``"
 				   class="block hover:opacity-40 h-60 w-60 rounded-full shadow-lg border-6 border-white"

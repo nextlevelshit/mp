@@ -58,7 +58,15 @@ const router = createRouter({
 		{
 			path: "/checkout/3",
 			name: "checkout-payment",
-			component: () => import("./views/checkout/CheckoutPaymentView.vue")
+			component: () => import("./views/checkout/CheckoutPaymentView.vue"),
+			beforeRouteLeave (to, from , next) {
+				const answer = window.confirm("Unter Umständen geht dein Fortschritt verloren. Bist du sicher, dass du die Seite verlassen möchtest?")
+				if (answer) {
+					next()
+				} else {
+					next(false)
+				}
+			},
 		},
 		{
 			path: "/checkout/result/:uuid",

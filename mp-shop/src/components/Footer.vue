@@ -1,5 +1,5 @@
 <template>
-	<div class="bg-neutral-800 text-neutral-400 py-12 tracking-wide mt-40">
+	<div class="bg-gray-800 text-gray-400 py-12 tracking-wide mt-40">
 		<div class="container mx-auto">
 			<div class="flex">
 				<div class="w-1/4">
