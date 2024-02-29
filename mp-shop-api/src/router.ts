@@ -209,23 +209,29 @@ router.put("/v1/order/:uuid/finalize", async (req, res) => {
 	try {
 		const { uuid } = req.params;
 
-		await depotApi.orderFactory().update(uuid, {
+		const authorisedOrder = await depotApi.orderFactory().update(uuid, {
 			paymentAuthorised: true,
 			paymentStatus: "authorised",
 			Date: new Date().toISOString().slice(0, 10),
 		});
+
+		res.status(200).send(new OrderDto(authorisedOrder).dto);
+
+		verbose(`Finalizing order with UUID ${uuid}`);
 
 		await Promise.all([
 			depotApi.orderFactory().generateInvoiceAndSaveToOrder(uuid),
 			depotApi.orderFactory().generateDeliveryNoteAndSaveToOrder(uuid),
 		]);
 
-		const order = await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid);
+		verbose(`Sending invoice and delivery note for order with UUID ${uuid}`);
 
-		// Increment the finalized order counter
+		await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid);
+
+		verbose(`Order with UUID ${uuid} has been finalized`);
+
 		finalizedOrderCounter.inc();
 
-		res.status(200).send(new OrderDto(order).dto);
 	} catch (e) {
 		verbose(e);
 		res.status(500).send("Could not finalize order");
