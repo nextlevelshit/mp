@@ -62,6 +62,8 @@ services:
                 condition: service_completed_successfully
         volumes:
             - ./mp-proxy/nginx-template.conf:/nginx-template.conf:ro
+            - cache-data:/cache
+            - certs-data:/etc/nginx/certs:ro
 
     certs:
         container_name: certs-dev
