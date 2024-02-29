@@ -3,7 +3,7 @@
 		<div class="container mx-auto">
 			<div class="flex gap-12 py-6">
 				<router-link to="/" class="w-1/4">
-					<h1 class="tracking-wide text-2xl font-bebas leading-none">
+					<h1 class="tracking-wide text-3xl font-bebas leading-none">
 						MUELLERPRINTS.<br/>Paperwork
 					</h1>
 				</router-link>

@@ -13,7 +13,7 @@
 export default {
 	data() {
 		return {
-			isInPendingState: false
+			isInPendingState: this.isPending
 		}
 	},
 	props: ["type", "classes", "href", "isPending"],

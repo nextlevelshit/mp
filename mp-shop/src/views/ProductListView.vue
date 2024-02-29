@@ -28,6 +28,7 @@ import {localStorageLabelCartUuid} from "@/config/constants";
 import ProductCard from "@/components/ProductCard.vue";
 import Header from "@/components/Header.vue";
 import Title from "@/components/Title.vue";
+import {cart} from "@/stores/cart";
 
 const logger = debug("app:i:product-list-view");
 const verbose = debug("app:v:product-list-view");
@@ -37,24 +38,23 @@ export default {
 	data() {
 		return {
 			list: null,
-			cartUuid: null,
-			cart: null
+		}
+	},
+	computed: {
+		cart() {
+			return cart;
+		},
+		cartUuid() {
+			return cart.uuid;
 		}
 	},
 	async mounted() {
-		this.list = await shopApi.getProducts();
 
 		try {
-			let cartUuid = localStorage.getItem(localStorageLabelCartUuid);
 
-			const result = await shopApi.getOrCreateOrder(cartUuid);
-			// TODO: Fix error handling
-			this.cartUuid = result.uuid;
-			this.cart = result;
-			localStorage.setItem(localStorageLabelCartUuid, this.cartUuid);
+			this.list = await shopApi.getProducts();
 		} catch (error) {
-			logger("Error fetching or creating cart:", error);
-			localStorage.removeItem(localStorageLabelCartUuid);
+			logger("Error fetching products", error);
 		}
 	},
 	methods: {}

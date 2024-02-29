@@ -8,13 +8,26 @@
 					<Title :level="2">Deine Bestellnummer: {{ order.id }}</Title>
 				</div>
 
-				<p>In Kürze erhälst du von uns eine E-Mail mit allen Einzelheiten zu deiner Bestellung. Du hast jedoch
-					vorab die Möglichkeit die Rechnung direkt herunterzuladen.</p>
+				<p class="text-lg w-2/3">In Kürze erhälst du von uns eine E-Mail mit allen Einzelheiten zu deiner
+					Bestellung. Du kannst sie auch hier herunterladen, sobald sie erstellt wurde.</p>
 
 				<div>
-					<Button classes="" :is-pending="isDownloadPending" @click="downloadInvoice">
-						Rechnung herunterladen
+					<Button :is-pending="!hasReachedMaxFailedRequests && (!isReadyToDownload || isDownloadPending)"
+							@click="downloadInvoice">
+						<span v-if="hasReachedMaxFailedRequests">
+							Bald verfügbar
+						</span>
+						<span v-else-if="isReadyToDownload">
+							Rechnung herunterladen
+						</span>
+						<span v-else>
+							Rechnung wird geladen
+						</span>
 					</Button>
+					<div v-if="hasReachedMaxFailedRequests" class="text-sm mt-3">
+						Es konnte noch keine Rechnung ermittelt werden. Bitte prüfe deine E-Mails oder kontaktiere uns:
+						order@muellerprints.de
+					</div>
 				</div>
 
 				<hr/>
@@ -47,7 +60,7 @@
 					</ul>
 				</div>
 
-				<ConfettiExplosion :colors="['#2563eb', '#ec4899', '#16a34a']" />
+				<ConfettiExplosion :colors="['#2563eb', '#ec4899', '#16a34a']"/>
 			</div>
 
 		</div>
@@ -70,23 +83,44 @@ import Button from "@/components/Button.vue";
 const logger = debug("app:i:checkout-result-view");
 const verbose = debug("app:v:checkout-result-view");
 
+const maxFailedRequests = 60;
+
 export default {
 	components: {Button, Title, Stepper, Header, CodeBlock, ConfettiExplosion},
 	props: ["uuid"],
 	data() {
 		return {
 			order: {} as Order,
-			isDownloadPending: false
+			isDownloadPending: false,
+			failedDownloadRequests: 0,
+			hasReachedMaxFailedRequests: false
 		}
 	},
 	computed: {
 		orderProducts() {
 			return this.order?.cartProducts;
+		},
+		isReadyToDownload() {
+			return !!this.order?.invoice;
 		}
 	},
 	async mounted() {
+		const fetchOrder = async () => {
+			const order = await shopApi.getOrder(this.uuid);
+
+			if (!order.invoice) {
+				this.failedDownloadRequests++;
+				if (this.failedDownloadRequests < maxFailedRequests) {
+					setTimeout(fetchOrder, 1000);
+				} else {
+					this.hasReachedMaxFailedRequests = true;
+				}
+			}
+			return order;
+		}
+
 		try {
-			this.order = await shopApi.getOrder(this.uuid);
+			this.order = await fetchOrder();
 		} catch (e) {
 			verbose("Could not fetch checkout status");
 		}
@@ -94,6 +128,10 @@ export default {
 	methods: {
 		numberFormatter,
 		downloadInvoice() {
+			if (!this.isReadyToDownload) {
+				verbose("Invoice not ready to download");
+				return;
+			}
 			try {
 				this.isDownloadPending = true;
 				if (this.order.invoice) {
