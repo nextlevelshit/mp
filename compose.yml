@@ -142,6 +142,7 @@ services:
         environment:
             VITE_BASE_URL: ${SHOP_BASE_URL:-}
             VITE_PAYMENT_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
+            VITE_UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID}
         networks:
             - internal
         depends_on:
