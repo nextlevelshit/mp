@@ -225,15 +225,11 @@ services:
 
     umami:
         container_name: umami
-#        image: ghcr.io/umami-software/umami:postgresql-latest
         build:
             context: ./umami
             args:
                 DATABASE_TYPE: postgresql
-#                APP_SECRET: ${UMAMI_API_SECRET}
                 BASE_PATH: /umami
-        ports:
-            - "3000:3000"
         environment:
             DATABASE_URL: postgresql://${UMAMI_DATABASE_USERNAME}:${UMAMI_DATABASE_PASSWORD}@umami-db:5432/${UMAMI_DATABASE_NAME}
             DATABASE_TYPE: postgresql
@@ -269,7 +265,6 @@ services:
             - umami-data:/var/lib/postgresql/data
         networks:
             - tracking
-
 
 volumes:
     silo-data:
