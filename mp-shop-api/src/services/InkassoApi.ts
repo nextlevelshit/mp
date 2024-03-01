@@ -1,4 +1,4 @@
-import {inkassoPort} from "../config/constants";
+import {inkassoAddress} from "../config/constants";
 import {PdfBody} from "../types";
 import {Counter} from "prom-client";
 import debug from "debug";
@@ -80,7 +80,7 @@ interface InkassoApiOptions {
 type Headers = Record<string, string>;
 
 export const inkassoApi = new InkassoApi({
-    baseUrl: `http://mp-inkasso:${inkassoPort}/v1`,
+    baseUrl: `${inkassoAddress}/v1`,
     defaultHeaders: {
         "content-type": "application/json",
     },

@@ -67,19 +67,19 @@
 							<Title :level="3">Kontaktinformationen</Title>
 							<p>{{ cart.email }}</p>
 						</div>
-						<a href="/checkout/1" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
+						<a href="/checkout/1" @click="trackEvent(`checkout-payment-change-email-address-clicked`)" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
 					</div>
 
 					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg relative">
 						<Title :level="3">Rechnungsadresse:</Title>
 						<p class="text-lg whitespace-pre-line" v-html="cart.invoiceAddress"/>
-						<a href="/checkout/2" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
+						<a href="/checkout/2" @click="trackEvent(`checkout-payment-change-invoice-address-clicked`)" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
 					</div>
 
 					<div v-if="cart.address" class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg relative">
 						<Title :level="3">Lieferadresse:</Title>
 						<p class="text-lg whitespace-pre-line" v-html="cart.address"/>
-						<a href="/checkout/2" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
+						<a href="/checkout/2" @click="trackEvent(`checkout-payment-change-delivery-address-clicked`)" class="absolute bottom-8 right-12 hover:underline underline-offset-2">Ändern</a>
 					</div>
 
 					<div class="bg-gray-100 mt-10 p-8 text-gray-700 rounded-lg">
@@ -118,6 +118,7 @@ import Header from "@/components/Header.vue";
 import Title from "@/components/Title.vue";
 import {numberFormatter} from "@/util/numberFormatter";
 import {paymentEnvironment} from "@/config/constants";
+import {trackEvent} from "@/util/trackEvent";
 
 const logger = debug("app:i:checkout-view");
 const verbose = debug("app:v:checkout-view");
@@ -163,6 +164,7 @@ export default {
 		}
 	},
 	methods: {
+		trackEvent,
 		numberFormatter,
 		async startCheckout() {
 			verbose("SessionId not found, initilizing checkout");
@@ -178,7 +180,6 @@ export default {
 			} catch (error) {
 				verbose("Error initializing checkout:", error);
 				this.hasPaymentError = true;
-
 			}
 		},
 		async finalizeCheckout(id: string, details: string) {
@@ -223,7 +224,8 @@ export default {
 					await this.handleCheckoutResponse(result, component);
 				},
 				onError: (error: any, component: any) => {
-					logger("Checkout failed");
+					logger("Creating checkout failed");
+					trackEvent("checkout-payment-create-failed");
 					verbose(error.name, error.message, error.stack, component);
 				}
 			};
@@ -243,29 +245,33 @@ export default {
 			} else {
 				switch (res.resultCode) {
 					case "Authorised":
+						trackEvent("checkout-payment-authorised");
 						await shopApi.finalizeOrder(uuid);
+						trackEvent("checkout-payment-finalized");
+						window.location.assign(`/checkout/result/${uuid}`);
 						break;
 					case "Pending":
 					case "Received":
 						await shopApi.updateOrder(uuid, {
 							paymentStatus: "pending"
 						});
+						trackEvent("checkout-payment-pending");
 						verbose("Order pending");
 						break;
 					case "Refused":
 						await shopApi.updateOrder(uuid, {
 							paymentStatus: "refused"
 						});
+						trackEvent("checkout-payment-refused");
 						verbose("Order refused");
 						break;
 					default:
 						await shopApi.updateOrder(uuid, {
 							paymentStatus: "error"
 						});
+						trackEvent("checkout-payment-error");
 						break;
 				}
-
-				window.location.assign(`/checkout/result/${uuid}`);
 			}
 		}
 	}

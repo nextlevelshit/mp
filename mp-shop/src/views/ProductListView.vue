@@ -29,6 +29,8 @@ import ProductCard from "@/components/ProductCard.vue";
 import Header from "@/components/Header.vue";
 import Title from "@/components/Title.vue";
 import {cart} from "@/stores/cart";
+import {scrollProgress} from "@/util/scrollProgress";
+import {trackEvent} from "@/util/trackEvent";
 
 const logger = debug("app:i:product-list-view");
 const verbose = debug("app:v:product-list-view");
@@ -38,6 +40,8 @@ export default {
 	data() {
 		return {
 			list: null,
+			hasScrolled50: false,
+			hasScrolled100: false
 		}
 	},
 	computed: {
@@ -49,7 +53,7 @@ export default {
 		}
 	},
 	async mounted() {
-
+		window.addEventListener("scroll", this.trackScrolling);
 		try {
 
 			this.list = await shopApi.getProducts();
@@ -57,6 +61,25 @@ export default {
 			logger("Error fetching products", error);
 		}
 	},
-	methods: {}
+	unmounted() {
+		window.removeEventListener("scroll", this.trackScrolling);
+	},
+	methods: {
+		trackScrolling() {
+			if (this.hasScrolled100) return;
+
+			const progress = scrollProgress()
+
+			if (progress >= 50 && !this.hasScrolled50) {
+				trackEvent("product-list-scrolled-50");
+				this.hasScrolled50 = true;
+			}
+
+			if (progress === 100) {
+				trackEvent("product-list-scrolled-100");
+				this.hasScrolled100 = true;
+			}
+		},
+	}
 }
 </script>

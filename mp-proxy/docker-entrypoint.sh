@@ -4,7 +4,7 @@ set -e
 
 # Substitute environment variables in the NGINX configuration template
 # shellcheck disable=SC2016
-envsubst '$SHOP_ADDRESS $SHOP_API_ADDRESS $DEPOT_ADDRESS $GRAFANA_ADDRESS' < /etc/nginx/nginx-template.conf > /etc/nginx/nginx.conf
+envsubst '$SHOP_ADDRESS $SHOP_API_ADDRESS $DEPOT_ADDRESS $GRAFANA_ADDRESS $UMAMI_ADDRESS' < /etc/nginx/nginx-template.conf > /etc/nginx/nginx.conf
 
 echo "Generated nginx.conf:"
 echo ""

@@ -285,3 +285,17 @@ export interface ProductVariant {
 	pages?: number;
 	pattern?: number;
 }
+
+export interface Legal {
+	id: number;
+	attributes: {
+		createdAt: string;
+		updatedAt: string;
+		terms: string;
+		imprint?: string;
+		privacyPolicy?: string;
+		shippingPolicy?: string;
+		returnPolicy?: string;
+		contact?: string;
+	};
+}

@@ -83,3 +83,11 @@ services:
     grafana:
         container_name: grafana-dev
         restart: no
+
+    umami:
+        container_name: umami-dev
+        restart: no
+
+    umami-db:
+        container_name: umami-db-dev
+        restart: no

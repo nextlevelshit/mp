@@ -324,6 +324,18 @@ router.get("/v1/product/:id/variants", async (req, res) => {
 	}
 });
 
+router.get("/v1/legal", async (req, res) => {
+	try {
+		verbose(`Querying legal pages`);
+
+		const legalPages = await depotApi.legal();
+
+		res.status(200).send(legalPages);
+	} catch (e) {
+		res.status(500).send("Could not fetch product rulings");
+	}
+});
+
 router.get("/v1/product-ruling", async (req, res) => {
 	try {
 		verbose(`Querying product rulings`);

@@ -6,7 +6,7 @@
 					{{ numberFormatter(cart.total) }} €</Title>
 
 				<div class="grid place-content-center">
-					<Button href="/checkout">
+					<Button href="/checkout" @click="trackEvent(`cart-cta-top-clicked`, { total: cart.total })">
 						Jetzt bezahlen
 					</Button>
 				</div>
@@ -57,7 +57,7 @@
 					</div>
 
 					<div class="grid place-content-end">
-						<Button href="/checkout" classes="w-full">
+						<Button href="/checkout" classes="w-full" @click="trackEvent(`cart-cta-bottom-clicked`, { total: cart.total })">
 							Jetzt bezahlen
 						</Button>
 					</div>
@@ -67,7 +67,7 @@
 				<Title :level="2" html-tag="h1" classes="text-center">Dein Warenkorb ist leer.</Title>
 
 				<div class="grid place-content-center">
-					<Button href="/products">
+					<Button href="/products" @click="trackEvent(`cart-empty-cta-clicked`, {target: `/products`})">
 						Entdecke unsere Produkte
 					</Button>
 				</div>
@@ -86,6 +86,7 @@ import {numberFormatter} from "@/util/numberFormatter";
 import type {CartProduct} from "@/types";
 import Title from "@/components/Title.vue";
 import Button from "@/components/Button.vue";
+import {trackEvent} from "@/util/trackEvent";
 
 const logger = debug("app:i:cart-view");
 const verbose = debug("app:v:cart-view");
@@ -100,10 +101,11 @@ export default {
 			return cart.uuid;
 		},
 		cartProducts() {
-			return cart.products;
+			return cart.products || [];
 		}
 	},
 	methods: {
+		trackEvent,
 		numberFormatter,
 		async removeFromCart(productId: number, count = 1) {
 			verbose(`Removing ${count} product with ID ${productId} from cart`);

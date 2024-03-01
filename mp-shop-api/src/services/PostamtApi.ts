@@ -1,4 +1,4 @@
-import { postamtPort } from "../config/constants";
+import {postamtAddress} from "../config/constants";
 import debug from "debug";
 import {Counter} from "prom-client";
 
@@ -117,5 +117,5 @@ interface PdfMessageBody {
 type Headers = Record<string, string>;
 
 export const postamtApi = new PostamtApi({
-    baseUrl: `http://mp-postamt:${postamtPort}/v1`
+    baseUrl: `${postamtAddress}/v1`
 });

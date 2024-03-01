@@ -1,6 +1,6 @@
 import {v4 as generateUuid} from "uuid";
 import qs from "qs";
-import {depotBearerToken, depotPort} from "../config/constants";
+import {depotBearerToken, depotPort, depotAddress} from "../config/constants";
 import {
 	Order,
 	Product,
@@ -12,7 +12,7 @@ import {
 	ProductCover,
 	OrderUpdate,
 	OrderUpdatedTotalRequest,
-	ProductVariant
+	ProductVariant, Legal
 } from "../types";
 import {ProductDto, ProductDtoData} from "../dto/ProductDto";
 import {ProductRulingDto, ProductRulingDtoData} from "../dto/ProductRulingDto";
@@ -943,6 +943,32 @@ class DepotApi {
 			(paymentMethod) => new PaymentMethodDto(paymentMethod)
 		);
 	}
+
+	async legal(filter?: any) {
+		const query = filter ? qs.stringify(filter, {encode: false}) : "";
+
+		verbose(`Querying legal pages with "${query}"`);
+
+		const response = await fetch(`${this.baseUrl}/legal?${query}`, {
+			method: "GET",
+			headers: this.headers,
+		});
+
+		if (!response.ok) {
+			throw new Error(`Request failed with status ${response.status}`);
+		}
+
+		const {data} = await response.json();
+		const { attributes} = data as Legal;
+		const { terms, privacyPolicy, imprint, contact } = attributes;
+
+		return {
+			terms,
+			privacyPolicy,
+			imprint,
+			contact
+		}
+	}
 }
 
 interface DepotApiOptions {
@@ -954,8 +980,8 @@ interface DepotApiOptions {
 type Headers = Record<string, string>;
 
 export const depotApi = new DepotApi({
-	host: `http://mp-depot:${depotPort}`,
-	baseUrl: `http://mp-depot:${depotPort}/api`,
+	host: depotAddress,
+	baseUrl: `${depotAddress}/api`,
 	defaultHeaders: {
 		authorization: `Bearer ${depotBearerToken}`,
 		"content-type": "application/json"

@@ -43,19 +43,10 @@
 							<a :href="`/details/${position.product.id}`"
 							   class="text-xl font-bold flex-grow">{{ position.product.name }}</a>
 
-							<select
-								@change="changeCountCart(position, parseInt(($event.target as HTMLInputElement).value))"
+							<span
 								class="block appearance-none w-16 text-center bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 rounded shadow leading-tight focus:outline-none focus:border-indigo-500 focus:shadow-outline">
-								<option v-for="count in 10" :selected="position.count === count" :value="count">
-									{{ count }}
-								</option>
-							</select>
-
-							<!--								<div class="flex flex-col gap-2 flex-end w-24">-->
-							<!--									<span class="text-xl font-bold text-right">{{-->
-							<!--											numberFormatter(position.product.totalProductPrice * position.count)-->
-							<!--										}} €</span>-->
-							<!--								</div>-->
+									{{ position.count }}
+							</span>
 						</li>
 					</ul>
 				</div>
@@ -79,6 +70,7 @@ import Stepper from "@/components/Stepper.vue";
 import Title from "@/components/Title.vue";
 import {numberFormatter} from "@/util/numberFormatter";
 import Button from "@/components/Button.vue";
+import {trackEvent} from "@/util/trackEvent";
 
 const logger = debug("app:i:checkout-result-view");
 const verbose = debug("app:v:checkout-result-view");
@@ -135,11 +127,14 @@ export default {
 			try {
 				this.isDownloadPending = true;
 				if (this.order.invoice) {
+					trackEvent("checkout-result-invoice-download-succeeded");
 					window.open(this.order.invoice.attributes.url, "_blank");
 				} else {
+					trackEvent("checkout-result-invoice-download-not-available");
 					logger("Invoice URL not available");
 				}
 			} catch (e) {
+				trackEvent("checkout-result-invoice-download-failed");
 				logger("Error downloading invoice:", e);
 			} finally {
 				this.isDownloadPending = false;

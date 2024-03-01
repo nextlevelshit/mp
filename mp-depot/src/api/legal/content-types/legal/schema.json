@@ -4,7 +4,8 @@
   "info": {
     "singularName": "legal",
     "pluralName": "legals",
-    "displayName": "Legal"
+    "displayName": "Legal",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -19,6 +20,9 @@
     },
     "privacyPolicy": {
       "type": "richtext"
+    },
+    "terms": {
+      "type": "blocks"
     }
   }
 }

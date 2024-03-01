@@ -142,10 +142,22 @@ class ShopApi {
 		const response = await fetch(`${this.baseUrl}/v1/product-cover`);
 		return this.handleResponse<any>(response);
 	}
+
+	async getLegal(): Promise<LegalResponse> {
+		const response = await fetch(`${this.baseUrl}/v1/legal`);
+		return this.handleResponse<LegalResponse>(response);
+	}
 }
 
 interface ShopApiOptions {
 	baseUrl: string;
+}
+
+interface LegalResponse {
+	imprint?: string;
+	contact?: string;
+	privacyPolicy?: string;
+	terms?: string;
 }
 
 export const shopApi = new ShopApi({

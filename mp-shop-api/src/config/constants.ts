@@ -11,6 +11,10 @@ export const depotBearerToken = process.env.DEPOT_TOKEN!;
 export const depotPort = process.env.DEPOT_PORT!;
 export const inkassoPort = process.env.INKASSO_PORT!;
 export const postamtPort = process.env.POSTAMT_PORT!;
+export const umamiAddress = process.env.UMAMI_ADDRESS!;
+export const depotAddress = `http://mp-depot:${depotPort}`;
+export const inkassoAddress = `http://mp-inkasso:${inkassoPort}`;
+export const postamtAddress = `http://mp-postamt:${postamtPort}`;
 // TODO: Should be retrieved from DepotApi
 export const vatIncludedDecimal = 1.19;
 // TODO: Should be retrieved from DepotApi

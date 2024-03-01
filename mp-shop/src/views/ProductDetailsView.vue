@@ -12,7 +12,7 @@
 								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
 												  :path="cover.productId &&`/details/${cover.productId}`"
-												  :is-active="cover.productId === product.id">
+												  :is-active="cover.productId === product.id" @click="trackEvent(`product-change-cover-clicked`, { product: product.id, label: cover.name })">
 										<img v-if="cover.iconUrl" :alt="cover.name" :src="cover.iconUrl"/>
 									</SelectionBox>
 								</div>
@@ -23,7 +23,7 @@
 								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
 												  :path="ruling.productId && `/details/${ruling.productId}`"
-												  :is-active="ruling.productId === product.id">
+												  :is-active="ruling.productId === product.id" @click="trackEvent(`product-change-ruling-clicked`, { product: product.id, label: ruling.name })">
 										<img v-if="ruling.iconUrl" :alt="ruling.name" :src="ruling.iconUrl"/>
 									</SelectionBox>
 								</div>
@@ -34,7 +34,7 @@
 								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
 												  :path="pages.productId && `/details/${pages.productId}`"
-												  :is-active="pages.productId === product.id"/>
+												  :is-active="pages.productId === product.id" @click="trackEvent(`product-change-pages-clicked`, { product: product.id, label: pages.name })"/>
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
@@ -83,7 +83,7 @@
 		</div>
 
 		<ul class="grid grid-cols-5 gap-12">
-			<li v-for="(pattern, i) in patternVariants.patterns" :key="i">
+			<li v-for="(pattern, i) in patternVariants.patterns" :key="i" @click="trackEvent(`product-pattern-clicked`, { product: product.id, pattern: pattern.id})">
 				<a :href="pattern.productVariant?.id ? `/details/${pattern.productVariant.id}` : ``"
 				   class="block hover:opacity-40 h-60 w-60 rounded-full shadow-lg border-6 border-white"
 				   :style="`background: url(${pattern.image.url}) no-repeat; background-size: cover;`">
@@ -107,6 +107,8 @@ import VueMagnifier from "@websitebeaver/vue-magnifier";
 import "@websitebeaver/vue-magnifier/styles.css";
 import Button from "@/components/Button.vue";
 import Title from "@/components/Title.vue";
+import {trackEvent} from "@/util/trackEvent";
+import {scrollProgress} from "@/util/scrollProgress";
 
 const logger = debug("app:i:product-details-view");
 const verbose = debug("app:v:product-details-view");
@@ -163,10 +165,13 @@ export default {
 			product: {} as Product,
 			productVariants: {} as ProductVariantResponse,
 			patternVariants: {} as PatternVariantsResponse,
-			isAddingToCart: false
+			isAddingToCart: false,
+			hasScrolled50: false,
+			hasScrolled100: false
 		}
 	},
 	async mounted() {
+		window.addEventListener("scroll", this.trackScrolling);
 		try {
 			this.product = await shopApi.getProductById(this.id);
 		} catch (e) {
@@ -188,19 +193,42 @@ export default {
 			verbose(e);
 		}
 	},
+	unmounted() {
+		window.removeEventListener("scroll", this.trackScrolling);
+	},
 	methods: {
+		trackEvent,
 		numberFormatter,
+		trackScrolling() {
+			if (this.hasScrolled100) return;
+
+			const progress = scrollProgress()
+
+			if (progress >= 50 && !this.hasScrolled50) {
+				trackEvent("product-details-scrolled-50");
+				this.hasScrolled50 = true;
+			}
+
+			if (progress === 100) {
+				trackEvent("product-details-scrolled-100");
+				this.hasScrolled100 = true;
+			}
+		},
 		async addToCart() {
 			verbose(`Adding product with ID ${this.product.id} to cart`);
+
+			trackEvent(`product-details-add-to-cart-clicked`, { product: this.product.id, price: this.product.totalProductPrice });
 
 			try {
 				this.isAddingToCart = true;
 				await shopApi.addProductToCart(this.uuid, this.product.id);
+				trackEvent(`product-details-add-to-cart-succeeded`, { product: this.product.id });
+				window.location.assign("/cart");
 			} catch (error) {
 				logger(`Could not add product ${this.product.id} to cart:`, error);
+				trackEvent(`product-details-add-to-cart-failed`, { product: this.product.id });
 			} finally {
 				this.isAddingToCart = false;
-				window.location.assign("/cart");
 			}
 		}
 	},
