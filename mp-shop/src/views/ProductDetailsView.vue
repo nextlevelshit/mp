@@ -83,7 +83,7 @@
 		</div>
 
 		<ul class="grid grid-cols-5 gap-12">
-			<li v-for="(pattern, i) in patternVariants.patterns" :key="i" @click="trackEvent(`product-pattern-clicked`, { product: product.id, pattern: pattern.id})">
+			<li v-for="(pattern, i) in patternVariants.patterns" :key="i" @click="trackEvent(`product-details-pattern-clicked`, { product: product.id, pattern: pattern.id})">
 				<a :href="pattern.productVariant?.id ? `/details/${pattern.productVariant.id}` : ``"
 				   class="block hover:opacity-40 h-60 w-60 rounded-full shadow-lg border-6 border-white"
 				   :style="`background: url(${pattern.image.url}) no-repeat; background-size: cover;`">

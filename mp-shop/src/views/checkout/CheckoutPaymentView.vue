@@ -19,7 +19,7 @@
 								<img :src="position.product.image.url" :alt="position.product.name"
 									 class="w-6 object-cover">
 
-								<span class="text-sm flex-grow">{{ position.product.name }}</span>
+								<span class="text-xl flex-grow">{{ position.product.name }}</span>
 
 								<div
 									class="block text-center bg-white border border-gray-300 px-4 py-2 rounded shadow leading-tight">
@@ -27,7 +27,7 @@
 								</div>
 
 								<div class="flex flex-col gap-2 flex-end w-24">
-									<span class="text-sm font-bold text-right">{{
+									<span class="text-xl text-right">{{
 											numberFormatter(position.product.totalProductPrice * position.count)
 										}} €</span>
 								</div>

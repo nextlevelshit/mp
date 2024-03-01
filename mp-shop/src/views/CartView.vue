@@ -101,7 +101,7 @@ export default {
 			return cart.uuid;
 		},
 		cartProducts() {
-			return cart.products || [];
+			return cart.products || [] as CartProduct[];
 		}
 	},
 	methods: {
@@ -112,8 +112,10 @@ export default {
 
 			try {
 				const cartAfterUpdate = await shopApi.removeProductFromCart(cart.uuid, productId, count);
+				trackEvent("cart-product-removed", { cart: this.uuid, product: productId, count })
 				cart.overwrite(cartAfterUpdate);
 			} catch (error) {
+				trackEvent("cart-product-remove-failed", { cart: this.uuid, product: productId, count })
 				logger(`Could not remove product ${productId} from cart:`, error);
 			}
 		},
@@ -129,6 +131,8 @@ export default {
 		},
 		async changeCountCart(position: CartProduct, count: number) {
 			verbose(`Changing count of product with ID ${position.product.id} from ${position.count} to ${count}`);
+
+			trackEvent("cart-product-count-changed", { cart: this.uuid, product: position.product.id, from: position.count, to: count })
 
 			if (count > position.count) {
 				await this.addToCart(position.product.id, count - position.count);

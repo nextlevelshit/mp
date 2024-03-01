@@ -75,7 +75,7 @@ import {trackEvent} from "@/util/trackEvent";
 const logger = debug("app:i:checkout-result-view");
 const verbose = debug("app:v:checkout-result-view");
 
-const maxFailedRequests = 60;
+const maxFailedRequests = 20;
 
 export default {
 	components: {Button, Title, Stepper, Header, CodeBlock, ConfettiExplosion},
@@ -97,24 +97,28 @@ export default {
 		}
 	},
 	async mounted() {
-		const fetchOrder = async () => {
-			const order = await shopApi.getOrder(this.uuid);
+		const fetchAndSetOrder = async () => {
+			this.order = await shopApi.getOrder(this.uuid);
 
-			if (!order.invoice) {
-				this.failedDownloadRequests++;
-				if (this.failedDownloadRequests < maxFailedRequests) {
-					setTimeout(fetchOrder, 1000);
-				} else {
-					this.hasReachedMaxFailedRequests = true;
-				}
+			if (this.order.invoice?.attributes.url) {
+				return;
 			}
-			return order;
-		}
 
+			this.failedDownloadRequests++;
+
+			if (this.failedDownloadRequests < maxFailedRequests) {
+				verbose("Retrying to fetch invoice");
+				setTimeout(fetchAndSetOrder, 3000);
+			} else {
+				this.hasReachedMaxFailedRequests = true;
+				throw Error(`Failed to retrieve invoice after ${maxFailedRequests} attempts`);
+			}
+		}
 		try {
-			this.order = await fetchOrder();
+			await fetchAndSetOrder();
 		} catch (e) {
-			verbose("Could not fetch checkout status");
+			verbose("Error fetching invoice:", e);
+			trackEvent("checkout-result-invoice-fetch-failed");
 		}
 	},
 	methods: {
