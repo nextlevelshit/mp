@@ -1,8 +1,8 @@
 <template>
-	<label class="relative w-full border border-gray-300 p-2 rounded-md cursor-text h-12 peer-">
+	<label class="focus-within:ring-4 focus-within:ring-offset-2 ring-gray-500 relative w-full border border-gray-500 rounded-md cursor-text h-12 overflow-hidden">
 		<span :class="spanClasses" class="absolute left-2 top-0 transition-all select-none">{{ label }}</span>
 		<input :value="modelValue" @input="update(($event.target as HTMLInputElement).value)" :required="required"
-			   class="outline-none w-full rounded-sm pt-3 border-transparent" placeholder=""
+			   class="outline-none w-full h-full rounded-sm pt-4 p-2 border-transparent" placeholder=""
 			   :autocomplete="autocomplete" :aria-label="label" @focus="inputFocused = true"
 			   @blur="inputFocused = false"/>
 	</label>
@@ -57,7 +57,7 @@ export default {
 		spanClasses() {
 			return {
 				'text-md pt-3': !this.inputFocused && !this.modelValue,
-				'text-xs pt-1': this.inputFocused || this.modelValue,
+				'text-xs pt-[3px]': this.inputFocused || this.modelValue,
 				'text-gray-500': !this.inputFocused && !this.modelValue,
 				'text-gray-400': this.inputFocused || this.modelValue,
 			};

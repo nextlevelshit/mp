@@ -180,6 +180,7 @@ export default {
 			} catch (error) {
 				verbose("Error initializing checkout:", error);
 				this.hasPaymentError = true;
+				trackEvent("checkout-payment-start-failed");
 			}
 		},
 		async finalizeCheckout(id: string, details: string) {
