@@ -1,5 +1,5 @@
 <template>
-	<footer class="bg-white dark:bg-gray-900">
+	<footer class="bg-gray-800 text-white mt-40">
 		<div class="mx-auto container p-4 py-6 lg:py-8">
 			<div class="md:flex md:justify-between">
 				<div class="mb-6 md:mb-0">
@@ -11,8 +11,8 @@
 				</div>
 				<div class="grid grid-cols-2 gap-8 sm:gap-6 sm:grid-cols-3">
 					<div>
-						<h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Notizbücher</h2>
-						<ul class="text-gray-500 dark:text-gray-400 font-medium">
+						<h2 class="mb-6 text-sm font-semibold uppercase">Notizbücher</h2>
+						<ul class="text-gray-400 font-medium">
 							<li class="mb-4">
 								<a href="https://flowbite.com/" class="hover:underline">Softcover Einband</a>
 							</li>
@@ -22,8 +22,8 @@
 						</ul>
 					</div>
 					<div>
-						<h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Notizhefte</h2>
-						<ul class="text-gray-500 dark:text-gray-400 font-medium">
+						<h2 class="mb-6 text-sm font-semibold uppercase">Notizhefte</h2>
+						<ul class="text-gray-400 font-medium">
 							<li class="mb-4">
 								<a href="https://github.com/themesberg/flowbite" class="hover:underline ">Steppstichheftung</a>
 							</li>
@@ -33,8 +33,8 @@
 						</ul>
 					</div>
 					<div>
-						<h2 class="mb-6 text-sm font-semibold text-gray-900 uppercase dark:text-white">Legal</h2>
-						<ul class="text-gray-500 dark:text-gray-400 font-medium">
+						<h2 class="mb-6 text-sm font-semibold uppercase">Legal</h2>
+						<ul class="text-gray-400 font-medium">
 							<li class="mb-4">
 								<a href="/imprint" class="hover:underline hover:text-white" @click="trackEvent(`footer-imprint-clicked`)">Impressum</a>
 							</li>
@@ -54,7 +54,7 @@
 					</div>
 				</div>
 			</div>
-			<hr class="my-6 border-gray-200 sm:mx-auto dark:border-gray-700 lg:my-8" />
+			<hr class="my-6 sm:mx-auto border-gray-700 lg:my-8" />
 			<div class="sm:flex sm:items-center sm:justify-between">
           <span class="text-sm text-gray-500 sm:text-center dark:text-gray-400">© {{new Date().getFullYear()}} <a href="/" class="hover:underline">muellerprints. PAPERWORK</a> – Alle Rechte vorbehalten
           </span>
