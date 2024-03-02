@@ -1,20 +1,20 @@
 <template>
 	<header class="text-gray-900">
-		<div class="container mx-auto p-4 py-6 lg:py-8">
-			<div class="flex gap-12 py-6">
-				<router-link to="/" class="w-1/4" @click="trackEvent(`header-logo-clicked`)">
+		<div class="lg:container mx-auto p-4 py-6 lg:py-8">
+			<div class="flex flex-col lg:flex-row gap-12 py-6">
+				<router-link to="/" class="lg:w-1/4" @click="trackEvent(`header-logo-clicked`)">
 					<h1 class="tracking-wide text-3xl font-bebas leading-none">
 						MUELLERPRINTS.<br/>Paperwork
 					</h1>
 				</router-link>
-				<div v-if="$route.name" role="navigation" class="grow w-3/4">
+				<div v-if="$route.name" role="navigation" class="grow lg:w-3/4">
 					<nav class="flex justify-end" v-if="isCheckoutRoute" aria-label="Navigation">
 						<router-link class="hover:text-gray-400" to="/cart" @click="trackEvent(`header-back-to-cart-clicked`)">
 							Zurück zum Warenkorb
 						</router-link>
 					</nav>
-					<nav class="flex justify-between gap-28 h-full" v-else aria-label="Navigation">
-						<div class="flex gap-8">
+					<nav class="flex flex-col lg:flex-row justify-between gap-4 lg:gap-28 lg:h-full" v-else aria-label="Navigation">
+						<div class="flex flex-col lg:flex-row gap-4 lg:gap-8">
 							<HeaderNavLink label="Notizbücher und Notizhefte" path="/products" @click="trackEvent(`header-products-clicked`)" />
 							<HeaderNavLink label="Herstellung" path="/production" @click="trackEvent(`header-production-clicked`)" />
 						</div>

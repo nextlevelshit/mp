@@ -1,5 +1,5 @@
 <template>
-	<main class="pt-4 container mx-auto markdown">
+	<main class="pt-4 px-4 lg:container mx-auto markdown">
 		<VueMarkdown :source="imprint"/>
 	</main>
 </template>

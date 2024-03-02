@@ -1,5 +1,5 @@
 <template>
-	<main class="pt-4 container mx-auto">
+	<main class="pt-4 px-4 lg:container mx-auto markdown">
 		<Title :level="1" html-tag="h1">Allgemeine Geschäftsbedingungen mit Kundeninformationen</Title>
 		<Title :level="2" html-tag="h2">Inhaltsverzeichnis</Title>
 		Geltungsbereich
@@ -155,7 +155,7 @@
 		<br>
 		<br>
 		<img src="https://www.it-recht-kanzlei.de/logo/AGB-Logo.png?i=335c3-19d45-39ca-9080-1"
-			 alt="Vertreten durch die IT-Recht Kanzlei" style="width: 10%; height: auto;"/>
+			 alt="Vertreten durch die IT-Recht Kanzlei" class="w-36"/>
 	</main>
 </template>
 

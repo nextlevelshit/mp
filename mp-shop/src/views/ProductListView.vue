@@ -1,7 +1,7 @@
 <template>
-	<main class="pt-4 container mx-auto">
-		<div class="flex gap-12 relative">
-			<div class="w-1/4">
+	<main class="pt-4 lg:container mx-auto px-4">
+		<div class="flex flex-col lg:flex-row gap-12 relative">
+			<div class="lg:w-1/4">
 				<div class="sticky top-4">
 					<Title :level="2" html-tag="h1">Notizbücher und Notizhefte</Title>
 					<p class="tracking-tight">
@@ -15,7 +15,7 @@
 				</div>
 			</div>
 
-			<div class="w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+			<div class="lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
 				<ProductCard v-for="(item, i) in list" :key="i" :product="item" :cartUuid="cartUuid"/>
 			</div>
 		</div>

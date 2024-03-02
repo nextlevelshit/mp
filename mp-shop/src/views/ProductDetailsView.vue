@@ -1,13 +1,13 @@
 <template>
 	<article :class="bgColor" itemscope itemtype="https://schema.org/Product">
-		<main class="pt-12 container mx-auto">
+		<main class="pt-12 px-4 lg:container mx-auto">
 			<div v-if="product">
-				<p class="text-3xl font-semibold mb-4 w-2/3" v-html="product.cover?.copyText?.details"></p>
+				<p class="text-3xl font-semibold mb-4 lg:w-2/3" v-html="product.cover?.copyText?.details"></p>
 				<!--    <h1 class="text-2xl font-bold mb-4">{{ product.name }} - Product ID: {{ id }}</h1>-->
-				<div class="flex gap-12 relative">
-					<div class="w-2/5 pt-8">
+				<div class="flex flex-col-reverse lg:flex-row gap-12 relative">
+					<div class="lg:w-2/5 pt-8">
 						<div class="rounded-lg bg-white shadow-xl mb-16">
-							<section class="flex gap-12 py-6 px-8">
+							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
 								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Einband</h2>
 								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
@@ -18,7 +18,7 @@
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
-							<section class="flex gap-12 py-6 px-8">
+							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
 								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Layout</h2>
 								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
@@ -29,7 +29,7 @@
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
-							<section class="flex gap-12 py-6 px-8">
+							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
 								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
 								<div class="flex w-2/3 gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
@@ -38,7 +38,7 @@
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
-							<section class="flex gap-12 py-6 px-8 items-center">
+							<section class="flex gap-12 py-6 px-4 lg:px-8 items-center">
 								<div class="w-1/3" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
 									<meta itemprop="priceCurrency" content="EUR"/>
 									<span itemprop="price" class="oldstyle-nums text-3xl tracking-tight font-bold">
@@ -65,7 +65,7 @@
 							<p><span class="font-bold">Banderole:</span> {{ product.cover.copyText.banderole }}</p>
 						</div>
 					</div>
-					<div class="flex justify-center w-3/5 pt-8 mx-auto">
+					<div class="flex justify-center lg:w-3/5 pt-8 mx-auto">
 						<!-- Product Image -->
 						<div class="w-2/5">
 							<VueMagnifier v-if="product.image" zoom-factor="1" mg-height="300" mg-width="300"
@@ -77,12 +77,12 @@
 			</div>
 		</main>
 	</article>
-	<section class="flex flex-col gap-8 container mx-auto items-center my-10" v-if="patternVariants.patterns">
+	<section class="flex flex-col gap-8 px-4 lg:container mx-auto items-center my-10" v-if="patternVariants.patterns">
 		<div class="">
 			<Title :level="1" html-tag="h2">Erhältlich in {{ patternVariants.patterns.length }} weiteren Mustern</Title>
 		</div>
 
-		<ul class="grid grid-cols-5 gap-12">
+		<ul class="grid grid-cols-1 lg:grid-cols-5 gap-12">
 			<li v-for="(pattern, i) in patternVariants.patterns" :key="i" @click="trackEvent(`product-details-pattern-clicked`, { product: product.id, pattern: pattern.id})">
 				<a :href="pattern.productVariant?.id ? `/details/${pattern.productVariant.id}` : ``"
 				   class="block hover:opacity-40 h-60 w-60 rounded-full shadow-lg border-6 border-white"
