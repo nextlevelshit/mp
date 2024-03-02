@@ -1,6 +1,6 @@
 <template>
 	<header class="text-gray-900">
-		<div class="container mx-auto">
+		<div class="container mx-auto p-4 py-6 lg:py-8">
 			<div class="flex gap-12 py-6">
 				<router-link to="/" class="w-1/4" @click="trackEvent(`header-logo-clicked`)">
 					<h1 class="tracking-wide text-3xl font-bebas leading-none">
