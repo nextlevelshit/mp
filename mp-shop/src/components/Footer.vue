@@ -38,13 +38,13 @@
 							<li class="mb-4">
 								<a href="/imprint" class="hover:underline hover:text-white" @click="trackEvent(`footer-imprint-clicked`)">Impressum</a>
 							</li>
-							<li>
+							<li class="mb-4">
 								<a href="/privacy" class="hover:underline hover:text-white" @click="trackEvent(`footer-privacy-clicked`)">Datenschutzerklärung</a>
 							</li>
-							<li>
+							<li class="mb-4">
 								<a href="/terms" class="hover:underline hover:text-white" @click="trackEvent(`footer-terms-clicked`)">Allgemeine Geschäftsbedingungen (AGB)</a>
 							</li>
-							<li>
+							<li class="mb-4">
 								<a href="/payment" class="hover:underline hover:text-white" @click="trackEvent(`footer-payment-clicked`)">Zahlungsarten</a>
 							</li>
 							<li>
