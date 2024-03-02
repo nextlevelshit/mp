@@ -7,8 +7,15 @@ COPY ./package.json ./
 RUN npm i --no-audit --no-fund --progress=false --no-warnings --log-level=error
 COPY ./ /app
 
+ARG VITE_BASE_URL
+ARG VITE_PAYMENT_ENVIRONMENT
+ARG VITE_UMAMI_WEBSITE_ID
+
 ENV NGINX_DEBUG="false" \
-    NODE_ENV="production"
+    NODE_ENV="production" \
+    VITE_BASE_URL=${VITE_BASE_URL} \
+    VITE_PAYMENT_ENVIRONMENT=${VITE_PAYMENT_ENVIRONMENT} \
+    VITE_UMAMI_WEBSITE_ID=${VITE_UMAMI_WEBSITE_ID}
 
 RUN npm run build-only
 
