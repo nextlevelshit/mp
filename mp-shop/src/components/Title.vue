@@ -10,7 +10,7 @@ const classes: Record<Level, string> = {
 	2: "text-2xl font-bold mb-4 mt-5",
 	3: "text-xl mt-2 font-semibold mb-1",
 	4: "text-md mt-2 mb-1 font-semibold",
-	5: "text-base mb-1 font-semibold mt-2",
+	5: "text-sm uppercase mb-1 font-semibold mt-2 text-gray-500",
 };
 
 const logger = debug("app:i:title-component");

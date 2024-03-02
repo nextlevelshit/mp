@@ -90,8 +90,8 @@ class ShopApi {
 		return this.handleResponse<any>(response);
 	}
 
-	async getProducts(): Promise<Product[]> {
-		const response = await fetch(`${this.baseUrl}/v1/product`);
+	async getProducts(coverId?: number): Promise<Product[]> {
+		const response = await fetch(`${this.baseUrl}/v1/product?cover=${coverId || ""}`);
 		return this.handleResponse<Product[]>(response);
 	}
 

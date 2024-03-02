@@ -2,11 +2,15 @@ import { createRouter, createWebHistory } from "vue-router";
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.VITE_BASE_URL),
+	scrollBehavior() {
+		if (!window.document) return;
+		window.document.getElementById("app")!.scrollIntoView({ behavior: "smooth" });
+	},
 	routes: [
 		{
 			path: "/",
 			name: "root",
-			redirect: "/products"
+			redirect: "/booklets/stitched"
 		},
 		{
 			path: "/terms",
@@ -29,8 +33,27 @@ const router = createRouter({
 			component: () => import("./views/legal/PaymentMethodsView.vue")
 		},
 		{
-			path: "/products",
-			name: "product-list",
+			path: "/booklets/stitched",
+			name: "product-booklet-list",
+			props: {
+				cover: 3
+			},
+			component: () => import("./views/ProductListView.vue")
+		},
+		{
+			path: "/notebooks/softcover",
+			name: "product-softcover-list",
+			props: {
+				cover: 2
+			},
+			component: () => import("./views/ProductListView.vue")
+		},
+		{
+			path: "/notebooks/hardcover",
+			name: "product-hardcover-list",
+			props: {
+				cover: 1
+			},
 			component: () => import("./views/ProductListView.vue")
 		},
 		{
@@ -59,14 +82,6 @@ const router = createRouter({
 			path: "/checkout/3",
 			name: "checkout-payment",
 			component: () => import("./views/checkout/CheckoutPaymentView.vue"),
-			beforeRouteLeave (to, from , next) {
-				const answer = window.confirm("Unter Umständen geht dein Fortschritt verloren. Bist du sicher, dass du die Seite verlassen möchtest?")
-				if (answer) {
-					next()
-				} else {
-					next(false)
-				}
-			},
 		},
 		{
 			path: "/checkout/result/:uuid",

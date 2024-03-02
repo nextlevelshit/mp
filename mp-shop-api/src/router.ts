@@ -168,7 +168,7 @@ router.all("/v1/order/:uuid/redirect", async (req, res) => {
 
 router.put("/v1/order/:uuid/generate-invoice", async (req, res) => {
 	try {
-		const { uuid } = req.params;
+		const {uuid} = req.params;
 
 		const order = await depotApi.orderFactory().generateInvoiceAndSaveToOrder(uuid);
 
@@ -181,7 +181,7 @@ router.put("/v1/order/:uuid/generate-invoice", async (req, res) => {
 
 router.put("/v1/order/:uuid/generate-delivery-note", async (req, res) => {
 	try {
-		const { uuid } = req.params;
+		const {uuid} = req.params;
 
 		const order = await depotApi.orderFactory().generateDeliveryNoteAndSaveToOrder(uuid);
 
@@ -194,7 +194,7 @@ router.put("/v1/order/:uuid/generate-delivery-note", async (req, res) => {
 
 router.put("/v1/order/:uuid/send-invoice", async (req, res) => {
 	try {
-		const { uuid } = req.params;
+		const {uuid} = req.params;
 
 		const order = await depotApi.orderFactory().sendInvoiceAndUpdateOrder(uuid);
 
@@ -207,7 +207,7 @@ router.put("/v1/order/:uuid/send-invoice", async (req, res) => {
 
 router.put("/v1/order/:uuid/finalize", async (req, res) => {
 	try {
-		const { uuid } = req.params;
+		const {uuid} = req.params;
 
 		const authorisedOrder = await depotApi.orderFactory().update(uuid, {
 			paymentAuthorised: true,
@@ -241,6 +241,8 @@ router.put("/v1/order/:uuid/finalize", async (req, res) => {
 router.get("/v1/product", async (req, res) => {
 	try {
 		verbose(`Querying products`);
+		const defaultCover = 2;
+		const cover = req.query.cover ? parseInt(req.query.cover as string) : defaultCover;
 
 		const productList = await depotApi.productFactory().all({
 			pagination: {
@@ -254,13 +256,13 @@ router.get("/v1/product", async (req, res) => {
 					}
 				},
 				pages: {
-					id:  {
+					id: {
 						$eq: 1
 					}
 				},
 				cover: {
 					id: {
-						$eq: 3
+						$eq: cover
 					}
 				}
 			}
@@ -404,7 +406,10 @@ router.get("/v1/product-cover", async (req, res) => {
 	try {
 		verbose(`Querying product covers`);
 
-		const covers = await depotApi.productCover();
+		const covers = await depotApi.productCover({
+			fields: ["id", "name", "binding", "price"],
+			populate: {icon: {fields: ["url"]}}
+		});
 
 		res.status(200).send(covers);
 	} catch (e) {
@@ -419,5 +424,5 @@ router.post("/v1/webhooks/notifications", async (req, res) => {
 
 router.get("/health", async (req, res) => {
 	healthCheckCounter.inc();
-	res.status(200).json({ status: "ok" });
+	res.status(200).json({status: "ok"});
 });

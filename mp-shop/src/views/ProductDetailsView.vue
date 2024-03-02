@@ -8,8 +8,8 @@
 					<div class="lg:w-2/5 pt-8">
 						<div class="rounded-lg bg-white shadow-xl mb-16">
 							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
-								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Einband</h2>
-								<div class="flex w-2/3 gap-4">
+								<h2 class="pt-3 lg:w-1/3 uppercase text-gray-500 text-sm font-semibold">Einband</h2>
+								<div class="flex lg:w-2/3 gap-4">
 									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
 												  :path="cover.productId &&`/details/${cover.productId}`"
 												  :is-active="cover.productId === product.id" @click="trackEvent(`product-change-cover-clicked`, { product: product.id, label: cover.name })">
@@ -19,8 +19,8 @@
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
 							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
-								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Layout</h2>
-								<div class="flex w-2/3 gap-4">
+								<h2 class="pt-3 lg:w-1/3 uppercase text-gray-500 text-sm font-semibold">Layout</h2>
+								<div class="flex lg:w-2/3 gap-4">
 									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
 												  :path="ruling.productId && `/details/${ruling.productId}`"
 												  :is-active="ruling.productId === product.id" @click="trackEvent(`product-change-ruling-clicked`, { product: product.id, label: ruling.name })">
@@ -30,8 +30,8 @@
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
 							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
-								<h2 class="pt-3 w-1/3 uppercase text-gray-600 text-sm">Seitenanzahl</h2>
-								<div class="flex w-2/3 gap-4">
+								<h2 class="pt-3 lg:w-1/3 uppercase text-gray-500 text-sm font-semibold">Seitenanzahl</h2>
+								<div class="flex lg:w-2/3 gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
 												  :path="pages.productId && `/details/${pages.productId}`"
 												  :is-active="pages.productId === product.id" @click="trackEvent(`product-change-pages-clicked`, { product: product.id, label: pages.name })"/>

@@ -15,7 +15,8 @@
 					</nav>
 					<nav class="flex flex-col lg:flex-row justify-between gap-4 lg:gap-28 lg:h-full" v-else aria-label="Navigation">
 						<div class="flex flex-col lg:flex-row gap-4 lg:gap-8">
-							<HeaderNavLink label="Notizbücher und Notizhefte" path="/products" @click="trackEvent(`header-products-clicked`)" />
+							<HeaderNavLink label="Notizhefte" path="/booklets/stitched" @click="trackEvent(`header-booklets-clicked`)" />
+							<HeaderNavLink label="Notizbücher" path="/notebooks/softcover" @click="trackEvent(`header-notebooks-clicked`)" />
 							<HeaderNavLink label="Herstellung" path="/production" @click="trackEvent(`header-production-clicked`)" />
 						</div>
 						<HeaderNavLink :label="`Warenkorb (${productsCount})`" path="/cart" @click="trackEvent(`header-cart-clicked`)"/>
