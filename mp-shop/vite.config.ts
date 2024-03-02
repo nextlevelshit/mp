@@ -16,5 +16,10 @@ export default defineConfig({
     },
     server: {
         port: 9999,
-    }
+    },
+	define: {
+		VITE_BASE_URL: process.env.VITE_BASE_URL,
+		VITE_PAYMENT_ENVIRONMENT: process.env.VITE_PAYMENT_ENVIRONMENT,
+		VITE_UMAMI_WEBSITE_ID: process.env.VITE_UMAMI_WEBSITE_ID,
+	}
 })
