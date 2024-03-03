@@ -20,7 +20,7 @@
 						<div class="flex gap-4 justify-items-stretch mt-2">
 							<SelectionBox v-for="productCover in productCovers" :label="productCover.label"
 										  :path="productCover.id !== cover && productCover.url"
-										  :is-active="productCover.id === cover" @click="trackEvent(`product-list-sidebar-cover-clicked`)">
+										  :is-active="productCover.isActive" @click="trackEvent(`product-list-sidebar-cover-clicked`)">
 								<img v-if="productCover.iconUrl" :alt="productCover.alt" :src="productCover.iconUrl"/>
 							</SelectionBox>
 						</div>
@@ -53,7 +53,7 @@ export default {
 	components: {SelectionBox, Title, Header, ProductCard},
 	props: {
 		cover: {
-			type: Number,
+			type: String,
 			required: false,
 		}
 	},
@@ -77,24 +77,20 @@ export default {
 		window.addEventListener("scroll", this.trackScrolling);
 
 		try {
-			this.list = await shopApi.getProducts(this.cover);
+			this.list = await shopApi.getProducts(parseInt(this.cover));
 		} catch (error) {
 			logger("Error fetching products", error);
 		}
 
 		try {
 			const productCovers = await shopApi.getProductCovers();
-			const productLinks = {
-				1: "/notebooks/hardcover",
-				2: "/notebooks/softcover",
-				3: "/booklets/stitched",
-			};
 			this.productCovers = productCovers.map(cover => ({
 				id: cover.id,
 				label: cover.name,
 				alt: `${cover.name} – ${cover.binding}`,
 				iconUrl: cover.icon?.url,
-				url: productLinks[cover.id],
+				url: `/notebooks/${cover.id}`,
+				isActive: parseInt(this.cover) === cover.id
 			}));
 		} catch (error) {
 			logger("Error fetching product covers", error);

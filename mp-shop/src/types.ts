@@ -75,21 +75,7 @@ export interface Product {
 	price: number | null;
 	publishedAt: string;
 	slug: string | null;
-	cover: {
-		id: number;
-		name: string;
-		binding: string;
-		price: number;
-		copyText: {
-			text: string;
-			cover: string;
-			paper: string;
-			format: string;
-			content: string;
-			details: string;
-			banderole: string;
-		};
-	} | null;
+	cover: ProductCover | null;
 	pattern: {
 		id: number;
 		name: string;
@@ -116,6 +102,24 @@ export interface CartProduct {
 	product: Product;
 }
 
+export interface ProductCover {
+	id: number;
+	name: string;
+	binding: string;
+	price: number;
+	copyText?: {
+		text: string;
+		cover: string;
+		paper: string;
+		format: string;
+		content: string;
+		details: string;
+		banderole: string;
+	};
+	icon?: {
+		url: string;
+	}
+}
 
 export interface Order {
 	id: number;

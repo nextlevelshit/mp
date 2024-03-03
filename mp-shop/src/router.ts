@@ -1,16 +1,29 @@
-import { createRouter, createWebHistory } from "vue-router";
+import {createRouter, createWebHistory} from "vue-router";
+import {bookletCoverId, softCoverId, hardCoverId, baseUrl} from "@/config/constants";
 
 const router = createRouter({
-	history: createWebHistory(import.meta.env.VITE_BASE_URL),
+	history: createWebHistory(baseUrl),
 	scrollBehavior() {
 		if (!window.document) return;
-		window.document.getElementById("app")!.scrollIntoView({ behavior: "smooth" });
+		window.document.getElementById("app")!.scrollIntoView({behavior: "smooth"});
 	},
 	routes: [
 		{
 			path: "/",
 			name: "root",
 			redirect: "/booklets/stitched"
+		},
+		{
+			path: "/booklets/stitched",
+			redirect: `/notebooks/${bookletCoverId}`
+		},
+		{
+			path: "/notebooks/softcover",
+			redirect: `/notebooks/${softCoverId}`
+		},
+		{
+			path: "/notebooks/hardcover",
+			redirect: `/notebooks/${hardCoverId}`
 		},
 		{
 			path: "/terms",
@@ -33,27 +46,9 @@ const router = createRouter({
 			component: () => import("./views/legal/PaymentMethodsView.vue")
 		},
 		{
-			path: "/booklets/stitched",
-			name: "product-booklet-list",
-			props: {
-				cover: 3
-			},
-			component: () => import("./views/ProductListView.vue")
-		},
-		{
-			path: "/notebooks/softcover",
-			name: "product-softcover-list",
-			props: {
-				cover: 2
-			},
-			component: () => import("./views/ProductListView.vue")
-		},
-		{
-			path: "/notebooks/hardcover",
-			name: "product-hardcover-list",
-			props: {
-				cover: 1
-			},
+			path: "/notebooks/:cover",
+			name: "product-list",
+			props: true,
 			component: () => import("./views/ProductListView.vue")
 		},
 		{
@@ -92,7 +87,7 @@ const router = createRouter({
 		{
 			path: "/health",
 			name: "health",
-			redirect: { name: "root" },
+			redirect: {name: "root"},
 		},
 	]
 });

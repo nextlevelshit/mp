@@ -67,7 +67,7 @@
 				<Title :level="2" html-tag="h1" classes="text-center">Dein Warenkorb ist leer.</Title>
 
 				<div class="grid place-content-center">
-					<Button href="/products" @click="trackEvent(`cart-empty-cta-clicked`, {target: `/products`})">
+					<Button href="/" @click="trackEvent(`cart-empty-to-products-clicked`, {target: `/`})">
 						Entdecke unsere Produkte
 					</Button>
 				</div>

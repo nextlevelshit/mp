@@ -1,2 +1,7 @@
 export const localStorageLabelCartUuid = "mp-shop:cart";
-export const paymentEnvironment = (import.meta.env.VITE_PAYMENT_ENVIRONMENT! as string).toLowerCase() as "live" | "test";
+export const baseUrl = import.meta.env.VITE_BASE_URL!;
+export const paymentEnvironment = (import.meta.env.VITE_PAYMENT_ENVIRONMENT!).toLowerCase() as "live" | "test";
+export const bookletCoverId = parseInt((import.meta.env.VITE_BOOKLET_COVER_ID!));
+export const softCoverId = parseInt((import.meta.env.VITE_SOFT_COVER_ID!));
+export const hardCoverId = parseInt((import.meta.env.VITE_HARD_COVER_ID!));
+debugger;

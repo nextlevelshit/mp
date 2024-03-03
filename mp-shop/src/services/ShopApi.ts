@@ -1,4 +1,11 @@
-import type {Order, OrderUpdateBody, Product, ProductVariantResponse, PatternVariantsResponse} from "@/types";
+import type {
+	Order,
+	OrderUpdateBody,
+	Product,
+	ProductVariantResponse,
+	PatternVariantsResponse,
+	ProductCover
+} from "@/types";
 import debug from "debug";
 
 const logger = debug("app:i:shop-api");
@@ -138,9 +145,9 @@ class ShopApi {
 		return this.handleResponse<any>(response);
 	}
 
-	async getProductCovers(): Promise<any> {
+	async getProductCovers(): Promise<ProductCover[]> {
 		const response = await fetch(`${this.baseUrl}/v1/product-cover`);
-		return this.handleResponse<any>(response);
+		return this.handleResponse<ProductCover[]>(response);
 	}
 
 	async getLegal(): Promise<LegalResponse> {
