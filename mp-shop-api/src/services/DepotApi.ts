@@ -1,6 +1,7 @@
 import {v4 as generateUuid} from "uuid";
 import qs from "qs";
-import {depotBearerToken, depotPort, depotAddress} from "../config/constants";
+import {caching} from "cache-manager";
+import {depotBearerToken, depotAddress} from "../config/constants";
 import {
 	Order,
 	Product,
@@ -29,6 +30,11 @@ import {postamtApi} from "./PostamtApi";
 const logger = debug("app:i:shop-api:depot-api");
 const verbose = debug("app:v:shop-api:depot-api");
 
+const cache = caching("memory", {
+	max: 100,
+	ttl: 60_000 // 10 minutes
+});
+
 class DepotApi {
 	readonly host: string;
 	baseUrl: string;
@@ -40,17 +46,30 @@ class DepotApi {
 		this.headers = options.defaultHeaders ?? {};
 	}
 
-	private async fetchEntity<T, U = any>(
+	private async fetchAndCacheEntities<T, U = any>(
 		endpoint: string,
 		mapDto: (item: T) => any,
 		depth = 3,
 		filter?: any
 	): Promise<U[]> {
-		const query = filter ? qs.stringify(filter, {encode: false}) : "";
+		const query = filter ? qs.stringify(filter, { encode: false }) : "";
 
 		verbose(`Querying ${endpoint} with "${query}"`);
 
-		const response = await fetch(`${this.baseUrl}/${endpoint}?${query}&populate=deep,${depth}`, {
+		const cacheKey = `${endpoint}_${depth}_${query}`;
+
+		// Attempt to retrieve data from cache
+		const cachedResult: U[] | undefined = await (await cache).get(cacheKey);
+
+		if (cachedResult) {
+			console.log("Retrieving from cache");
+			return cachedResult;
+		}
+
+		// If not cached, fetch from the API
+		const url = `${this.baseUrl}/${endpoint}?${query}&populate=deep,${depth}`;
+
+		const response = await fetch(url, {
 			method: "GET",
 			headers: this.headers,
 		});
@@ -59,9 +78,14 @@ class DepotApi {
 			throw new Error(`Request failed with status ${response.status}`);
 		}
 
-		const {data} = await response.json();
+		const { data } = await response.json();
 
-		return (data as T[]).map((item) => mapDto(item).dto);
+		// Map DTO and cache the result
+		const result = (data as T[]).map(item => mapDto(item).dto);
+
+		await (await cache).set(cacheKey, result);
+
+		return result;
 	}
 
 	orderFactory() {
@@ -895,7 +919,7 @@ class DepotApi {
 	}
 
 	async productRuling(filter?: any): Promise<ProductRulingDtoData[]> {
-		return this.fetchEntity<ProductRuling>(
+		return this.fetchAndCacheEntities<ProductRuling>(
 			"product-rulings",
 			(productRuling) => new ProductRulingDto(productRuling),
 			2,
@@ -904,7 +928,7 @@ class DepotApi {
 	}
 
 	async productPattern(filter?: any): Promise<ProductPatternDtoData[]> {
-		return this.fetchEntity<ProductPattern>(
+		return this.fetchAndCacheEntities<ProductPattern>(
 			"product-patterns",
 			(pattern) => new ProductPatternDto(pattern),
 			1,
@@ -913,7 +937,7 @@ class DepotApi {
 	}
 
 	async productPages(): Promise<ProductPagesDtoData[]> {
-		return this.fetchEntity<ProductPages>(
+		return this.fetchAndCacheEntities<ProductPages>(
 			"product-pages",
 			(pages) => new ProductPagesDto(pages),
 			1
@@ -921,7 +945,10 @@ class DepotApi {
 	}
 
 	async productCover(filter?: any): Promise<ProductCoverDtoData[]> {
-		return this.fetchEntity<ProductCover>(
+		// implement in memory cache
+
+
+		return this.fetchAndCacheEntities<ProductCover>(
 			"product-covers",
 			(cover) => new ProductCoverDto(cover),
 			2,
@@ -930,7 +957,7 @@ class DepotApi {
 	}
 
 	async deliveryMethod() {
-		return this.fetchEntity<DeliveryMethod>(
+		return this.fetchAndCacheEntities<DeliveryMethod>(
 			"deliveries",
 			(deliveryMethod) => new DeliveryMethodDto(deliveryMethod),
 			1
@@ -938,7 +965,7 @@ class DepotApi {
 	}
 
 	async paymentMethod() {
-		return this.fetchEntity<PaymentMethod>(
+		return this.fetchAndCacheEntities<PaymentMethod>(
 			"payments",
 			(paymentMethod) => new PaymentMethodDto(paymentMethod)
 		);
