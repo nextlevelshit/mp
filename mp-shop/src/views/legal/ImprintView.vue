@@ -34,24 +34,22 @@ export default defineComponent({
 </script>
 
 <style>
-.markdown {
-	h1 {
-		@apply text-3xl font-bold mb-5 mt-6;
-	}
-	h2 {
-		@apply text-2xl font-bold mb-4 mt-5;
-	}
-	h3 {
-		@apply text-xl mt-2 font-semibold mb-1;
-	}
-	ul {
-		@apply list-disc pl-6;
-	}
-	p + p {
-		@apply mt-4;
-	}
-	a {
-		@apply underline-offset-2 underline hover:text-gray-700;
-	}
+.markdown h1 {
+	@apply text-3xl font-bold mb-5 mt-6;
+}
+.markdown h2 {
+	@apply text-2xl font-bold mb-4 mt-5;
+}
+.markdown h3 {
+	@apply text-xl mt-2 font-semibold mb-1;
+}
+.markdown ul {
+	@apply list-disc pl-6;
+}
+.markdown p + p {
+	@apply mt-4;
+}
+.markdown a {
+	@apply underline-offset-2 underline hover:text-gray-700;
 }
 </style>
