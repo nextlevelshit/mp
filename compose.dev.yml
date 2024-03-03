@@ -45,7 +45,7 @@ services:
         container_name: shop-dev
         build:
             context: ./mp-shop
-            dockerfile: dev.Dockerfile
+            target: development
         restart: no
         volumes:
             - ./mp-shop/src:/app/src:ro
@@ -78,11 +78,11 @@ services:
 
     prometheus:
         container_name: prometheus-dev
-        restart: no
+#        restart: no
 
     grafana:
         container_name: grafana-dev
-        restart: no
+#        restart: no
 
     umami:
         container_name: umami-dev

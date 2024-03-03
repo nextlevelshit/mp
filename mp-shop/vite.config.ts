@@ -18,8 +18,11 @@ export default defineConfig({
         port: 9999,
     },
 	define: {
-		VITE_BASE_URL: process.env.VITE_BASE_URL,
-		VITE_PAYMENT_ENVIRONMENT: process.env.VITE_PAYMENT_ENVIRONMENT,
-		VITE_UMAMI_WEBSITE_ID: process.env.VITE_UMAMI_WEBSITE_ID,
+		VITE_BASE_URL: JSON.stringify(process.env.VITE_BASE_URL),
+		VITE_PAYMENT_ENVIRONMENT: JSON.stringify(process.env.VITE_PAYMENT_ENVIRONMENT),
+		VITE_UMAMI_WEBSITE_ID: JSON.stringify(process.env.VITE_UMAMI_WEBSITE_ID),
+		VITE_BOOKLET_COVER_ID: process.env.VITE_BOOKLET_COVER_ID,
+		VITE_SOFT_COVER_ID: process.env.VITE_SOFT_COVER_ID,
+		VITE_HARD_COVER_ID: process.env.VITE_HARD_COVER_ID,
 	}
 })

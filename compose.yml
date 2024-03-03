@@ -138,10 +138,15 @@ services:
         container_name: shop
         build:
             context: ./mp-shop
+            target: production
+            # Milti-stage forces us to env vars as  build-time variables
             args:
-                VITE_BASE_URL: ${SHOP_BASE_URL:-}
+                VITE_BASE_URL: ${SHOP_BASE_URL:-/}
                 VITE_PAYMENT_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
                 VITE_UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID}
+                VITE_BOOKLET_COVER_ID: ${SHOP_BOOKLET_COVER_ID}
+                VITE_SOFT_COVER_ID: ${SHOP_SOFT_COVER_ID}
+                VITE_HARD_COVER_ID: ${SHOP_HARD_COVER_ID}
         restart: unless-stopped
         stop_signal: SIGKILL
         networks:
