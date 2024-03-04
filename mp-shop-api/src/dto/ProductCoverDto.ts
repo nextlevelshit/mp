@@ -36,9 +36,9 @@ export class ProductCoverDto {
 		format: string;
 		content: string;
 		details: string;
-		banderole: string;
-	} {
-		return this.productCover.attributes.copyText;
+		banderole: string
+	} | null {
+		return this.productCover.attributes?.copyText ?? null;
 	}
 
 	get dto(): ProductCoverDtoData {
@@ -66,6 +66,6 @@ export interface ProductCoverDtoData {
 		content: string;
 		details: string;
 		banderole: string;
-	};
+	} | null;
 	icon: MediaDataDtoData | null;
 }

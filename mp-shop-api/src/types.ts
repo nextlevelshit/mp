@@ -170,7 +170,7 @@ export interface ProductCover {
 		price: number;
 		createdAt: string;
 		updatedAt: string;
-		copyText: {
+		copyText?: {
 			text: string;
 			cover: string;
 			paper: string;
@@ -178,7 +178,7 @@ export interface ProductCover {
 			content: string;
 			details: string;
 			banderole: string;
-		};
+		} | null;
 		icon?: {
 			data: null | MediaData;
 		}

@@ -54,7 +54,7 @@ class DepotApi {
 	): Promise<U[]> {
 		const query = filter ? qs.stringify(filter, { encode: false }) : "";
 
-		verbose(`Querying ${endpoint} with "${query}"`);
+		logger(`Querying ${endpoint} with "${query}"`);
 
 		const cacheKey = `${endpoint}_${depth}_${query}`;
 
@@ -62,7 +62,8 @@ class DepotApi {
 		const cachedResult: U[] | undefined = await (await cache).get(cacheKey);
 
 		if (cachedResult) {
-			console.log("Retrieving from cache");
+			verbose(`Retrieving from cache: ${cacheKey}`);
+			verbose(cachedResult);
 			return cachedResult;
 		}
 
@@ -945,9 +946,6 @@ class DepotApi {
 	}
 
 	async productCover(filter?: any): Promise<ProductCoverDtoData[]> {
-		// implement in memory cache
-
-
 		return this.fetchAndCacheEntities<ProductCover>(
 			"product-covers",
 			(cover) => new ProductCoverDto(cover),

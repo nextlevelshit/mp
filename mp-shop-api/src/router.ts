@@ -242,23 +242,28 @@ router.get("/v1/product", async (req, res) => {
 	try {
 		verbose(`Querying products`);
 
-		const [allCovers, allRulings, allPages] = await Promise.all([
-			depotApi.productCover(),
+		const [allRulings, allPages] = await Promise.all([
 			depotApi.productRuling(),
 			depotApi.productPages()
 		]);
 
-		const lowestPriceCover = allCovers.sort((a, b) => a.price - b.price)[0].id;
 		const lowestPriceRuling = allRulings.sort((a, b) => a.price - b.price)[0].id;
 		const lowestPricePages = allPages.sort((a, b) => a.price - b.price)[0].id;
 
+		let cover = parseInt(req.query.cover as string);
+
+		if (!req.query.cover) {
+			let allCovers = await depotApi.productCover({
+				fields: ["id", "price"],
+			});
+			cover = allCovers.sort((a, b) => a.price - b.price)[0].id;
+		}
+
 		logger({
-			lowestPriceCover,
+			cover,
 			lowestPriceRuling,
 			lowestPricePages
 		});
-
-		const cover = req.query.cover ? parseInt(req.query.cover as string) : lowestPriceCover;
 
 		const productList = await depotApi.productFactory().all({
 			pagination: {
