@@ -1,5 +1,5 @@
 <template>
-	<main class="mt-8 mb-12 container mx-auto">
+	<main class="pt-4 lg:container mx-auto px-4">
 		<div class="flex gap-12 relative max-w-screen-lg mx-auto">
 			<div v-if="order" class="flex flex-col gap-8 w-full">
 				<div>

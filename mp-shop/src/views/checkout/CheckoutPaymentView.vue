@@ -1,16 +1,16 @@
 <template>
-	<main class="container mx-auto">
+	<main class="pt-4 lg:container mx-auto px-4">
 		<Stepper :step="3"/>
 
 		<div v-if="cart">
-			<div class="mt-8 mb-12 flex gap-8 mx-auto relative">
-				<div class="w-1/2">
+			<div class="mt-8 mb-12 flex flex-col-reverse lg:flex-row gap-8 mx-auto relative">
+				<div class="lg:w-1/2">
 					<div v-if="!hasPaymentError" class="payment sticky top-4" ref="payment"></div>
 					<div v-else class="p-8 text-center mx-auto rounded-md bg-rose-100 b">
 						<span class="text-rose-800">Es ist ein Fehler aufgetreten. Bitte versuche es erneut.</span>
 					</div>
 				</div>
-				<div class="w-1/2">
+				<div class="lg:w-1/2">
 					<div v-if="cartProducts" class="flex flex-col gap-8">
 						<ul class="divide-y divide-gray-300">
 							<li v-for="(position, index) in cartProducts" :key="index"

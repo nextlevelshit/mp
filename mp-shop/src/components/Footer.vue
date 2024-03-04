@@ -14,13 +14,13 @@
 						<h2 class="mb-4 text-sm font-semibold uppercase">Notizbücher</h2>
 						<ul class="text-gray-400 font-medium mb-4">
 							<li class="mb-2 lg:mb-4">
-								<router-link to="/notebooks/softcover" class="hover:text-white"
+								<router-link :to="`/notebooks/${softCoverId}`" class="hover:text-white"
 											 @click="trackEvent(`footer-notebooks-softcover-clicked`)">Softcover
 									Fadenheftung
 								</router-link>
 							</li>
 							<li>
-								<router-link to="/notebooks/hardcover" class="hover:text-white"
+								<router-link :to="`/notebooks/${hardCoverId}`" class="hover:text-white"
 											 @click="trackEvent(`footer-notebooks-hardcover-clicked`)">Hardcover
 									Fadenheftung
 								</router-link>
@@ -31,12 +31,12 @@
 						<h2 class="mb-4 text-sm font-semibold uppercase">Notizhefte</h2>
 						<ul class="text-gray-400 font-medium mb-4">
 							<li class="mb-2 lg:mb-4">
-								<router-link to="/booklets/stitched" class="hover:underline"
+								<router-link :to="`/notebooks/${bookletCoverId}`" class="hover:underline"
 											 @click="trackEvent(`footer-booklets-stiched-clicked`)">Steppstichheftung
 								</router-link>
 							</li>
 							<li>
-								<router-link to="/booklets/stitched" class="hover:text-white"
+								<router-link :to="`/notebooks/${bookletCoverId}`" class="hover:text-white"
 											 @click="trackEvent(`footer-booklets-glued-clicked`)">Klebeheftung
 								</router-link>
 							</li>
@@ -93,4 +93,5 @@
 
 <script setup lang="ts">
 import {trackEvent} from "@/util/trackEvent";
+import {softCoverId, hardCoverId, bookletCoverId} from "@/config/constants";
 </script>

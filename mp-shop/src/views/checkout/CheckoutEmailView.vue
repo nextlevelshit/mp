@@ -1,5 +1,5 @@
 <template>
-	<div class="container mx-auto">
+	<div class="pt-4 lg:container mx-auto px-4">
 		<Stepper :step="1"/>
 
 		<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-md mx-auto">

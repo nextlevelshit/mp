@@ -1,6 +1,6 @@
 <template>
-	<main class="mt-8 mb-12 container mx-auto">
-		<div class="flex gap-12 relative max-w-screen-lg mx-auto">
+	<main class="pt-4 lg:container lg:max-w-screen-lg  lg:mx-auto px-4">
+		<div class="relative w-full">
 			<div v-if="cartProducts.length > 0" class="flex flex-col gap-8 w-full">
 				<Title :level="2" html-tag="h1" classes="text-center">Im Warenkorb gesamt:
 					{{ numberFormatter(cart.total) }} €</Title>
@@ -21,23 +21,27 @@
 							<img :src="position.product.image.url" :alt="position.product.name"
 								 class="w-12 object-cover">
 
-							<a :href="`/details/${position.product.id}`" class="text-xl font-bold flex-grow">{{ position.product.name }}</a>
+							<div class="flex flex-col gap-3 lg:gap-6 lg:flex-row lg:items-center justify-between flex-grow">
+								<a :href="`/details/${position.product.id}`" class="text-xl font-bold flex-grow">{{ position.product.name }}</a>
 
-							<select
-								@change="changeCountCart(position, parseInt(($event.target as HTMLInputElement).value))"
-								class="block appearance-none w-16 text-center bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 rounded shadow leading-tight focus:outline-none focus:border-indigo-500 focus:shadow-outline">
-								<option v-for="count in 10" :selected="position.count === count" :value="count">
-									{{ count }}
-								</option>
-							</select>
+								<div class="flex items-center justify-between">
+									<select
+										@change="changeCountCart(position, parseInt(($event.target as HTMLInputElement).value))"
+										class="block appearance-none w-16 text-center bg-white border border-gray-300 hover:border-gray-500 px-4 py-2 rounded shadow leading-tight focus:outline-none focus:border-indigo-500 focus:shadow-outline">
+										<option v-for="count in 10" :selected="position.count === count" :value="count">
+											{{ count }}
+										</option>
+									</select>
 
-							<div class="flex flex-col gap-2 flex-end w-24">
-								<span class="text-xl font-bold text-right">{{
-										numberFormatter(position.product.totalProductPrice * position.count)
-									}} €</span>
-								<button @click="removeFromCart(position.product.id, position.count)"
-										class="text-gray-500 hover:text-gray-900 hover:underline text-right">Entfernen
-								</button>
+									<div class="flex flex-col gap-2 flex-end w-24">
+									<span class="text-xl font-bold text-right">{{
+											numberFormatter(position.product.totalProductPrice * position.count)
+										}} €</span>
+										<button @click="removeFromCart(position.product.id, position.count)"
+												class="text-gray-500 hover:text-gray-900 hover:underline text-right">Entfernen
+										</button>
+									</div>
+								</div>
 							</div>
 						</li>
 					</ul>
@@ -45,18 +49,18 @@
 					<hr/>
 
 					<div>
-						<div class="flex justify-between mb-2">
+						<div class="flex flex-col lg:flex-row justify-between mb-2">
 							<span class="text-2xl font-bold">Deine Gesamtsumme</span>
-							<div class="flex flex-col flex-end">
-								<span class="text-2xl font-bold text-right">{{ numberFormatter(cart.total) }} €</span>
-								<span class="text-gray-600 text-sm text-right">Enthält MwSt. in Höhe von {{
+							<div class="flex flex-col lg:flex-end">
+								<span class="text-2xl font-bold lg:text-right">{{ numberFormatter(cart.total) }} €</span>
+								<span class="text-gray-600 text-sm lg:text-right">Enthält MwSt. in Höhe von {{
 										numberFormatter(cart.VAT)
 									}} € zzgl. Versandkosten</span>
 							</div>
 						</div>
 					</div>
 
-					<div class="grid place-content-end">
+					<div class="grid lg:place-content-end">
 						<Button href="/checkout" classes="w-full" @click="trackEvent(`cart-cta-bottom-clicked`, { total: cart.total })">
 							Jetzt bezahlen
 						</Button>

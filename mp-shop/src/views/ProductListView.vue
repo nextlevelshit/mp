@@ -19,6 +19,7 @@
 						<Title :level="5" html-tag="h2">Wähle deinen Einband</Title>
 						<div class="flex gap-4 justify-items-stretch mt-2">
 							<SelectionBox v-for="productCover in productCovers" :label="productCover.label"
+										  :aria-label="productCover.alt"
 										  :path="productCover.id !== cover && productCover.url"
 										  :is-active="productCover.isActive" @click="trackEvent(`product-list-sidebar-cover-clicked`)">
 								<img v-if="productCover.iconUrl" :alt="productCover.alt" :src="productCover.iconUrl"/>
