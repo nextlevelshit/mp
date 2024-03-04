@@ -5,3 +5,4 @@
 .env.dev
 
 mp-silo/data/*
+mp-proxy/cache/*
