@@ -14,7 +14,7 @@
 					<label class="flex gap-4 text-sm cursor-pointer">
 						<input v-model="acceptedTermsAndConditions" required type="checkbox" class="w-4 cursor-pointer"/>
 						<span>
-						Mit der Anmeldung bestätige ich, die <a href="/terms" target="_blank" class="underline" @click="trackEvent(`checkout-email-terms-clicked`)">AGB</a> und <a href="/privacy" target="_blank" class="underline" @click="trackEvent(`checkout-email-privacy-clicked`)">Datenschutzerklärung</a> gelesen und verstanden zu haben
+						Mit der Anmeldung bestätige ich, die <a href="/legal/terms" target="_blank" class="underline" @click="trackEvent(`checkout-email-terms-clicked`)">AGB</a> und <a href="/legal/privacy" target="_blank" class="underline" @click="trackEvent(`checkout-email-privacy-clicked`)">Datenschutzerklärung</a> gelesen und verstanden zu haben
 						und stimme diesen zu.
 					</span>
 					</label>

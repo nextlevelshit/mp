@@ -18,11 +18,17 @@ export class DeliveryMethodDto {
 	get price(): number {
 		return this.deliveryMethod.attributes.price;
 	}
+
+	get description(): string | null {
+		return this.deliveryMethod.attributes.description ?? null;
+	}
+
 	get dto(): DeliveryMethodDtoData {
 		return {
 			id: this.id,
 			name: this.name,
 			price: this.price,
+			description: this.description
 		};
 	}
 }
@@ -31,4 +37,5 @@ export interface DeliveryMethodDtoData {
 	id: number;
 	name: string;
 	price: number;
+	description: string | null;
 }

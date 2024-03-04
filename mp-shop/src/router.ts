@@ -1,5 +1,5 @@
 import {createRouter, createWebHistory} from "vue-router";
-import {bookletCoverId, softCoverId, hardCoverId, baseUrl} from "@/config/constants";
+import {bookletCoverId, baseUrl} from "@/config/constants";
 
 const router = createRouter({
 	history: createWebHistory(baseUrl),
@@ -11,27 +11,16 @@ const router = createRouter({
 		{
 			path: "/",
 			name: "root",
-			redirect: "/notebooks/"
+			redirect: `/notebooks/${bookletCoverId}`
 		},
 		{
-			path: "/terms",
-			name: "legal-terms",
-			component: () => import("./views/legal/TermsView.vue")
+			path: "/",
+			name: "root",
+			redirect: `/notebooks/${bookletCoverId}`
 		},
 		{
-			path: "/imprint",
-			name: "legal-imprint",
-			component: () => import("./views/legal/ImprintView.vue")
-		},
-		{
-			path: "/privacy",
-			name: "legal-privacy",
-			component: () => import("./views/legal/PrivacyView.vue")
-		},
-		{
-			path: "/payment",
-			name: "legal-payment",
-			component: () => import("./views/legal/PaymentMethodsView.vue")
+			path: "/notebooks/",
+			redirect: `/notebooks/${bookletCoverId}`
 		},
 		{
 			path: "/notebooks/:cover",
@@ -71,6 +60,12 @@ const router = createRouter({
 			name: "checkout-result",
 			props: true,
 			component: () => import("./views/checkout/CheckoutResultView.vue")
+		},
+		{
+			path: "/legal/:content",
+			name: "legal",
+			props: true,
+			component: () => import("./views/LegalView.vue")
 		},
 		{
 			path: "/health",

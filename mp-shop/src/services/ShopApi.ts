@@ -4,7 +4,7 @@ import type {
 	Product,
 	ProductVariantResponse,
 	PatternVariantsResponse,
-	ProductCover
+	ProductCover, Legal, Content, PaymentMethod, DeliveryMethod
 } from "@/types";
 import debug from "debug";
 
@@ -125,14 +125,14 @@ class ShopApi {
 		return this.handleResponse<any>(response);
 	}
 
-	async getPaymentMethods(): Promise<any> {
+	async getPaymentMethods(): Promise<PaymentMethod[]> {
 		const response = await fetch(`${this.baseUrl}/v1/payment-method`);
-		return this.handleResponse<any>(response);
+		return this.handleResponse<PaymentMethod[]>(response);
 	}
 
-	async getDeliveryMethods(): Promise<any> {
+	async getDeliveryMethods(): Promise<DeliveryMethod[]> {
 		const response = await fetch(`${this.baseUrl}/v1/delivery-method`);
-		return this.handleResponse<any>(response);
+		return this.handleResponse<DeliveryMethod[]>(response);
 	}
 
 	async getProductPatterns(): Promise<any> {
@@ -150,21 +150,19 @@ class ShopApi {
 		return this.handleResponse<ProductCover[]>(response);
 	}
 
-	async getLegal(): Promise<LegalResponse> {
+	async getLegal(): Promise<Legal> {
 		const response = await fetch(`${this.baseUrl}/v1/legal`);
-		return this.handleResponse<LegalResponse>(response);
+		return this.handleResponse<Legal>(response);
+	}
+
+	async getContent(): Promise<Content> {
+		const response = await fetch(`${this.baseUrl}/v1/content`);
+		return this.handleResponse<Content>(response);
 	}
 }
 
 interface ShopApiOptions {
 	baseUrl: string;
-}
-
-interface LegalResponse {
-	imprint?: string;
-	contact?: string;
-	privacyPolicy?: string;
-	terms?: string;
 }
 
 export const shopApi = new ShopApi({

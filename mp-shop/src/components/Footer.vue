@@ -46,28 +46,28 @@
 						<h2 class="mb-4 text-sm font-semibold uppercase">Legal</h2>
 						<ul class="text-gray-400 font-medium mb-4">
 							<li class="mb-2 lg:mb-4">
-								<router-link to="/imprint" class="hover:text-white"
+								<router-link to="/legal/imprint" class="hover:text-white"
 											 @click="trackEvent(`footer-imprint-clicked`)">Impressum
 								</router-link>
 							</li>
 							<li class="mb-2 lg:mb-4">
-								<router-link to="/privacy" class="hover:text-white"
+								<router-link to="/legal/privacy" class="hover:text-white"
 											 @click="trackEvent(`footer-privacy-clicked`)">Datenschutzerklärung
 								</router-link>
 							</li>
 							<li class="mb-2 lg:mb-4">
-								<router-link to="/terms" class="hover:text-white"
+								<router-link to="/legal/terms" class="hover:text-white"
 											 @click="trackEvent(`footer-terms-clicked`)">Allgemeine Geschäftsbedingungen
 									(AGB)
 								</router-link>
 							</li>
 							<li class="mb-2 lg:mb-4">
-								<router-link to="/payment" class="hover:text-white"
+								<router-link to="/legal/payment" class="hover:text-white"
 											 @click="trackEvent(`footer-payment-clicked`)">Zahlungsarten
 								</router-link>
 							</li>
 							<li>
-								<router-link to="/delivery" class="hover:text-white"
+								<router-link to="/legal/delivery" class="hover:text-white"
 											 @click="trackEvent(`footer-delivery-clicked`)">Versandarten
 								</router-link>
 							</li>

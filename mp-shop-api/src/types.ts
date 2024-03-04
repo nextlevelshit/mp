@@ -201,6 +201,7 @@ export interface PaymentMethod {
 	attributes: {
 		name: string;
 		price: number;
+		description?: string;
 	};
 }
 
@@ -209,6 +210,7 @@ export interface DeliveryMethod {
 	attributes: {
 		name: string;
 		price: number;
+		description?: string;
 	};
 }
 
@@ -293,9 +295,9 @@ export interface Legal {
 		updatedAt: string;
 		terms: string;
 		imprint?: string;
-		privacyPolicy?: string;
-		shippingPolicy?: string;
-		returnPolicy?: string;
+		privacy?: string;
+		delivery?: string;
+		payment?: string;
 		contact?: string;
 	};
 }

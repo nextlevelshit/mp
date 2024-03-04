@@ -1,15 +1,15 @@
 <template>
-	<article :class="bgColor" itemscope itemtype="https://schema.org/Product">
+	<article :class="bgColor" class="shadow-inner" itemscope itemtype="https://schema.org/Product">
 		<main class="pt-12 px-4 lg:container mx-auto">
 			<div v-if="product">
-				<p class="text-3xl font-semibold mb-4 lg:w-2/3" v-html="product.cover?.copyText?.details"></p>
+				<p class="text-3xl font-semibold mb-4 xl:w-2/3" v-html="product.cover?.copyText?.details"></p>
 				<!--    <h1 class="text-2xl font-bold mb-4">{{ product.name }} - Product ID: {{ id }}</h1>-->
 				<div class="flex flex-col-reverse lg:flex-row gap-12 relative">
-					<div class="lg:w-2/5 pt-8">
+					<div class="lg:w-1/2 xl:w-2/5 pt-8">
 						<div class="rounded-lg bg-white shadow-xl mb-16">
-							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
-								<h2 class="pt-3 lg:w-1/3 uppercase text-gray-500 text-sm font-semibold">Einband</h2>
-								<div class="flex lg:w-2/3 gap-4">
+							<section class="flex flex-col xl:flex-row gap-4 xl:gap-12 py-6 px-4 xl:px-8">
+								<h2 class="pt-3 xl:w-1/3 uppercase text-gray-500 text-sm font-semibold">Einband</h2>
+								<div class="flex xl:w-2/3 gap-4">
 									<SelectionBox v-for="cover in productVariantsCover" :label="cover.name"
 												  :path="cover.productId &&`/details/${cover.productId}`"
 												  :is-active="cover.productId === product.id" @click="trackEvent(`product-change-cover-clicked`, { product: product.id, label: cover.name })">
@@ -18,9 +18,9 @@
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
-							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
-								<h2 class="pt-3 lg:w-1/3 uppercase text-gray-500 text-sm font-semibold">Layout</h2>
-								<div class="flex lg:w-2/3 gap-4">
+							<section class="flex flex-col xl:flex-row gap-4 xl:gap-12 py-6 px-4 xl:px-8">
+								<h2 class="pt-3 xl:w-1/3 uppercase text-gray-500 text-sm font-semibold">Layout</h2>
+								<div class="flex xl:w-2/3 gap-4">
 									<SelectionBox v-for="ruling in productVariantsRuling" :label="ruling.name"
 												  :path="ruling.productId && `/details/${ruling.productId}`"
 												  :is-active="ruling.productId === product.id" @click="trackEvent(`product-change-ruling-clicked`, { product: product.id, label: ruling.name })">
@@ -29,9 +29,9 @@
 								</div>
 							</section>
 							<hr class="border-t-[1px] border-gray-300"/>
-							<section class="flex flex-col lg:flex-row gap-4 lg:gap-12 py-6 px-4 lg:px-8">
-								<h2 class="pt-3 lg:w-1/3 uppercase text-gray-500 text-sm font-semibold">Seitenanzahl</h2>
-								<div class="flex lg:w-2/3 gap-4">
+							<section class="flex flex-col xl:flex-row gap-4 xl:gap-12 py-6 px-4 xl:px-8">
+								<h2 class="pt-3 xl:w-1/3 uppercase text-gray-500 text-sm font-semibold">Seitenanzahl</h2>
+								<div class="flex xl:w-2/3 gap-4">
 									<SelectionBox v-for="pages in productVariantsPages" :label="pages.name"
 												  :path="pages.productId && `/details/${pages.productId}`"
 												  :is-active="pages.productId === product.id" @click="trackEvent(`product-change-pages-clicked`, { product: product.id, label: pages.name })"/>
@@ -65,7 +65,7 @@
 							<p><span class="font-bold">Banderole:</span> {{ product.cover.copyText.banderole }}</p>
 						</div>
 					</div>
-					<div class="flex justify-center lg:w-3/5 pt-8 mx-auto">
+					<div class="flex justify-center lg:w-1/2 xl:w-3/5 pt-8 mx-auto">
 						<!-- Product Image -->
 						<div class="w-2/5">
 							<VueMagnifier v-if="product.image" zoom-factor="1" mg-height="300" mg-width="300"

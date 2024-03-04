@@ -60,12 +60,14 @@ export interface DeliveryMethod {
 	id: number;
 	name: string;
 	price: number;
+	description: string | null;
 }
 
 export interface PaymentMethod {
 	id: number;
 	name: string;
 	price: number;
+	description: string | null;
 }
 
 export interface Product {
@@ -256,3 +258,9 @@ export interface Address {
 	postalCode: string;
 	city: string;
 }
+
+export type Legal = Record<LegalPage, string>;
+export type LegalPage = "imprint" | "contact" | "terms" | "privacy" | "delivery" | "payment";
+
+export type Content = Record<LegalPage, string>;
+export type ContentPage = "production";

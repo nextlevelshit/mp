@@ -32,7 +32,7 @@ const verbose = debug("app:v:shop-api:depot-api");
 
 const cache = caching("memory", {
 	max: 100,
-	ttl: 60_000 // 10 minutes
+	ttl: 1_000 * 60 * 10, // 10 minutes
 });
 
 class DepotApi {
@@ -965,7 +965,8 @@ class DepotApi {
 	async paymentMethod() {
 		return this.fetchAndCacheEntities<PaymentMethod>(
 			"payments",
-			(paymentMethod) => new PaymentMethodDto(paymentMethod)
+			(paymentMethod) => new PaymentMethodDto(paymentMethod),
+			1
 		);
 	}
 
@@ -985,13 +986,15 @@ class DepotApi {
 
 		const {data} = await response.json();
 		const { attributes} = data as Legal;
-		const { terms, privacyPolicy, imprint, contact } = attributes;
+		const { terms, privacy, imprint, contact, payment, delivery } = attributes;
 
 		return {
 			terms,
-			privacyPolicy,
+			privacy,
 			imprint,
-			contact
+			contact,
+			payment,
+			delivery
 		}
 	}
 }
