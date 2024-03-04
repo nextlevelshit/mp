@@ -6,7 +6,7 @@ type Level = 1 | 2 | 3 | 4 | 5;
 type HtmlTag = "h1" | "h2" | "h3" | "h4" | "h5" | "p";
 
 const classes: Record<Level, string> = {
-	1: "text-3xl font-bold mb-5 mt-6",
+	1: "text-2xl lg:text-3xl font-bold mb-5 mt-6",
 	2: "text-2xl font-bold mb-4 mt-5",
 	3: "text-xl mt-2 font-semibold mb-1",
 	4: "text-md mt-2 mb-1 font-semibold",

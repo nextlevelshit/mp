@@ -8,7 +8,7 @@
 					<Title :level="2">Deine Bestellnummer: {{ order.id }}</Title>
 				</div>
 
-				<p class="text-lg w-2/3">In Kürze erhälst du von uns eine E-Mail mit allen Einzelheiten zu deiner
+				<p class="text-lg lg:w-2/3">In Kürze erhälst du von uns eine E-Mail mit allen Einzelheiten zu deiner
 					Bestellung. Du kannst sie auch hier herunterladen, sobald sie erstellt wurde.</p>
 
 				<div>
@@ -17,11 +17,8 @@
 						<span v-if="hasReachedMaxFailedRequests">
 							Bald verfügbar
 						</span>
-						<span v-else-if="isReadyToDownload">
-							Rechnung herunterladen
-						</span>
 						<span v-else>
-							Rechnung wird geladen
+							Rechnung herunterladen
 						</span>
 					</Button>
 					<div v-if="hasReachedMaxFailedRequests" class="text-sm mt-3">

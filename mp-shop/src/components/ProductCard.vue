@@ -1,7 +1,7 @@
 <template>
 	<a :href="`/details/${product.id}`" class="gap-2 flex flex-col group" @click="trackEvent(`product-card-clicked`, {product: product.id, price: product.totalProductPrice})">
-		<div :class="[bgColor, shadowColor]" class="p-12 rounded-sm shadow-2xl group-active:shadow-none group-hover:opacity-70 group-focus:opacity-70">
-			<img :src="product.image.url" :alt="product.name" class="lg:w-full object-cover max-h-24 lg:max-h-fit">
+		<div :class="[bgColor, shadowColor]" class="p-12 flex items-center justify-center rounded-sm shadow-2xl group-active:shadow-none group-hover:opacity-70 group-focus:opacity-70">
+			<img :src="product.image.url" :alt="product.name" class="lg:w-full object-cover max-h-64 lg:max-h-fit">
 		</div>
 		<div class="flex flex-col justify-between">
 			<div class="px-2 py-4">

@@ -18,15 +18,13 @@
 						</svg>
 					</button>
 				</div>
-				<div v-if="$route.name" role="navigation" class="grow lg:w-3/4 p-2 py-6 lg:py-8 hidden lg:block" :class="{'!block': isMobileMenuOpen}">
+				<div v-if="$route.name" role="navigation" class="grow lg:w-3/4 p-4 py-6 lg:py-8 hidden lg:block" :class="{'!block': isMobileMenuOpen}">
 					<nav class="flex justify-end" v-if="isCheckoutRoute" aria-label="Navigation">
-						<router-link class="hover:text-gray-400" to="/cart"
-									 @click="trackEvent(`header-back-to-cart-clicked`)">
-							Zurück zum Warenkorb
-						</router-link>
+						<HeaderNavLink label="Zurück zum Warenkorb" to="/cart"
+									   @click="trackEvent(`header-back-to-cart-clicked`)"/>
 					</nav>
 					<nav class="flex flex-col lg:flex-row justify-between gap-4 lg:gap-28 lg:h-full" v-else
-						 aria-label="Navigation">
+						 aria-label="Navigation" @click="closeMobileMenu()">
 						<div class="flex flex-col lg:flex-row gap-4 lg:gap-8">
 							<HeaderNavLink label="Notizhefte" :path="`/notebooks/${bookletCoverId}`"
 										   @click="trackEvent(`header-booklets-clicked`)"/>
@@ -60,6 +58,9 @@ export default {
 		trackEvent,
 		toggleMobileMenu() {
 			this.isMobileMenuOpen = !this.isMobileMenuOpen;
+		},
+		closeMobileMenu() {
+			this.isMobileMenuOpen = false;
 		}
 	},
 	components: {HeaderNavLink},

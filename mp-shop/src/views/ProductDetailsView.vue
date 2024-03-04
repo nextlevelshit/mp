@@ -2,7 +2,11 @@
 	<article :class="bgColor" class="shadow-inner" itemscope itemtype="https://schema.org/Product">
 		<main class="pt-12 px-4 lg:container mx-auto">
 			<div v-if="product">
-				<p class="text-3xl font-semibold mb-4 xl:w-2/3" v-html="product.cover?.copyText?.details"></p>
+				<p class="text-gray-800 text-lg">{{product.cover?.copyText?.format}}</p>
+				<Title :level="1" html-tag="h1" classes="xl:w-2/3">
+					<span v-html="product.cover?.copyText?.details" class=""></span>
+				</Title>
+				<p class="text-gray-800 text-lg lg:w-4/5">{{product.cover?.copyText?.paper}}</p>
 				<!--    <h1 class="text-2xl font-bold mb-4">{{ product.name }} - Product ID: {{ id }}</h1>-->
 				<div class="flex flex-col-reverse lg:flex-row gap-12 relative">
 					<div class="lg:w-1/2 xl:w-2/5 pt-8">
@@ -49,8 +53,7 @@
 									<Button @click="addToCart"
 											:is-pending="isAddingToCart"
 											classes="w-full">
-										<span v-if="isAddingToCart">Wird hinzugefügt...</span>
-										<span v-else>In den Warenkorb</span>
+										In den Warenkorb
 									</Button>
 								</div>
 							</section>
