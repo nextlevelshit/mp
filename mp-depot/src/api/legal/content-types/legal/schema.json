@@ -18,11 +18,17 @@
     "contact": {
       "type": "richtext"
     },
-    "privacyPolicy": {
+    "terms": {
       "type": "richtext"
     },
-    "terms": {
-      "type": "blocks"
+    "delivery": {
+      "type": "richtext"
+    },
+    "payment": {
+      "type": "richtext"
+    },
+    "privacy": {
+      "type": "richtext"
     }
   }
 }

@@ -4,7 +4,8 @@
   "info": {
     "singularName": "payment",
     "pluralName": "payments",
-    "displayName": "Payment"
+    "displayName": "Payment",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -16,6 +17,9 @@
     },
     "price": {
       "type": "decimal"
+    },
+    "description": {
+      "type": "text"
     }
   }
 }

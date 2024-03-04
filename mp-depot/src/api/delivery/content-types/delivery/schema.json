@@ -4,7 +4,8 @@
   "info": {
     "singularName": "delivery",
     "pluralName": "deliveries",
-    "displayName": "Delivery"
+    "displayName": "Delivery",
+    "description": ""
   },
   "options": {
     "draftAndPublish": false
@@ -17,6 +18,9 @@
     },
     "price": {
       "type": "decimal"
+    },
+    "description": {
+      "type": "text"
     }
   }
 }
