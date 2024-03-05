@@ -57,6 +57,7 @@ services:
         restart: no
         environment:
             NGINX_DEBUG: true
+            SHOP_ADDRESS: http://mp-shop:9999
         depends_on:
             certs:
                 condition: service_completed_successfully
