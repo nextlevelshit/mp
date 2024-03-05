@@ -160,7 +160,7 @@ services:
         restart: unless-stopped
         stop_signal: SIGKILL
         environment:
-            SHOP_ADDRESS: http://mp-shop:9999
+            SHOP_ADDRESS: http://mp-shop:80
             SHOP_API_ADDRESS: http://mp-shop-api:8888
             DEPOT_ADDRESS: http://mp-depot:5555
             GRAFANA_ADDRESS: http://grafana:3000
