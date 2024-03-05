@@ -68,7 +68,6 @@ services:
             PORT: 5555
             DATABASE_HOST: mp-silo
             DATABASE_SSL: false
-            DATABASE_URL: ${DEPOT_DATABASE_URL:-}
             DATABASE_PORT: ${SILO_PORT}
             DATABASE_NAME: ${SILO_DATABASE_NAME:-}
             DATABASE_USERNAME: ${SILO_DATABASE_USERNAME:-}
