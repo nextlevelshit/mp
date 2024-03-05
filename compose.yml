@@ -217,6 +217,7 @@ services:
             GF_SERVER_ROUTER_LOGGING: false
             GF_SERVER_SERVE_FROM_SUB_PATH: true
             GF_SERVER_ROOT_URL: https://${PROXY_HOST}:${PROXY_SSL_PORT}/grafana
+            GF_SERVER_PORT: ${GRAFANA_PORT:-3000}
             GF_DATABASE_LOG_QUERIES: false
             GF_LOG_LEVEL: "error"
             GF_AUTH_ANONYMOUS_ENABLED: ${GRAFANA_AUTH_ANONYMOUS_ENABLED:-false}
