@@ -48,12 +48,14 @@ ENV NGINX_DEBUG="false" \
 # Copy build from builder stage to nginx
 COPY --from=builder /app/dist /usr/share/nginx/html
 
-# Copy docker-entrypoint.sh script
+COPY ./nginx.conf /etc/nginx/conf.d/default.conf
+
+# Copy entrypoint and make executable
 COPY ./docker-entrypoint.sh /app/docker-entrypoint.sh
 RUN chmod +x /app/docker-entrypoint.sh
 
 # Expose production port
-EXPOSE 80
+EXPOSE 9999
 
 # Set entrypoint
 ENTRYPOINT [ "/app/docker-entrypoint.sh" ]
