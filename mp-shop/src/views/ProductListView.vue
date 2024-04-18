@@ -1,5 +1,13 @@
 <template>
 	<main class="pt-4 lg:container mx-auto px-4">
+		<div class="mb-20">
+			<Carousel>
+				<SwiperSlide v-for="(item, i) in list" :key="i">
+					<ProductCard :product="item" :cartUuid="cartUuid" />
+				</SwiperSlide>
+			</Carousel>
+		</div>
+
 		<div class="flex flex-col lg:flex-row gap-12 relative">
 			<aside class="lg:w-1/4">
 				<div class="sticky top-4 flex flex-col gap-8">
@@ -38,7 +46,6 @@
 <script>
 import debug from "debug";
 import {shopApi} from "@/services/ShopApi";
-import {localStorageLabelCartUuid} from "@/config/constants";
 import ProductCard from "@/components/ProductCard.vue";
 import Header from "@/components/Header.vue";
 import Title from "@/components/Title.vue";
@@ -46,12 +53,14 @@ import {cart} from "@/stores/cart";
 import {scrollProgress} from "@/util/scrollProgress";
 import {trackEvent} from "@/util/trackEvent";
 import SelectionBox from "@/components/SelectionBox.vue";
+import Carousel from "@/components/Carousel.vue";
+import {SwiperSlide} from 'swiper/vue';
 
 const logger = debug("app:i:product-list-view");
 const verbose = debug("app:v:product-list-view");
 
 export default {
-	components: {SelectionBox, Title, Header, ProductCard},
+	components: {Carousel, SelectionBox, Title, Header, ProductCard, SwiperSlide},
 	props: {
 		cover: {
 			type: String,

@@ -11,3 +11,9 @@ export default {
 	components: {Footer, Header}
 };
 </script>
+
+<style>
+	html, body {
+		@apply overflow-x-hidden;
+	}
+</style>

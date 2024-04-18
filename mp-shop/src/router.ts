@@ -14,11 +14,6 @@ const router = createRouter({
 			redirect: `/notebooks/${bookletCoverId}`
 		},
 		{
-			path: "/",
-			name: "root",
-			redirect: `/notebooks/${bookletCoverId}`
-		},
-		{
 			path: "/notebooks/",
 			redirect: `/notebooks/${bookletCoverId}`
 		},
