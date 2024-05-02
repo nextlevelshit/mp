@@ -24,6 +24,8 @@ services:
     mp-depot:
         container_name: depot-dev
         restart: no
+        ports:
+            - "5555:5555"
         environment:
             NODE_ENV: development
         volumes:
