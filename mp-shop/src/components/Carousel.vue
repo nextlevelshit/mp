@@ -1,5 +1,5 @@
 <template>
-	<swiper
+	<Swiper
 		:modules="modules"
 		:slides-per-view="6"
 		:space-between="50"
@@ -9,6 +9,9 @@
 		@slideChange="onSlideChange"
 		:centeredSlides="false"
 		:loop="false"
+		:mousewheel="true"
+		:grabCursor="true"
+		:keyboard="true"
 		:breakpoints="{
 			1920: {
            slidesPerView: 4,
@@ -24,61 +27,15 @@
          }
 		}"
 	>
-		<slot />
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 1</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 2</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 3</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 4</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 5</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 6</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 7</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-<!--		<swiper-slide>-->
-<!--			<div class="bg-indigo-50 rounded-2xl h-96 flex justify-center items-center">-->
-<!--				<span class="text-3xl font-semibold text-indigo-600">Slide 8</span>-->
-<!--			</div>-->
-<!--		</swiper-slide>-->
-	</swiper>
+		<slot/>
+	</Swiper>
 </template>
 <script>
-// import Swiper core and required modules
 import {Navigation, A11y} from 'swiper/modules';
-
-// Import Swiper Vue.js components
 import {Swiper, SwiperSlide} from 'swiper/vue';
-
-// Import Swiper styles
 import 'swiper/css';
 import 'swiper/css/navigation';
 
-// Import Swiper styles
 export default {
 	components: {
 		Swiper,
@@ -91,6 +48,7 @@ export default {
 		const onSlideChange = () => {
 			console.log('slide change');
 		};
+
 		return {
 			onSwiper,
 			onSlideChange,
@@ -118,6 +76,7 @@ export default {
 .swiper-button-next:after {
 	@apply ml-2;
 }
+
 .swiper-button-prev:after {
 	@apply mr-2;
 }
