@@ -125,13 +125,13 @@ services:
             retries: 3
         networks:
             - internal
-        depends_on:
-            mp-depot:
-                condition: service_started
-            mp-inkasso:
-                condition: service_started
-            mp-postamt:
-                condition: service_started
+#        depends_on:
+#            mp-depot:
+#                condition: service_started
+#            mp-inkasso:
+#                condition: service_started
+#            mp-postamt:
+#                condition: service_started
 
     mp-shop:
         container_name: shop
