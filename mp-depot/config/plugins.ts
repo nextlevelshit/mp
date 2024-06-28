@@ -14,7 +14,12 @@ export default ({env}) => ({
       },
       "x-strapi-config": {
         "plugins": ["upload"],
-        "path": "/documentation"
+        "path": "/documentation",
+        mutateDocumentation: (generatedDocumentationDraft) => {
+          generatedDocumentationDraft.paths[
+            "/order/{uuid}" // must be an existing path
+            ].get.parameters[0].schema.type = "string";
+        },
       },
       "servers": [
         {

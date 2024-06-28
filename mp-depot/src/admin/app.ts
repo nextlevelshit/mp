@@ -5,4 +5,5 @@ export default {
     // Disable notifications about new Strapi releases
     notifications: { releases: false },
   },
+  bootstrap() {}
 };

@@ -19,26 +19,26 @@ services:
         networks:
             - internal
 
-    mp-postamt:
-        container_name: postamt
-        build: ./mp-postamt
-        stop_signal: SIGKILL
-        restart: unless-stopped
-        environment:
-            ENVIRONMENT: production
-            PYTHONUNBUFFERED: true
-            DEBUG_METRICS: ${POSTAMT_DEBUG_METRICS:-false}
-            SMTP_RELAY_HOST: ${POSTAMT_SMTP_RELAY_HOST}
-            SMTP_RELAY_PORT: ${POSTAMT_SMTP_RELAY_PORT}
-            SMTP_RELAY_USERNAME: ${POSTAMT_SMTP_RELAY_USERNAME}
-            SMTP_RELAY_PASSWORD: ${POSTAMT_SMTP_RELAY_PASSWORD}
-        healthcheck:
-            test: wget --no-verbose --spider -S -T 1 http://mp-postamt:2222/health || exit 1
-            interval: 30s
-            timeout: 10s
-            retries: 3
-        networks:
-            - internal
+#    mp-postamt:
+#        container_name: postamt
+#        build: ./mp-postamt
+#        stop_signal: SIGKILL
+#        restart: unless-stopped
+#        environment:
+#            ENVIRONMENT: production
+#            PYTHONUNBUFFERED: true
+#            DEBUG_METRICS: ${POSTAMT_DEBUG_METRICS:-false}
+#            SMTP_RELAY_HOST: ${POSTAMT_SMTP_RELAY_HOST}
+#            SMTP_RELAY_PORT: ${POSTAMT_SMTP_RELAY_PORT}
+#            SMTP_RELAY_USERNAME: ${POSTAMT_SMTP_RELAY_USERNAME}
+#            SMTP_RELAY_PASSWORD: ${POSTAMT_SMTP_RELAY_PASSWORD}
+#        healthcheck:
+#            test: wget --no-verbose --spider -S -T 1 http://mp-postamt:2222/health || exit 1
+#            interval: 30s
+#            timeout: 10s
+#            retries: 3
+#        networks:
+#            - internal
 
     mp-silo:
         container_name: silo
@@ -82,6 +82,11 @@ services:
             ADMIN_JWT_SECRET: ${DEPOT_ADMIN_JWT_SECRET}
             APP_KEYS: ${DEPOT_APP_KEYS}
             TRANSFER_TOKEN_SALT: ${DEPOT_TRANSFER_TOKEN_SALT}
+            ADYEN_MERCHANT_ACCOUNT: ${SHOP_API_ADYEN_MERCHANT_ACCOUNT}
+            ADYEN_HMAC_KEY: ${SHOP_API_ADYEN_HMAC_KEY}
+            ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
+            ADYEN_API_KEY: ${SHOP_API_ADYEN_API_KEY}
+            ADYEN_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
         healthcheck:
             test: wget --no-verbose --spider -S -T 1 http://mp-depot:5555/_health || exit 1
             interval: 30s
@@ -95,36 +100,36 @@ services:
             - data
         depends_on:
             mp-silo:
-                condition: service_healthy
+                condition: service_started
 
-    mp-shop-api:
-        container_name: shop-api
-        build: ./mp-shop-api
-        restart: unless-stopped
-        stop_signal: SIGKILL
-        environment:
-            NODE_ENV: production
-            DEPOT_PORT: 5555
-            INKASSO_PORT: 1111
-            POSTAMT_PORT: 2222
-            DEPOT_ADDRESS: http://mp-depot:5555
-            INKASSO_ADDRESS: http://mp-inkasso:1111
-            POSTAMT_ADDRESS: http://mp-postamt:2222
-            UMAMI_ADDRESS: http://umami:3000
-            ADYEN_MERCHANT_ACCOUNT: ${SHOP_API_ADYEN_MERCHANT_ACCOUNT}
-            ADYEN_HMAC_KEY: ${SHOP_API_ADYEN_HMAC_KEY}
-            ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
-            ADYEN_API_KEY: ${SHOP_API_ADYEN_API_KEY}
-            ADYEN_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
-            DEPOT_TOKEN: ${SHOP_API_DEPOT_TOKEN}
-            EXPRESS_TRUST_TOKEN: ${SHOP_API_EXPRESS_TRUST_TOKEN:-}
-        healthcheck:
-            test: wget --no-verbose --spider -S -T 1 http://mp-shop-api:8888/health || exit 1
-            interval: 30s
-            timeout: 10s
-            retries: 3
-        networks:
-            - internal
+#    mp-shop-api:
+#        container_name: shop-api
+#        build: ./mp-shop-api
+#        restart: unless-stopped
+#        stop_signal: SIGKILL
+#        environment:
+#            NODE_ENV: production
+#            DEPOT_PORT: 5555
+#            INKASSO_PORT: 1111
+#            POSTAMT_PORT: 2222
+#            DEPOT_ADDRESS: http://mp-depot:5555
+#            INKASSO_ADDRESS: http://mp-inkasso:1111
+#            POSTAMT_ADDRESS: http://mp-postamt:2222
+#            UMAMI_ADDRESS: http://umami:3000
+#            ADYEN_MERCHANT_ACCOUNT: ${SHOP_API_ADYEN_MERCHANT_ACCOUNT}
+#            ADYEN_HMAC_KEY: ${SHOP_API_ADYEN_HMAC_KEY}
+#            ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
+#            ADYEN_API_KEY: ${SHOP_API_ADYEN_API_KEY}
+#            ADYEN_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
+#            DEPOT_TOKEN: ${SHOP_API_DEPOT_TOKEN}
+#            EXPRESS_TRUST_TOKEN: ${SHOP_API_EXPRESS_TRUST_TOKEN:-}
+#        healthcheck:
+#            test: wget --no-verbose --spider -S -T 1 http://mp-shop-api:8888/health || exit 1
+#            interval: 30s
+#            timeout: 10s
+#            retries: 3
+#        networks:
+#            - internal
 #        depends_on:
 #            mp-depot:
 #                condition: service_started
@@ -155,9 +160,9 @@ services:
         stop_signal: SIGKILL
         networks:
             - internal
-        depends_on:
-            mp-shop-api:
-                condition: service_healthy
+#        depends_on:
+#            mp-shop-api:
+#                condition: service_healthy
 
     mp-proxy:
         container_name: proxy
@@ -166,10 +171,10 @@ services:
         stop_signal: SIGKILL
         environment:
             SHOP_ADDRESS: http://mp-shop:9999
-            SHOP_API_ADDRESS: http://mp-shop-api:8888
+#            SHOP_API_ADDRESS: http://mp-shop-api:8888
             DEPOT_ADDRESS: http://mp-depot:5555
-            GRAFANA_ADDRESS: http://grafana:3000
-            UMAMI_ADDRESS: http://umami:3000
+#            GRAFANA_ADDRESS: http://grafana:3000
+#            UMAMI_ADDRESS: http://umami:3000
         volumes:
             - cache-data:/cache
             - certs-data:/etc/nginx/certs:ro
@@ -184,14 +189,14 @@ services:
                 condition: service_completed_successfully
             mp-shop:
                 condition: service_started
-            mp-shop-api:
-                condition: service_started
+#            mp-shop-api:
+#                condition: service_started
             mp-depot:
                 condition: service_started
-            grafana:
-                condition: service_started
-            umami:
-                condition: service_started
+#            grafana:
+#                condition: service_started
+#            umami:
+#                condition: service_started
 
     certs:
         container_name: certs
@@ -214,80 +219,80 @@ services:
         networks:
             - internal
 
-    grafana:
-        container_name: grafana
-        image: grafana/grafana
-        restart: unless-stopped
-        environment:
-            GF_SERVER_ROUTER_LOGGING: false
-            GF_SERVER_SERVE_FROM_SUB_PATH: true
-            GF_SERVER_ROOT_URL: https://${PROXY_HOST}:${PROXY_SSL_PORT}/grafana
-            GF_SERVER_PORT: ${GRAFANA_PORT:-3000}
-            GF_DATABASE_LOG_QUERIES: false
-            GF_LOG_LEVEL: "error"
-            GF_AUTH_ANONYMOUS_ENABLED: ${GRAFANA_AUTH_ANONYMOUS_ENABLED:-false}
-        volumes:
-            - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/default.yaml
-            - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/default.yaml
-            - ./grafana/dashboards:/var/lib/grafana/dashboards
-        networks:
-            - internal
-        depends_on:
-            - prometheus
+#    grafana:
+#        container_name: grafana
+#        image: grafana/grafana
+#        restart: unless-stopped
+#        environment:
+#            GF_SERVER_ROUTER_LOGGING: false
+#            GF_SERVER_SERVE_FROM_SUB_PATH: true
+#            GF_SERVER_ROOT_URL: https://${PROXY_HOST}:${PROXY_SSL_PORT}/grafana
+#            GF_SERVER_PORT: ${GRAFANA_PORT:-3000}
+#            GF_DATABASE_LOG_QUERIES: false
+#            GF_LOG_LEVEL: "error"
+#            GF_AUTH_ANONYMOUS_ENABLED: ${GRAFANA_AUTH_ANONYMOUS_ENABLED:-false}
+#        volumes:
+#            - ./grafana/datasource.yml:/etc/grafana/provisioning/datasources/default.yaml
+#            - ./grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/default.yaml
+#            - ./grafana/dashboards:/var/lib/grafana/dashboards
+#        networks:
+#            - internal
+#        depends_on:
+#            - prometheus
 
-    umami:
-        container_name: umami
-        build:
-            context: ./umami
-            args:
-                DATABASE_TYPE: postgresql
-                BASE_PATH: /umami
-        environment:
-            DATABASE_URL: postgresql://${UMAMI_DATABASE_USERNAME}:${UMAMI_DATABASE_PASSWORD}@umami-db:5432/${UMAMI_DATABASE_NAME}
-            DATABASE_TYPE: postgresql
-            APP_SECRET: ${UMAMI_API_SECRET}
-            DISABLE_TELEMETRY: true
-        restart: unless-stopped
-        healthcheck:
-            test: wget --no-verbose --spider -S -T 1 http://umami:3000/umami/api/heartbeat || exit 1
-            interval: 30s
-            timeout: 10s
-            retries: 3
-        networks:
-            - tracking
-            - internal
-        depends_on:
-            umami-db:
-                condition: service_healthy
+#    umami:
+#        container_name: umami
+#        build:
+#            context: ./umami
+#            args:
+#                DATABASE_TYPE: postgresql
+#                BASE_PATH: /umami
+#        environment:
+#            DATABASE_URL: postgresql://${UMAMI_DATABASE_USERNAME}:${UMAMI_DATABASE_PASSWORD}@umami-db:5432/${UMAMI_DATABASE_NAME}
+#            DATABASE_TYPE: postgresql
+#            APP_SECRET: ${UMAMI_API_SECRET}
+#            DISABLE_TELEMETRY: true
+#        restart: unless-stopped
+#        healthcheck:
+#            test: wget --no-verbose --spider -S -T 1 http://umami:3000/umami/api/heartbeat || exit 1
+#            interval: 30s
+#            timeout: 10s
+#            retries: 3
+#        networks:
+#            - tracking
+#            - internal
+#        depends_on:
+#            umami-db:
+#                condition: service_healthy
 
-    umami-db:
-        container_name: umami-db
-        image: postgres:alpine
-        restart: unless-stopped
-        environment:
-            POSTGRES_USER: ${UMAMI_DATABASE_USERNAME}
-            POSTGRES_PASSWORD: ${UMAMI_DATABASE_PASSWORD}
-            POSTGRES_DB: ${UMAMI_DATABASE_NAME}
-        healthcheck:
-            test: pg_isready -h umami-db -p 5432 -U ${UMAMI_DATABASE_USERNAME} -d ${UMAMI_DATABASE_NAME}
-            interval: 30s
-            timeout: 10s
-            retries: 3
-        volumes:
-            - umami-data:/var/lib/postgresql/data
-        networks:
-            - tracking
+#    umami-db:
+#        container_name: umami-db
+#        image: postgres:alpine
+#        restart: unless-stopped
+#        environment:
+#            POSTGRES_USER: ${UMAMI_DATABASE_USERNAME}
+#            POSTGRES_PASSWORD: ${UMAMI_DATABASE_PASSWORD}
+#            POSTGRES_DB: ${UMAMI_DATABASE_NAME}
+#        healthcheck:
+#            test: pg_isready -h umami-db -p 5432 -U ${UMAMI_DATABASE_USERNAME} -d ${UMAMI_DATABASE_NAME}
+#            interval: 30s
+#            timeout: 10s
+#            retries: 3
+#        volumes:
+#            - umami-data:/var/lib/postgresql/data
+#        networks:
+#            - tracking
 
 volumes:
     silo-data:
     depot-data:
     certs-data:
     cache-data:
-    umami-data:
+#    umami-data:
 
 networks:
     internal:
     public:
         driver: bridge
     data:
-    tracking:
+#    tracking:

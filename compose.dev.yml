@@ -9,17 +9,32 @@ services:
         volumes:
             - ./mp-inkasso/data:/app/data
             - ./mp-inkasso/src:/app/src:ro
+        deploy:
+            resources:
+                limits:
+                    cpus: "1.0"
+                    memory: 600m
 
-    mp-postamt:
-        container_name: postamt-dev
-        restart: no
-        environment:
-            ENVIRONMENT: development
+#    mp-postamt:
+#        container_name: postamt-dev
+#        restart: no
+#        environment:
+#            ENVIRONMENT: development
+#        deploy:
+#            resources:
+#                limits:
+#                    cpus: "1.0"
+#                    memory: 600m
 
     mp-silo:
         container_name: silo-dev
         volumes:
             - ./mp-silo/data:/var/lib/postgresql/data
+        deploy:
+            resources:
+                limits:
+                    cpus: "1.0"
+                    memory: 600m
 
     mp-depot:
         container_name: depot-dev
@@ -28,6 +43,11 @@ services:
             - "5555:5555"
         environment:
             NODE_ENV: development
+        deploy:
+            resources:
+                limits:
+                    cpus: "4.0"
+                    memory: 8g
         volumes:
             - ./mp-depot/config:/opt/app/config:ro
             - ./mp-depot/src:/opt/app/src:rw
@@ -35,13 +55,13 @@ services:
             - ./mp-depot/database:/opt/app/database
             - ./mp-depot/public/uploads:/opt/app/public/uploads
 
-    mp-shop-api:
-        container_name: shop-api-dev
-        restart: no
-        environment:
-            NODE_ENV: development
-        volumes:
-            - ./mp-shop-api/src:/app/src:ro
+#    mp-shop-api:
+#        container_name: shop-api-dev
+#        restart: no
+#        environment:
+#            NODE_ENV: development
+#        volumes:
+#            - ./mp-shop-api/src:/app/src:ro
 
     mp-shop:
         container_name: shop-dev
@@ -49,6 +69,11 @@ services:
             context: ./mp-shop
             target: development
         restart: no
+        deploy:
+            resources:
+                limits:
+                    cpus: "1.0"
+                    memory: 600m
         volumes:
             - ./mp-shop/src:/app/src:ro
             - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
@@ -66,6 +91,11 @@ services:
             - ./mp-proxy/nginx-template.conf:/nginx-template.conf:ro
             - cache-data:/cache
             - certs-data:/etc/nginx/certs:ro
+        deploy:
+            resources:
+                limits:
+                    cpus: "1.0"
+                    memory: 600m
 
     certs:
         container_name: certs-dev
@@ -80,14 +110,18 @@ services:
 
     prometheus:
         container_name: prometheus-dev
-
-    grafana:
-        container_name: grafana-dev
-
-    umami:
-        container_name: umami-dev
-        restart: no
-
-    umami-db:
-        container_name: umami-db-dev
-        restart: no
+        deploy:
+            resources:
+                limits:
+                    cpus: "1.0"
+                    memory: 600m
+#    grafana:
+#        container_name: grafana-dev
+#
+#    umami:
+#        container_name: umami-dev
+#        restart: no
+#
+#    umami-db:
+#        container_name: umami-db-dev
+#        restart: no

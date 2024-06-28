@@ -1,5 +1,5 @@
 global:
-  scrape_interval: 15s
+  scrape_interval: 60s
 
   external_labels:
     monitor: "muellerprints"
@@ -9,9 +9,9 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
-  - job_name: 'mp-shop-api'
-    static_configs:
-      - targets: ['mp-shop-api:8888']
+#  - job_name: 'mp-shop-api'
+#    static_configs:
+#      - targets: ['mp-shop-api:8888']
 
   - job_name: 'mp-depot'
     static_configs:
@@ -28,9 +28,9 @@ scrape_configs:
     static_configs:
       - targets: ['mp-inkasso:1111']
 
-  - job_name: 'mp-postamt'
-    static_configs:
-      - targets: ['mp-postamt:2222']
+#  - job_name: 'mp-postamt'
+#    static_configs:
+#      - targets: ['mp-postamt:2222']
 
   - job_name: 'mp-silo'
     static_configs:

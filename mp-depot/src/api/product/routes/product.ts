@@ -11,7 +11,15 @@ export default {
     {
       method: 'GET',
       path: '/product',
-      handler: 'product.all',
+      handler: 'product.find',
+      config: {
+        policies: [],
+      },
+    },
+    {
+      method: 'PUT',
+      path: '/product/:id',
+      handler: 'product.update',
       config: {
         policies: [],
       },

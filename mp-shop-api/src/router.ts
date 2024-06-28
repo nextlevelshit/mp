@@ -93,6 +93,7 @@ router.all("/v1/order/:uuid", async (req, res) => {
 				res.status(200).send(updatedOrder.dto);
 				break;
 			default:
+
 				res.status(405).send("Method not allowed");
 		}
 	} catch (e) {

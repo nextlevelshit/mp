@@ -796,6 +796,7 @@ export interface ApiContentContent extends Schema.SingleType {
     displayName: 'Content';
   };
   options: {
+    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
     draftAndPublish: true;
   };
   attributes: {
@@ -826,6 +827,7 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     displayName: 'Customer';
   };
   options: {
+    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
     draftAndPublish: false;
   };
   attributes: {
@@ -857,6 +859,7 @@ export interface ApiDeliveryDelivery extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
     draftAndPublish: false;
   };
   attributes: {
@@ -889,6 +892,7 @@ export interface ApiLegalLegal extends Schema.SingleType {
     description: '';
   };
   options: {
+    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
     draftAndPublish: false;
   };
   attributes: {
@@ -924,6 +928,7 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
     draftAndPublish: false;
   };
   attributes: {
@@ -989,6 +994,7 @@ export interface ApiPaymentPayment extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
     draftAndPublish: false;
   };
   attributes: {
@@ -1021,6 +1027,19 @@ export interface ApiProductProduct extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: [
+      'createdAt',
+      'createdBy',
+      'updatedAt',
+      'updatedBy',
+      'created_at',
+      'updated_at',
+      'created_by',
+      'published_at',
+      'published_by',
+      'publishedAt',
+      'publishedBy'
+    ];
     draftAndPublish: true;
   };
   attributes: {
@@ -1082,6 +1101,18 @@ export interface ApiProductCoverProductCover extends Schema.CollectionType {
   };
   options: {
     draftAndPublish: false;
+    privateAttributes: [
+      'createdAt',
+      'updatedAt',
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'published_at',
+      'publishedAt',
+      'published_by',
+      'publishedBy'
+    ];
   };
   attributes: {
     name: Attribute.String & Attribute.Required;
@@ -1122,6 +1153,20 @@ export interface ApiProductImageProductImage extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: [
+      'createdAt',
+      'updatedAt',
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'published_at',
+      'publishedAt',
+      'published_by',
+      'publishedBy',
+      'images.provider',
+      'provider'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -1158,6 +1203,18 @@ export interface ApiProductPageProductPage extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: [
+      'createdAt',
+      'updatedAt',
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'published_at',
+      'publishedAt',
+      'published_by',
+      'publishedBy'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -1194,6 +1251,18 @@ export interface ApiProductPatternProductPattern extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: [
+      'createdAt',
+      'updatedAt',
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'published_at',
+      'publishedAt',
+      'published_by',
+      'publishedBy'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -1231,6 +1300,18 @@ export interface ApiProductRulingProductRuling extends Schema.CollectionType {
     description: '';
   };
   options: {
+    privateAttributes: [
+      'createdAt',
+      'updatedAt',
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'published_at',
+      'publishedAt',
+      'published_by',
+      'publishedBy'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -1267,6 +1348,18 @@ export interface ApiVatVat extends Schema.SingleType {
     displayName: 'VAT';
   };
   options: {
+    privateAttributes: [
+      'createdAt',
+      'updatedAt',
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'published_at',
+      'publishedAt',
+      'published_by',
+      'publishedBy'
+    ];
     draftAndPublish: false;
   };
   attributes: {

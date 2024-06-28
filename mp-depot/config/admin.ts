@@ -10,7 +10,13 @@ export default ({ env }) => ({
       salt: env('TRANSFER_TOKEN_SALT'),
     },
   },
+  autoOpen: false,
+  // watchIgnoreFiles: [
+  //   "**/controllers/**",
+  //   "**/database/**",
+  // ],
   flags: {
-    nps: false
+    nps: false,
+    promoteEE: false,
   }
 });
