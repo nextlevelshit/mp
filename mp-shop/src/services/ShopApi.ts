@@ -4,9 +4,14 @@ import type {
 	Product,
 	ProductVariantResponse,
 	PatternVariantsResponse,
-	ProductCover, Legal, Content, PaymentMethod, DeliveryMethod
+	ProductCover,
+	Legal,
+	Content,
+	PaymentMethod,
+	DeliveryMethod
 } from "@/types";
 import debug from "debug";
+import { shopApiToken } from "@/config/constants";
 
 const logger = debug("app:i:shop-api");
 const verbose = debug("app:v:shop-api");
@@ -22,18 +27,30 @@ class ShopApi {
 		if (!response.ok) {
 			throw new Error(`Request failed with status ${response.status}`);
 		}
-		return await response.json() as T;
+		return (await response.json()) as T;
+	}
+
+	private makeRequest(url: string, options?: RequestInit): Promise<Response> {
+		verbose(`Making request to ${url}`);
+		return fetch(url, {
+			...options,
+			headers: {
+				...options?.headers,
+				authorization: `Bearer ${shopApiToken}`,
+				"content-type": "application/json"
+			}
+		});
 	}
 
 	async createOrder(): Promise<string> {
-		const response = await fetch(`${this.baseUrl}/v1/order/`, {
-			method: "POST",
+		const response = this.makeRequest(`${this.baseUrl}/order/`, {
+			method: "POST"
 		});
 		return await response.text();
 	}
 
 	async getOrder(uuid: string): Promise<Order> {
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}`);
+		const response = this.makeRequest(`${this.baseUrl}/order/${uuid}`);
 		return this.handleResponse<Order>(response);
 	}
 
@@ -41,7 +58,7 @@ class ShopApi {
 		const createOrderAndReturn = async (): Promise<Order> => {
 			const newCartUuid = await this.createOrder();
 			return await this.getOrder(newCartUuid);
-		}
+		};
 		if (uuid) {
 			// If UUID is provided, attempt to get the existing cart
 			const order = await this.getOrder(uuid);
@@ -58,105 +75,126 @@ class ShopApi {
 	}
 
 	async updateOrder(uuid: string, data: OrderUpdateBody): Promise<Order> {
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}`, {
+		const response = this.makeRequest(`${this.baseUrl}/order/${uuid}`, {
 			method: "PUT",
 			headers: {
 				"content-type": "application/json"
 			},
-			body: JSON.stringify(data),
+			body: JSON.stringify(data)
 		});
 		return this.handleResponse<Order>(response);
 	}
 
 	async finalizeOrder(uuid: string): Promise<Order> {
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/finalize`, {
+		const response = this.makeRequest(`${this.baseUrl}/order/${uuid}/finalize`, {
 			method: "PUT"
 		});
 		return this.handleResponse<Order>(response);
 	}
 
 	async addProductToCart(uuid: string, productId: number, count = 1): Promise<Order> {
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/add-product/${productId}?count=${count}`, {
-			method: "PUT"
-		});
+		const response = this.makeRequest(
+			`${this.baseUrl}/order/${uuid}/add-product/${productId}?count=${count}`,
+			{
+				method: "PUT"
+			}
+		);
 		return this.handleResponse<Order>(response);
 	}
 
-	async removeProductFromCart(uuid: string, productId: number, count = 1): Promise<Order> {
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/remove-product/${productId}?count=${count}`, {
-			method: "PUT"
-		});
+	async removeProductFromCart(
+		uuid: string,
+		productId: number,
+		count = 1
+	): Promise<Order> {
+		const response = this.makeRequest(
+			`${this.baseUrl}/order/${uuid}/remove-product/${productId}?count=${count}`,
+			{
+				method: "PUT"
+			}
+		);
 		return this.handleResponse<Order>(response);
 	}
 
 	async checkoutOrder(uuid: string): Promise<any> {
 		const returnUrl = window.location.href;
-		const response = await fetch(`${this.baseUrl}/v1/order/${uuid}/checkout?returnUrl=${encodeURIComponent(returnUrl)}`, {
-			method: "POST",
-		});
+		const response = this.makeRequest(
+			`${this.baseUrl}/order/${uuid}/checkout?returnUrl=${encodeURIComponent(
+				returnUrl
+			)}`,
+			{
+				method: "POST"
+			}
+		);
 		return this.handleResponse<any>(response);
 	}
 
 	async getProducts(coverId?: number): Promise<Product[]> {
-		const response = await fetch(`${this.baseUrl}/v1/product?cover=${coverId || ""}`);
+		const response = this.makeRequest(
+			`${this.baseUrl}/product?cover=${coverId || ""}`
+		);
 		return this.handleResponse<Product[]>(response);
 	}
 
 	async getProductById(id: string): Promise<Product> {
-		logger(`Requestion product from ${this.baseUrl}/v1/product/${id}`);
-		const response = await fetch(`${this.baseUrl}/v1/product/${id}`);
+		logger(`Requestion product from ${this.baseUrl}/product/${id}`);
+		const response = this.makeRequest(`${this.baseUrl}/product/${id}`);
 		return this.handleResponse<Product>(response);
 	}
 
 	async getProductVariantsByProductId(id: string): Promise<ProductVariantResponse> {
-		logger(`Requestion product variants from ${this.baseUrl}/v1/product/${id}/variants`);
-		const response = await fetch(`${this.baseUrl}/v1/product/${id}/variants`);
+		logger(`Requestion product variants from ${this.baseUrl}/product/${id}/variants`);
+		const response = this.makeRequest(`${this.baseUrl}/product/${id}/variants`);
 		return this.handleResponse<ProductVariantResponse>(response);
 	}
 
 	async getPatternVariantsByProductId(id: string): Promise<PatternVariantsResponse> {
-		logger(`Requestion pattern variants from ${this.baseUrl}/v1/product/${id}/variants/pattern`);
-		const response = await fetch(`${this.baseUrl}/v1/product/${id}/variants/pattern`);
+		logger(
+			`Requestion pattern variants from ${this.baseUrl}/product/${id}/variants/pattern`
+		);
+		const response = this.makeRequest(
+			`${this.baseUrl}/product/${id}/variants/pattern`
+		);
 		return this.handleResponse<PatternVariantsResponse>(response);
 	}
 
 	async getProductRulings(): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/product-ruling`);
+		const response = this.makeRequest(`${this.baseUrl}/product-ruling`);
 		return this.handleResponse<any>(response);
 	}
 
 	async getPaymentMethods(): Promise<PaymentMethod[]> {
-		const response = await fetch(`${this.baseUrl}/v1/payment-method`);
+		const response = this.makeRequest(`${this.baseUrl}/payments`);
 		return this.handleResponse<PaymentMethod[]>(response);
 	}
 
 	async getDeliveryMethods(): Promise<DeliveryMethod[]> {
-		const response = await fetch(`${this.baseUrl}/v1/delivery-method`);
+		const response = this.makeRequest(`${this.baseUrl}/deliveries`);
 		return this.handleResponse<DeliveryMethod[]>(response);
 	}
 
 	async getProductPatterns(): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/product-pattern`);
+		const response = this.makeRequest(`${this.baseUrl}/product-patterns`);
 		return this.handleResponse<any>(response);
 	}
 
 	async getProductPages(): Promise<any> {
-		const response = await fetch(`${this.baseUrl}/v1/product-pages`);
+		const response = this.makeRequest(`${this.baseUrl}/product-pages`);
 		return this.handleResponse<any>(response);
 	}
 
 	async getProductCovers(): Promise<ProductCover[]> {
-		const response = await fetch(`${this.baseUrl}/v1/product-cover`);
+		const response = this.makeRequest(`${this.baseUrl}/product-cover`);
 		return this.handleResponse<ProductCover[]>(response);
 	}
 
 	async getLegal(): Promise<Legal> {
-		const response = await fetch(`${this.baseUrl}/v1/legal`);
+		const response = this.makeRequest(`${this.baseUrl}/legal`);
 		return this.handleResponse<Legal>(response);
 	}
 
 	async getContent(): Promise<Content> {
-		const response = await fetch(`${this.baseUrl}/v1/content`);
+		const response = this.makeRequest(`${this.baseUrl}/content`);
 		return this.handleResponse<Content>(response);
 	}
 }
@@ -166,5 +204,5 @@ interface ShopApiOptions {
 }
 
 export const shopApi = new ShopApi({
-	baseUrl: "/api",
+	baseUrl: "/api"
 });

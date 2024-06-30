@@ -1,4 +1,5 @@
 import {GetValues, GetPopulatableKeys, GetNonPopulatableKeys} from "@strapi/types/dist/types/core/attributes";
+import {NotificationItem} from "@adyen/api-library/lib/src/typings/notification/notificationItem";
 
 export type AdyenEnvironment = "TEST" | "LIVE";
 export type Order = GetValues<"api::order.order", GetNonPopulatableKeys<"api::order.order"> | GetPopulatableKeys<"api::order.order">>;
@@ -40,3 +41,8 @@ export type PdfBody = {
     amount: number;
   }
 };
+
+export interface NotificationRequest {
+  live: boolean;
+  notificationItems: NotificationItem[];
+}

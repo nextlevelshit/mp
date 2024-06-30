@@ -2,10 +2,11 @@
   "name": "mp-depot",
   "version": "1.0.0",
   "scripts": {
-    "develop": "npm run strapi develop -- --debug --bundler vite",
+    "develop": "npm run strapi develop -- --bundler vite",
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi",
+    "lint:fix": "prettier --write src/",
     "generate:types": "strapi ts:generate-types",
     "import": "npm run strapi import -- -f database/export.tar.gz --force",
     "export": "npm run strapi export -- --no-encrypt --file database/export_$(date +'%Y%m%d%H%M%S')"
@@ -26,6 +27,7 @@
   },
   "devDependencies": {
     "@adyen/api-library": "^17.2.0",
-    "@types/uuid": "^10.0.0"
+    "@types/uuid": "^10.0.0",
+    "prettier": "^3.0.0"
   }
 }

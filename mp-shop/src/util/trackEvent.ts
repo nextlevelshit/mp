@@ -9,4 +9,4 @@ export const trackEvent = (event: string, data?: Record<string, any>) => {
 	} else {
 		verbose("No tracking available");
 	}
-}
+};

@@ -2,10 +2,10 @@ import {Client, Config, CheckoutAPI} from "@adyen/api-library";
 import {adyenApiKey, adyenEnvironment, adyenMerchantAccount, adyenClientKey, adyenHmacKey} from "../../config/constants";
 import {PaymentCompletionDetails} from "@adyen/api-library/lib/src/typings/checkout/paymentCompletionDetails";
 import HmacValidator from "@adyen/api-library/lib/src/utils/hmacValidator";
-import {NotificationItem} from "@adyen/api-library/lib/src/typings/notification/notificationItem";
 import {NotificationRequestItem} from "@adyen/api-library/lib/src/typings/notification/notificationRequestItem";
 import EventCodeEnum = NotificationRequestItem.EventCodeEnum;
-import {AdyenEnvironment, Order} from "../../types";
+import {AdyenEnvironment, Order, NotificationRequest} from "../../types";
+import {CreateCheckoutSessionRequest} from "@adyen/api-library/lib/src/typings/checkout/models";
 
 
 class AdyenApi {
@@ -36,15 +36,16 @@ class AdyenApi {
       merchantAccount: adyenMerchantAccount,
       reference,
       returnUrl,
-    };
+      shopperLocale: "de-DE"
+    } satisfies CreateCheckoutSessionRequest;
 
     try {
       const session = await this.checkout.PaymentsApi.sessions(checkoutConfig);
-      strapi.log.info(session);
+      strapi.log.info("adyen-api: " + JSON.stringify({session}));
       return session;
     } catch (error) {
       // Handle errors and potentially increment a counter for failed session creations
-      strapi.log.debug("Error creating Adyen session:", error);
+      strapi.log.error("adyen-api: " + JSON.stringify({error}));
       throw error;
     }
   }
@@ -52,8 +53,8 @@ class AdyenApi {
   async handleShopperRedirect(redirect: any) {
     const details: PaymentCompletionDetails = {};
 
-    strapi.log.debug("Redirecting customer after checkout");
-    strapi.log.debug(redirect);
+    strapi.log.verbose("adyen-api: redirecting customer after checkout");
+    strapi.log.verbose(redirect);
 
     if (redirect.redirectResult) {
       details.redirectResult = redirect.redirectResult;
@@ -76,29 +77,36 @@ class AdyenApi {
     }
   }
 
-  async handleWebhook(reqBody: { notificationItems: NotificationItem[] }) {
+  async handleWebhook(req: NotificationRequest) {
+    strapi.log.verbose("adyen-api: " + JSON.stringify({req}));
     const validator = new HmacValidator();
-    const notification = reqBody.notificationItems[0].NotificationRequestItem;
+    const notification = req.notificationItems[0].NotificationRequestItem;
 
     if (!validator.validateHMAC(notification, this.hmacKey)) {
-      strapi.log.debug("Invalid HMAC signature: " + notification);
-      return { statusCode: 401, message: 'Invalid HMAC signature' };
+      strapi.log.error("adyen-api:" + JSON.stringify({notification}));
+      throw new Error("Could not validate webhook event");
     }
 
-    await this.consumeEvent(notification);
+    return await this.consumeEvent(notification);
+  }
 
-    return { statusCode: 200, message: '[accepted]' };
+  getClientKey() {
+    return this.clientKey;
   }
 
   private async consumeEvent(notification: NotificationRequestItem) {
     const {merchantReference: uuid, eventCode} = notification;
-    strapi.log.debug("Recieved valid notification")
-    strapi.log.debug("Order UUID: " + uuid + " eventCode: " + eventCode);
+    strapi.log.info("adyen-api: recieved valid webhook event")
+    strapi.log.verbose(`adyen-api: ${JSON.stringify({uuid, eventCode})}`);
 
     if (eventCode === EventCodeEnum.Authorisation) {
       // Update order
+      strapi.log.error("adyen-api: consumeEvent() for EventCodeEnum.Authorisation NOT IMPLEMENTED");
+      return {message: "success"}
+    } else {
+      strapi.log.error("adyen-api: consumeEvent() for any other event NOT IMPLEMENTED");
+      return {message: "failed"}
     }
-    // Add item to DB, queue, or different thread
   }
 }
 

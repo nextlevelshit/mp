@@ -9,9 +9,9 @@ import {sanitize} from "@strapi/utils";
  */
 export default factories.createCoreService('api::order.order', ({strapi}) => ({
   update: async (id: ID, params: Record<string, any>) => {
-    strapi.log.debug(JSON.stringify({params, ...orderDefaultParams}));
+    strapi.log.verbose(JSON.stringify({params, ...orderDefaultParams}));
     const orderUnsafe = await strapi.entityService.update("api::order.order", id, {...params, ...orderDefaultParams});
-    strapi.log.debug(JSON.stringify({orderUnsafe}));
+    strapi.log.verbose(JSON.stringify({orderUnsafe}));
     const cartProducts = orderUnsafe.cart;
     const delivery = orderUnsafe.delivery;
     const payment = orderUnsafe.payment;
@@ -19,7 +19,7 @@ export default factories.createCoreService('api::order.order', ({strapi}) => ({
     let subtotal = -1;
     let total = -1;
     let VAT = -1;
-    strapi.log.debug(JSON.stringify({cartProducts}));
+    strapi.log.verbose(JSON.stringify({cartProducts}));
     if (cartProducts) {
       const productsTotal = cartProducts.reduce((v, p) => (v + (calculateTotalProductPrice(p.product) ?? 0) * p.count), 0);
       const deliveryPrice = delivery ? delivery.price : 0;
@@ -30,17 +30,45 @@ export default factories.createCoreService('api::order.order', ({strapi}) => ({
       VAT = Math.round(total / vatIncludedDecimal * vatDecimal * 100) / 100;
       subtotal = Math.round((total - VAT) * 100) / 100;
     }
-    return strapi.entityService.update("api::order.order", id, {
+    const order = await strapi.entityService.update("api::order.order", id, {
       data: {
         subtotal,
         total,
         VAT,
       }, ...orderDefaultParams
     });
+    const cart = order.cart.map((product) => {
+      return {
+        ...product,
+        product: {
+          ...product.product,
+          totalProductPrice: calculateTotalProductPrice(product.product)
+        }
+      }
+    });
+    strapi.log.verbose(JSON.stringify({cart}, null, 2));
+
+    return {
+      ...order,
+      cart
+    };
   },
 
   findOne: async (id: ID) => {
-    return strapi.entityService.findOne("api::order.order", id, orderDefaultParams);
+    const order = await strapi.entityService.findOne("api::order.order", id, orderDefaultParams);
+    const cart = order.cart.map((product) => {
+      return {
+        ...product,
+        product: {
+          ...product.product,
+          totalProductPrice: calculateTotalProductPrice(product.product)
+        }
+      }
+    });
+    return {
+      ...order,
+      cart
+    };
   },
 
   findOneByUuid: async (uuid: string) => {
@@ -53,7 +81,20 @@ export default factories.createCoreService('api::order.order', ({strapi}) => ({
       ...orderDefaultParams
     };
     const {results} = await strapi.service("api::order.order").find(params);
-    return results.pop();
+    const order = results.pop();
+    const cart = order.cart.map((product) => {
+      return {
+        ...product,
+        product: {
+          ...product.product,
+          totalProductPrice: calculateTotalProductPrice(product.product)
+        }
+      }
+    });
+    return {
+      ...order,
+      cart
+    };
   },
 
   checkout: async (uuid: string, returnUrl: string) => {

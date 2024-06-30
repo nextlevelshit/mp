@@ -3,7 +3,7 @@ version: "3.9"
 services:
 
     mp-inkasso:
-        container_name: inkasso
+#        container_name: inkasso
         build: ./mp-inkasso
         restart: unless-stopped
         stop_signal: SIGKILL
@@ -20,7 +20,7 @@ services:
             - internal
 
 #    mp-postamt:
-#        container_name: postamt
+##        container_name: postamt
 #        build: ./mp-postamt
 #        stop_signal: SIGKILL
 #        restart: unless-stopped
@@ -41,7 +41,7 @@ services:
 #            - internal
 
     mp-silo:
-        container_name: silo
+#        container_name: silo
         image: postgres:alpine
         restart: unless-stopped
         environment:
@@ -59,7 +59,7 @@ services:
             - data
 
     mp-depot:
-        container_name: depot
+#        container_name: depot
         build: ./mp-depot
         restart: unless-stopped
         stop_signal: SIGKILL
@@ -87,6 +87,7 @@ services:
             ADYEN_CLIENT_KEY: ${SHOP_API_ADYEN_CLIENT_KEY}
             ADYEN_API_KEY: ${SHOP_API_ADYEN_API_KEY}
             ADYEN_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
+            INKASSO_ADDRESS: http://mp-inkasso:1111
         healthcheck:
             test: wget --no-verbose --spider -S -T 1 http://mp-depot:5555/_health || exit 1
             interval: 30s
@@ -103,7 +104,7 @@ services:
                 condition: service_started
 
 #    mp-shop-api:
-#        container_name: shop-api
+##        container_name: shop-api
 #        build: ./mp-shop-api
 #        restart: unless-stopped
 #        stop_signal: SIGKILL
@@ -139,13 +140,14 @@ services:
 #                condition: service_started
 
     mp-shop:
-        container_name: shop
+#        container_name: shop
         build:
             context: ./mp-shop
             target: production
             # Multi-stage forces us to env vars as  build-time variables
             args:
                 VITE_BASE_URL: ${SHOP_BASE_URL:-/}
+                VITE_SHOP_API_TOKEN: ${DEPOT_TOKEN_FULL_ACCESS}
                 VITE_PAYMENT_ENVIRONMENT: ${SHOP_API_ADYEN_ENVIRONMENT:-TEST}
                 VITE_UMAMI_WEBSITE_ID: ${UMAMI_WEBSITE_ID}
                 VITE_BOOKLET_COVER_ID: ${SHOP_BOOKLET_COVER_ID}
@@ -165,7 +167,7 @@ services:
 #                condition: service_healthy
 
     mp-proxy:
-        container_name: proxy
+#        container_name: proxy
         build: ./mp-proxy
         restart: unless-stopped
         stop_signal: SIGKILL
@@ -199,7 +201,7 @@ services:
 #                condition: service_started
 
     certs:
-        container_name: certs
+#        container_name: certs
         image: certbot/certbot
         command: >-
             certonly --standalone --http-01-port 80 --agree-tos --non-interactive --email "${CERTS_EMAIL}" -d "${CERTS_DOMAIN}"
@@ -210,7 +212,7 @@ services:
             - "80:80"
 
     prometheus:
-        container_name: prometheus
+#        container_name: prometheus
         image: prom/prometheus
         command: --log.level=error
         restart: unless-stopped
@@ -220,7 +222,7 @@ services:
             - internal
 
 #    grafana:
-#        container_name: grafana
+##        container_name: grafana
 #        image: grafana/grafana
 #        restart: unless-stopped
 #        environment:
@@ -241,7 +243,7 @@ services:
 #            - prometheus
 
 #    umami:
-#        container_name: umami
+##        container_name: umami
 #        build:
 #            context: ./umami
 #            args:
@@ -266,7 +268,7 @@ services:
 #                condition: service_healthy
 
 #    umami-db:
-#        container_name: umami-db
+##        container_name: umami-db
 #        image: postgres:alpine
 #        restart: unless-stopped
 #        environment:

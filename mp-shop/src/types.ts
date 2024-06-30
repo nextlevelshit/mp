@@ -120,7 +120,7 @@ export interface ProductCover {
 	};
 	icon?: {
 		url: string;
-	}
+	};
 }
 
 export interface Order {
@@ -260,7 +260,13 @@ export interface Address {
 }
 
 export type Legal = Record<LegalPage, string>;
-export type LegalPage = "imprint" | "contact" | "terms" | "privacy" | "delivery" | "payment";
+export type LegalPage =
+	| "imprint"
+	| "contact"
+	| "terms"
+	| "privacy"
+	| "delivery"
+	| "payment";
 
 export type Content = Record<LegalPage, string>;
 export type ContentPage = "production";

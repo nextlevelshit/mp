@@ -6,3 +6,6 @@
 
 mp-silo/data/*
 mp-proxy/cache/*
+mp-proxy/logs/*
+
+package-lock.json

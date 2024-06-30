@@ -1,5 +1,6 @@
 import type {AdyenEnvironment} from "../types";
 
+export const inkassoAddress = process.env.INKASSO_ADDRESS!;
 
 export const adyenApiKey = process.env.ADYEN_API_KEY!;
 export const adyenMerchantAccount = process.env.ADYEN_MERCHANT_ACCOUNT!;

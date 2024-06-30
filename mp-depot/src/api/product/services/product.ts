@@ -15,8 +15,8 @@ export default factories.createCoreService('api::product.product', ({ strapi }) 
       },
       ...paramsOverride,
     };
-    strapi.log.debug("Querying products with merged params:");
-    strapi.log.debug(JSON.stringify({params}));
+    strapi.log.verbose("Querying products with merged params:");
+    strapi.log.verbose(JSON.stringify({params}));
 
     const response = await strapi.entityService.findPage("api::product.product", params);
     const resultsUnsafe = response.results;

@@ -1,27 +1,57 @@
 <template>
 	<div class="pt-4 lg:container mx-auto px-4">
-		<Stepper :step="1"/>
+		<Stepper :step="1" />
 
 		<main class="mt-8 mb-12 flex flex-col gap-8 max-w-screen-md mx-auto">
-
 			<Title :level="2" html-tag="h1">Wie lauten deine Kontaktinformationen?</Title>
 
 			<div v-if="uuid">
 				<!-- Address Form -->
 				<form @submit.prevent="submit" class="flex flex-col gap-12">
-					<Input label="E-Mail-Address" v-model="emailAddress" :value="emailAddress" :required="true" autocomplete="email"/>
+					<Input
+						label="E-Mail-Address"
+						v-model="emailAddress"
+						:value="emailAddress"
+						:required="true"
+						autocomplete="email"
+					/>
 
 					<label class="flex gap-4 text-sm cursor-pointer">
-						<input v-model="acceptedTermsAndConditions" required type="checkbox" class="w-4 cursor-pointer"/>
+						<input
+							v-model="acceptedTermsAndConditions"
+							required
+							type="checkbox"
+							class="w-4 cursor-pointer"
+						/>
 						<span>
-						Mit der Anmeldung bestätige ich, die <a href="/legal/terms" target="_blank" class="underline" @click="trackEvent(`checkout-email-terms-clicked`)">AGB</a> und <a href="/legal/privacy" target="_blank" class="underline" @click="trackEvent(`checkout-email-privacy-clicked`)">Datenschutzerklärung</a> gelesen und verstanden zu haben
-						und stimme diesen zu.
-					</span>
+							Mit der Anmeldung bestätige ich, die
+							<a
+								href="/legal/terms"
+								target="_blank"
+								class="underline"
+								@click="trackEvent(`checkout-email-terms-clicked`)"
+								>AGB</a
+							>
+							und
+							<a
+								href="/legal/privacy"
+								target="_blank"
+								class="underline"
+								@click="trackEvent(`checkout-email-privacy-clicked`)"
+								>Datenschutzerklärung</a
+							>
+							gelesen und verstanden zu haben und stimme diesen zu.
+						</span>
 					</label>
 
 					<hr />
 
-					<Button type="submit" classes="w-full" :is-pending="formSubmitIsPending">Weiter zur Lieferadresse</Button>
+					<Button
+						type="submit"
+						classes="w-full"
+						:is-pending="formSubmitIsPending"
+						>Weiter zur Lieferadresse</Button
+					>
 				</form>
 			</div>
 		</main>
@@ -31,22 +61,22 @@
 <script lang="ts">
 import debug from "debug";
 import Button from "@/components/Button.vue";
-import {shopApi} from "@/services/ShopApi";
-import {cart} from "@/stores/cart";
+import { shopApi } from "@/services/ShopApi";
+import { cart } from "@/stores/cart";
 import Stepper from "@/components/Stepper.vue";
 import Header from "@/components/Header.vue";
 import Input from "@/components/Input.vue";
 import Title from "@/components/Title.vue";
-import {trackEvent} from "@/util/trackEvent";
+import { trackEvent } from "@/util/trackEvent";
 
 const logger = debug("app:i:checkout-email-view");
 const verbose = debug("app:v:checkout-email-view");
 
 export default {
-	components: {Title, Input, Header, Stepper, Button},
+	components: { Title, Input, Header, Stepper, Button },
 	computed: {
 		uuid() {
-			return cart.uuid
+			return cart.uuid;
 		}
 	},
 	data() {
@@ -54,7 +84,7 @@ export default {
 			emailAddress: "",
 			acceptedTermsAndConditions: false,
 			formSubmitIsPending: false
-		}
+		};
 	},
 	methods: {
 		trackEvent,
@@ -83,7 +113,6 @@ export default {
 			} finally {
 				this.formSubmitIsPending = false;
 			}
-
 		}
 	},
 	watch: {
@@ -93,5 +122,5 @@ export default {
 			}
 		}
 	}
-}
+};
 </script>

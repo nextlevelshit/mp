@@ -2,7 +2,12 @@ type TailwindColorPrefix = "text" | "bg" | "shadow";
 
 type TailwindColorShade = 50 | 100 | 150 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 
-export const randomTailwindColor = (rand: number, prefix: TailwindColorPrefix = "bg", shade: TailwindColorShade = 200, suffix = "") => {
+export const randomTailwindColor = (
+	rand: number,
+	prefix: TailwindColorPrefix = "bg",
+	shade: TailwindColorShade = 200,
+	suffix = ""
+) => {
 	const tailwindColors = [
 		// "slate",
 		// "gray",
@@ -25,10 +30,10 @@ export const randomTailwindColor = (rand: number, prefix: TailwindColorPrefix = 
 		"purple",
 		"fuchsia",
 		"pink",
-		"rose",
+		"rose"
 	];
 
 	const randomColorIndex = rand % tailwindColors.length;
 
 	return `${prefix}-${tailwindColors[randomColorIndex]}-${shade}${suffix}`;
-}
+};

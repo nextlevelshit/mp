@@ -1,7 +1,7 @@
 <template>
 	<main class="pt-4 px-4 lg:container mx-auto">
 		<div v-if="markdown" class="markdown lg:w-3/4">
-			<VueMarkdown :source="markdown"/>
+			<VueMarkdown :source="markdown" />
 		</div>
 
 		<aside class="lg:w-3/4">
@@ -11,7 +11,7 @@
 				<ul>
 					<li v-for="method in paymentMethods" :key="method.id">
 						<Title :level="3" html-tag="h3">{{ method.name }}</Title>
-						<P>{{ method.description }}</p>
+						<P>{{ method.description }}</P>
 					</li>
 				</ul>
 			</div>
@@ -30,10 +30,10 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, type PropType} from "vue";
+import { defineComponent, type PropType } from "vue";
 import debug from "debug";
-import {shopApi} from "@/services/ShopApi";
-import type {LegalPage, PaymentMethod, DeliveryMethod} from "@/types";
+import { shopApi } from "@/services/ShopApi";
+import type { LegalPage, PaymentMethod, DeliveryMethod } from "@/types";
 import VueMarkdown from "vue-markdown-render/src/VueMarkdown";
 import Title from "@/components/Title.vue";
 
@@ -41,18 +41,18 @@ const logger = debug("app:i:legal-view");
 const verbose = debug("app:v:legal-view");
 
 export default defineComponent({
-	components: {VueMarkdown, Title},
+	components: { VueMarkdown, Title },
 	data() {
 		return {
 			markdown: "",
 			deliveryMethods: {} as DeliveryMethod[],
-			paymentMethods: {} as PaymentMethod[],
-		}
+			paymentMethods: {} as PaymentMethod[]
+		};
 	},
 	props: {
 		content: {
 			type: String as PropType<LegalPage>,
-			required: true,
+			required: true
 		}
 	},
 	mounted: async function () {
@@ -75,8 +75,8 @@ export default defineComponent({
 		} catch (e) {
 			verbose("Error fetching payment or delivery or payment methods", e);
 		}
-	},
-})
+	}
+});
 </script>
 
 <style>

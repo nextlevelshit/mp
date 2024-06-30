@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "start": "npm run dev",
-    "dev": "vite --host 0.0.0.0",
+    "dev": "DEBUG=app*,vite:transform*,vite:cache* vite --host 0.0.0.0 --debug --logLevel info",
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "build-only": "vite build",

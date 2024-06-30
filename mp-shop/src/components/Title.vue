@@ -1,5 +1,5 @@
 <script lang="ts">
-import {type PropType, h} from "vue";
+import { type PropType, h } from "vue";
 import debug from "debug";
 
 type Level = 1 | 2 | 3 | 4 | 5;
@@ -10,7 +10,7 @@ const classes: Record<Level, string> = {
 	2: "text-2xl font-bold mb-4 mt-5",
 	3: "text-xl mt-2 font-semibold mb-1",
 	4: "text-md mt-2 mb-1 font-semibold",
-	5: "text-sm uppercase mb-1 font-semibold mt-2 text-gray-500",
+	5: "text-sm uppercase mb-1 font-semibold mt-2 text-gray-500"
 };
 
 const logger = debug("app:i:title-component");
@@ -37,9 +37,13 @@ export default {
 			return;
 		}
 
-		return h(this.htmlTag, {
-			class: classes[this.level] + " " + this.classes,
-		}, this.$slots["default"]!())
-	},
-}
+		return h(
+			this.htmlTag,
+			{
+				class: classes[this.level] + " " + this.classes
+			},
+			this.$slots["default"]!()
+		);
+	}
+};
 </script>

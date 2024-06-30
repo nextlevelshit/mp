@@ -827,7 +827,14 @@ export interface ApiCustomerCustomer extends Schema.CollectionType {
     displayName: 'Customer';
   };
   options: {
-    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
+    privateAttributes: [
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'createdAt',
+      'updatedAt'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -859,7 +866,14 @@ export interface ApiDeliveryDelivery extends Schema.CollectionType {
     description: '';
   };
   options: {
-    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
+    privateAttributes: [
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'createdAt',
+      'updatedAt'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -928,7 +942,14 @@ export interface ApiOrderOrder extends Schema.CollectionType {
     description: '';
   };
   options: {
-    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
+    privateAttributes: [
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'createdAt',
+      'updatedAt'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -938,8 +959,8 @@ export interface ApiOrderOrder extends Schema.CollectionType {
       'oneToOne',
       'api::customer.customer'
     >;
-    invoice: Attribute.Media;
-    deliveryNote: Attribute.Media;
+    invoice: Attribute.Media<'files'>;
+    deliveryNote: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     products: Attribute.Relation<
       'api::order.order',
       'oneToMany',
@@ -994,7 +1015,14 @@ export interface ApiPaymentPayment extends Schema.CollectionType {
     description: '';
   };
   options: {
-    privateAttributes: ['created_at', 'updated_at', 'created_by', 'updated_by'];
+    privateAttributes: [
+      'created_at',
+      'updated_at',
+      'created_by',
+      'updated_by',
+      'createdAt',
+      'updatedAt'
+    ];
     draftAndPublish: false;
   };
   attributes: {
@@ -1066,7 +1094,7 @@ export interface ApiProductProduct extends Schema.CollectionType {
       'manyToOne',
       'api::product-ruling.product-ruling'
     >;
-    image: Attribute.Media;
+    image: Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
     slug: Attribute.UID<'api::product.product', 'name'>;
     images: Attribute.Relation<
       'api::product.product',
@@ -1117,10 +1145,10 @@ export interface ApiProductCoverProductCover extends Schema.CollectionType {
   attributes: {
     name: Attribute.String & Attribute.Required;
     binding: Attribute.Enumeration<['Fadenheftung', 'Steppstich']>;
-    slides: Attribute.Media;
+    slides: Attribute.Media<'images', true>;
     copyText: Attribute.JSON;
-    image: Attribute.Media;
-    icon: Attribute.Media;
+    image: Attribute.Media<'images'>;
+    icon: Attribute.Media<'images'>;
     price: Attribute.Decimal;
     products: Attribute.Relation<
       'api::product-cover.product-cover',
@@ -1170,7 +1198,7 @@ export interface ApiProductImageProductImage extends Schema.CollectionType {
     draftAndPublish: false;
   };
   attributes: {
-    images: Attribute.Media;
+    images: Attribute.Media<'images', true>;
     name: Attribute.String;
     products: Attribute.Relation<
       'api::product-image.product-image',
@@ -1267,7 +1295,7 @@ export interface ApiProductPatternProductPattern extends Schema.CollectionType {
   };
   attributes: {
     name: Attribute.String & Attribute.Required;
-    image: Attribute.Media;
+    image: Attribute.Media<'images'>;
     description: Attribute.String;
     products: Attribute.Relation<
       'api::product-pattern.product-pattern',
@@ -1322,7 +1350,7 @@ export interface ApiProductRulingProductRuling extends Schema.CollectionType {
       'oneToMany',
       'api::product.product'
     >;
-    icon: Attribute.Media;
+    icon: Attribute.Media<'images'>;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     createdBy: Attribute.Relation<

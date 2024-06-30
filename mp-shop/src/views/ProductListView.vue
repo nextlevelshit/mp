@@ -14,57 +14,73 @@
 					<section>
 						<Title :level="2" html-tag="h1">Notizbücher und Notizhefte</Title>
 						<p class="tracking-tight">
-							Alle Notizhefte sind von uns selbst gestaltet, gedruckt und in Handarbeit gebunden. Das
-							eingesetzte, matte Recyclingpapier mit feiner Textur sorgt für angenehmes Schreiben und
-							Skizzieren.<br/>
-							Um den Inhalt liegt ein Matelbogen aus rot durchgefärbtem Papier, was einen
-							dezenten, farbigen Kontrast zu dem ansonsten absichtlich, schwarz-weiß gehaltenen Design
-							setzt.
+							Alle Notizhefte sind von uns selbst gestaltet, gedruckt und in
+							Handarbeit gebunden. Das eingesetzte, matte Recyclingpapier
+							mit feiner Textur sorgt für angenehmes Schreiben und
+							Skizzieren.<br />
+							Um den Inhalt liegt ein Matelbogen aus rot durchgefärbtem
+							Papier, was einen dezenten, farbigen Kontrast zu dem ansonsten
+							absichtlich, schwarz-weiß gehaltenen Design setzt.
 						</p>
 					</section>
 
 					<section>
 						<Title :level="5" html-tag="h2">Wähle deinen Einband</Title>
 						<div class="flex gap-4 justify-items-stretch mt-2">
-							<SelectionBox v-for="productCover in productCovers" :label="productCover.label"
-										  :aria-label="productCover.alt"
-										  :path="productCover.id !== cover && productCover.url"
-										  :is-active="productCover.isActive" @click="trackEvent(`product-list-sidebar-cover-clicked`)">
-								<img v-if="productCover.iconUrl" :alt="productCover.alt" :src="productCover.iconUrl"/>
+							<SelectionBox
+								v-for="productCover in productCovers"
+								:label="productCover.label"
+								:aria-label="productCover.alt"
+								:path="productCover.id !== cover && productCover.url"
+								:is-active="productCover.isActive"
+								@click="trackEvent(`product-list-sidebar-cover-clicked`)"
+							>
+								<img
+									v-if="productCover.iconUrl"
+									:alt="productCover.alt"
+									:src="productCover.iconUrl"
+								/>
 							</SelectionBox>
 						</div>
 					</section>
 				</div>
 			</aside>
 
-			<div class="lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-				<ProductCard v-for="(item, i) in list" :key="i" :product="item" :cartUuid="cartUuid" />
+			<div
+				class="lg:w-3/4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+			>
+				<ProductCard
+					v-for="(item, i) in list"
+					:key="i"
+					:product="item"
+					:cartUuid="cartUuid"
+				/>
 			</div>
 		</div>
 	</main>
 </template>
 <script>
 import debug from "debug";
-import {shopApi} from "@/services/ShopApi";
+import { shopApi } from "@/services/ShopApi";
 import ProductCard from "@/components/ProductCard.vue";
 import Header from "@/components/Header.vue";
 import Title from "@/components/Title.vue";
-import {cart} from "@/stores/cart";
-import {scrollProgress} from "@/util/scrollProgress";
-import {trackEvent} from "@/util/trackEvent";
+import { cart } from "@/stores/cart";
+import { scrollProgress } from "@/util/scrollProgress";
+import { trackEvent } from "@/util/trackEvent";
 import SelectionBox from "@/components/SelectionBox.vue";
 import Carousel from "@/components/Carousel.vue";
-import {SwiperSlide} from 'swiper/vue';
+import { SwiperSlide } from "swiper/vue";
 
 const logger = debug("app:i:product-list-view");
 const verbose = debug("app:v:product-list-view");
 
 export default {
-	components: {Carousel, SelectionBox, Title, Header, ProductCard, SwiperSlide},
+	components: { Carousel, SelectionBox, Title, Header, ProductCard, SwiperSlide },
 	props: {
 		cover: {
 			type: String,
-			required: false,
+			required: false
 		}
 	},
 	data() {
@@ -73,7 +89,7 @@ export default {
 			productCovers: null,
 			hasScrolled50: false,
 			hasScrolled100: false
-		}
+		};
 	},
 	computed: {
 		cart() {
@@ -94,7 +110,7 @@ export default {
 
 		try {
 			const productCovers = await shopApi.getProductCovers();
-			this.productCovers = productCovers.map(cover => ({
+			this.productCovers = productCovers.map((cover) => ({
 				id: cover.id,
 				label: cover.name,
 				alt: `${cover.name} – ${cover.binding}`,
@@ -114,7 +130,7 @@ export default {
 		trackScrolling() {
 			if (this.hasScrolled100) return;
 
-			const progress = scrollProgress()
+			const progress = scrollProgress();
 
 			if (progress >= 50 && !this.hasScrolled50) {
 				trackEvent("product-list-scrolled-50");
@@ -125,7 +141,7 @@ export default {
 				trackEvent("product-list-scrolled-100");
 				this.hasScrolled100 = true;
 			}
-		},
+		}
 	}
-}
+};
 </script>

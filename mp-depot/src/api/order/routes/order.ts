@@ -9,6 +9,14 @@ export default {
       },
     },
     {
+      method: 'POST',
+      path: '/order/webhook',
+      handler: 'order.webhook',
+      config: {
+        policies: [],
+      },
+    },
+    {
       method: 'GET',
       path: '/order/:uuid',
       handler: 'order.findOne',

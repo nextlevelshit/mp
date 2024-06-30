@@ -1,19 +1,32 @@
 <template>
-	<label class="focus-within:ring-4 focus-within:ring-offset-2 ring-gray-500 relative w-full border border-gray-500 rounded-md cursor-text h-12 overflow-hidden">
-		<span :class="spanClasses" class="absolute left-2 top-0 transition-all select-none">{{ label }}</span>
-		<input :value="modelValue" @input="update(($event.target as HTMLInputElement).value)" :required="required"
-			   class="outline-none w-full h-full rounded-sm pt-4 p-2 border-transparent" placeholder=""
-			   :autocomplete="autocomplete" :aria-label="label" @focus="inputFocused = true"
-			   @blur="inputFocused = false"/>
+	<label
+		class="focus-within:ring-4 focus-within:ring-offset-2 ring-gray-500 relative w-full border border-gray-500 rounded-md cursor-text h-12 overflow-hidden"
+	>
+		<span
+			:class="spanClasses"
+			class="absolute left-2 top-0 transition-all select-none"
+			>{{ label }}</span
+		>
+		<input
+			:value="modelValue"
+			@input="update(($event.target as HTMLInputElement).value)"
+			:required="required"
+			class="outline-none w-full h-full rounded-sm pt-4 p-2 border-transparent"
+			placeholder=""
+			:autocomplete="autocomplete"
+			:aria-label="label"
+			@focus="inputFocused = true"
+			@blur="inputFocused = false"
+		/>
 	</label>
 </template>
 
 <script lang="ts">
 import debug from "debug";
-import type {PropType} from "vue";
+import type { PropType } from "vue";
 
 type Autocomplete =
-	"given-name"
+	| "given-name"
 	| "family-name"
 	| "email"
 	| "tel"
@@ -56,10 +69,10 @@ export default {
 	computed: {
 		spanClasses() {
 			return {
-				'text-md pt-3': !this.inputFocused && !this.modelValue,
-				'text-xs pt-[3px]': this.inputFocused || this.modelValue,
-				'text-gray-500': !this.inputFocused && !this.modelValue,
-				'text-gray-400': this.inputFocused || this.modelValue,
+				"text-md pt-3": !this.inputFocused && !this.modelValue,
+				"text-xs pt-[3px]": this.inputFocused || this.modelValue,
+				"text-gray-500": !this.inputFocused && !this.modelValue,
+				"text-gray-400": this.inputFocused || this.modelValue
 			};
 		}
 	},
@@ -68,5 +81,5 @@ export default {
 			newValue && this.$emit("update:modelValue", newValue);
 		}
 	}
-}
+};
 </script>

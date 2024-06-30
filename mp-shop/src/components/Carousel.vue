@@ -14,50 +14,49 @@
 		:keyboard="true"
 		:breakpoints="{
 			1920: {
-           slidesPerView: 4,
-           spaceBetween: 30
-         },
-         1028: {
-           slidesPerView: 2,
-           spaceBetween: 10
-         },
-         990: {
-           slidesPerView: 1,
-           spaceBetween: 0
-         }
+				slidesPerView: 4,
+				spaceBetween: 30
+			},
+			1028: {
+				slidesPerView: 2,
+				spaceBetween: 10
+			},
+			990: {
+				slidesPerView: 1,
+				spaceBetween: 0
+			}
 		}"
 	>
-		<slot/>
+		<slot />
 	</Swiper>
 </template>
 <script>
-import {Navigation, A11y} from 'swiper/modules';
-import {Swiper, SwiperSlide} from 'swiper/vue';
-import 'swiper/css';
-import 'swiper/css/navigation';
+import { Navigation, A11y } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/vue";
+import "swiper/css";
+import "swiper/css/navigation";
 
 export default {
 	components: {
 		Swiper,
-		SwiperSlide,
+		SwiperSlide
 	},
 	setup() {
 		const onSwiper = (swiper) => {
 			console.log(swiper);
 		};
 		const onSlideChange = () => {
-			console.log('slide change');
+			console.log("slide change");
 		};
 
 		return {
 			onSwiper,
 			onSlideChange,
-			modules: [Navigation, A11y],
+			modules: [Navigation, A11y]
 		};
-	},
+	}
 };
 </script>
-
 
 <style>
 .swiper {

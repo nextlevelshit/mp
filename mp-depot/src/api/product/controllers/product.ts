@@ -29,8 +29,8 @@ export default factories.createCoreController('api::product.product', ({ strapi 
       const lowestPriceRuling = allRulings.results.sort((a, b) => a.price - b.price)[0].id;
       const lowestPricePages = allPages.results.sort((a, b) => a.price - b.price)[0].id;
 
-      strapi.log.debug(JSON.stringify({lowestPriceRuling}));
-      strapi.log.debug(JSON.stringify({lowestPricePages}));
+      strapi.log.verbose(JSON.stringify({lowestPriceRuling}));
+      strapi.log.verbose(JSON.stringify({lowestPricePages}));
 
       const params = await sanitize.contentAPI.query(ctx.query, strapi.getModel("api::product.product"));
       const response = await strapi.service("api::product.product").find({
@@ -43,23 +43,23 @@ export default factories.createCoreController('api::product.product', ({ strapi 
 
       return { data, meta: { pagination } };
     } catch (error) {
-      strapi.log.debug(error);
+      strapi.log.verbose(error);
       return ctx.badRequest('Could not fetch products');
     }
   },
 
   allVariants: async (ctx) => {
-    strapi.log.debug(JSON.stringify(ctx));
+    strapi.log.verbose(JSON.stringify(ctx));
     return "Not implemented";
   },
 
   variantsByPattern: async (ctx) => {
-    strapi.log.debug(JSON.stringify(ctx));
+    strapi.log.verbose(JSON.stringify(ctx));
     return "Not implemented";
   },
 
   variants: async (ctx) => {
-    strapi.log.debug(JSON.stringify(ctx));
+    strapi.log.verbose(JSON.stringify(ctx));
     return "Not implemented";
   }
 }));

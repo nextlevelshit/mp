@@ -2,21 +2,23 @@ version: "3.9"
 
 services:
     mp-inkasso:
-        container_name: inkasso-dev
+#        container_name: inkasso-dev
         restart: no
         environment:
             ENVIRONMENT: development
+        ports:
+            - "1111:1111"
         volumes:
             - ./mp-inkasso/data:/app/data
             - ./mp-inkasso/src:/app/src:ro
         deploy:
             resources:
                 limits:
-                    cpus: "1.0"
-                    memory: 600m
+                    cpus: "4.0"
+                    memory: 8gb
 
 #    mp-postamt:
-#        container_name: postamt-dev
+##        container_name: postamt-dev
 #        restart: no
 #        environment:
 #            ENVIRONMENT: development
@@ -27,7 +29,7 @@ services:
 #                    memory: 600m
 
     mp-silo:
-        container_name: silo-dev
+#        container_name: silo-dev
         volumes:
             - ./mp-silo/data:/var/lib/postgresql/data
         deploy:
@@ -37,7 +39,7 @@ services:
                     memory: 600m
 
     mp-depot:
-        container_name: depot-dev
+#        container_name: depot-dev
         restart: no
         ports:
             - "5555:5555"
@@ -46,17 +48,18 @@ services:
         deploy:
             resources:
                 limits:
-                    cpus: "4.0"
-                    memory: 8g
+                    cpus: "7.0"
+                    memory: 30g
         volumes:
             - ./mp-depot/config:/opt/app/config:ro
             - ./mp-depot/src:/opt/app/src:rw
+            - ./mp-depot/types:/opt/app/types:rw
             - ./mp-depot/package.json:/opt/package.json:ro
             - ./mp-depot/database:/opt/app/database
             - ./mp-depot/public/uploads:/opt/app/public/uploads
 
 #    mp-shop-api:
-#        container_name: shop-api-dev
+##        container_name: shop-api-dev
 #        restart: no
 #        environment:
 #            NODE_ENV: development
@@ -64,7 +67,7 @@ services:
 #            - ./mp-shop-api/src:/app/src:ro
 
     mp-shop:
-        container_name: shop-dev
+#        container_name: shop-dev
         build:
             context: ./mp-shop
             target: development
@@ -72,14 +75,15 @@ services:
         deploy:
             resources:
                 limits:
-                    cpus: "1.0"
-                    memory: 600m
+                    cpus: "2.0"
+                    memory: 2gb
         volumes:
             - ./mp-shop/src:/app/src:ro
+            - ./mp-shop/package.json:/app/package.json:ro
             - ./mp-shop/vite.config.ts:/app/vite.config.ts:ro
 
     mp-proxy:
-        container_name: proxy-dev
+#        container_name: proxy-dev
         build: ./mp-proxy
         restart: no
         environment:
@@ -89,6 +93,7 @@ services:
                 condition: service_completed_successfully
         volumes:
             - ./mp-proxy/nginx-template.conf:/nginx-template.conf:ro
+            - ./mp-proxy/logs/:/var/log/nginx/:rw
             - cache-data:/cache
             - certs-data:/etc/nginx/certs:ro
         deploy:
@@ -98,7 +103,7 @@ services:
                     memory: 600m
 
     certs:
-        container_name: certs-dev
+#        container_name: certs-dev
         image: !reset null
         command: !reset null
         build: ./certs
@@ -109,19 +114,19 @@ services:
             - certs-data:/etc/ssl
 
     prometheus:
-        container_name: prometheus-dev
+#        container_name: prometheus-dev
         deploy:
             resources:
                 limits:
                     cpus: "1.0"
                     memory: 600m
 #    grafana:
-#        container_name: grafana-dev
+##        container_name: grafana-dev
 #
 #    umami:
-#        container_name: umami-dev
+##        container_name: umami-dev
 #        restart: no
 #
 #    umami-db:
-#        container_name: umami-db-dev
+##        container_name: umami-db-dev
 #        restart: no
