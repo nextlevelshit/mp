@@ -1,3 +1,10 @@
+import type {
+	ProductShared,
+	OrderShared,
+	ProductCoverShared,
+	ProductPagesShared
+} from "@/shared";
+
 export interface MediaDataUnsafe {
 	id: number;
 	attributes: {
@@ -70,33 +77,7 @@ export interface PaymentMethod {
 	description: string | null;
 }
 
-export interface Product {
-	id: number;
-	name: string;
-	description: string | null;
-	price: number | null;
-	publishedAt: string;
-	slug: string | null;
-	cover: ProductCover | null;
-	pattern: {
-		id: number;
-		name: string;
-		description: string;
-		price: number;
-	} | null;
-	pages: {
-		id: number;
-		name: string;
-		price: number;
-	} | null;
-	ruling: {
-		id: number;
-		name: string;
-		price: number;
-	} | null;
-	image: MediaData;
-	totalProductPrice: number;
-}
+export type Product = ProductShared;
 
 export interface CartProduct {
 	id: number;
@@ -104,70 +85,14 @@ export interface CartProduct {
 	product: Product;
 }
 
-export interface ProductCover {
-	id: number;
-	name: string;
-	binding: string;
-	price: number;
-	copyText?: {
-		text: string;
-		cover: string;
-		paper: string;
-		format: string;
-		content: string;
-		details: string;
-		banderole: string;
-	};
-	icon?: {
-		url: string;
-	};
-}
+export type ProductCover = ProductCoverShared;
 
-export interface Order {
-	id: number;
-	date: string;
-	createdAt: string;
-	updatedAt: string;
-	email: string | null;
-	address: string;
-	invoiceAddress: string;
-	VAT: number;
-	subtotal: number;
-	total: number;
-	uuid: string;
-	invoice: MediaDataUnsafe | null;
-	deliveryNote: MediaDataUnsafe | null;
-	delivery: DeliveryMethod | null;
-	payment: PaymentMethod | null;
-	customer: {
-		id: number;
-		attributes: {
-			Name: string;
-			Address: string;
-		};
-	} | null;
-	cartProducts: CartProduct[] | null;
-	paymentAuthorised: boolean;
-	paymentStatus: string | null;
-	acceptedTermsAndConditionsAt: string;
-}
+export type Order = OrderShared;
 
 export type OrderUpdateBody = Partial<Order>;
 
 export interface ProductVariantResponse {
-	pages: {
-		id: number;
-		name: string;
-		price: number;
-		productVariant: {
-			id: number;
-			name: string;
-			cover: number;
-			ruling: number;
-			pages: number;
-			pattern: number;
-		};
-	}[];
+	pages: ProductPagesShared[];
 	cover: {
 		id: number;
 		name: string;

@@ -1,37 +1,46 @@
 {
-  "kind": "collectionType",
-  "collectionName": "product_rulings",
-  "info": {
-    "singularName": "product-ruling",
-    "pluralName": "product-rulings",
-    "displayName": "Product Ruling",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["createdAt", "updatedAt", "created_at", "updated_at", "created_by", "updated_by", "published_at", "publishedAt", "published_by", "publishedBy"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "name": {
-      "type": "string",
-      "required": true
-    },
-    "price": {
-      "type": "decimal"
-    },
-    "products": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::product.product",
-      "mappedBy": "ruling"
-    },
-    "icon": {
-      "allowedTypes": [
-        "images"
-      ],
-      "type": "media",
-      "multiple": false
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "product_rulings",
+	"info": {
+		"singularName": "product-ruling",
+		"pluralName": "product-rulings",
+		"displayName": "Product Ruling",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": [
+			"createdAt",
+			"updatedAt",
+			"created_at",
+			"updated_at",
+			"created_by",
+			"updated_by",
+			"published_at",
+			"publishedAt",
+			"published_by",
+			"publishedBy"
+		],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"price": {
+			"type": "decimal"
+		},
+		"products": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "api::product.product",
+			"mappedBy": "ruling"
+		},
+		"icon": {
+			"allowedTypes": ["images"],
+			"type": "media",
+			"multiple": false
+		}
+	}
 }

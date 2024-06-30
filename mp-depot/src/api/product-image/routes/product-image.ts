@@ -2,6 +2,6 @@
  * product-image router
  */
 
-import { factories } from '@strapi/strapi';
+import { factories } from "@strapi/strapi";
 
-export default factories.createCoreRouter('api::product-image.product-image');
+export default factories.createCoreRouter("api::product-image.product-image");

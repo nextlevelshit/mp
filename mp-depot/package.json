@@ -6,7 +6,7 @@
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi",
-    "lint:fix": "prettier --write src/",
+    "lint:fix": "prettier --write \"{src,types,config}/*\"",
     "generate:types": "strapi ts:generate-types",
     "import": "npm run strapi import -- -f database/export.tar.gz --force",
     "export": "npm run strapi export -- --no-encrypt --file database/export_$(date +'%Y%m%d%H%M%S')"

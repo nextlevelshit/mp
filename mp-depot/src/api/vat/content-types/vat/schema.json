@@ -1,25 +1,36 @@
 {
-  "kind": "singleType",
-  "collectionName": "vats",
-  "info": {
-    "singularName": "vat",
-    "pluralName": "vats",
-    "displayName": "VAT"
-  },
-  "options": {
-    "privateAttributes": ["createdAt", "updatedAt", "created_at", "updated_at", "created_by", "updated_by", "published_at", "publishedAt", "published_by", "publishedBy"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "name": {
-      "type": "string"
-    },
-    "percent": {
-      "type": "integer"
-    },
-    "decimal": {
-      "type": "decimal"
-    }
-  }
+	"kind": "singleType",
+	"collectionName": "vats",
+	"info": {
+		"singularName": "vat",
+		"pluralName": "vats",
+		"displayName": "VAT"
+	},
+	"options": {
+		"privateAttributes": [
+			"createdAt",
+			"updatedAt",
+			"created_at",
+			"updated_at",
+			"created_by",
+			"updated_by",
+			"published_at",
+			"publishedAt",
+			"published_by",
+			"publishedBy"
+		],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"name": {
+			"type": "string"
+		},
+		"percent": {
+			"type": "integer"
+		},
+		"decimal": {
+			"type": "decimal"
+		}
+	}
 }

@@ -1,34 +1,45 @@
 {
-  "kind": "collectionType",
-  "collectionName": "product_images",
-  "info": {
-    "singularName": "product-image",
-    "pluralName": "product-images",
-    "displayName": "Product Images",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["createdAt", "updatedAt", "created_at", "updated_at", "created_by", "updated_by", "published_at", "publishedAt", "published_by", "publishedBy", "images.provider", "provider"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "images": {
-      "type": "media",
-      "multiple": true,
-      "required": false,
-      "allowedTypes": [
-        "images"
-      ]
-    },
-    "name": {
-      "type": "string"
-    },
-    "products": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::product.product",
-      "mappedBy": "images"
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "product_images",
+	"info": {
+		"singularName": "product-image",
+		"pluralName": "product-images",
+		"displayName": "Product Images",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": [
+			"createdAt",
+			"updatedAt",
+			"created_at",
+			"updated_at",
+			"created_by",
+			"updated_by",
+			"published_at",
+			"publishedAt",
+			"published_by",
+			"publishedBy",
+			"images.provider",
+			"provider"
+		],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"images": {
+			"type": "media",
+			"multiple": true,
+			"required": false,
+			"allowedTypes": ["images"]
+		},
+		"name": {
+			"type": "string"
+		},
+		"products": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "api::product.product",
+			"mappedBy": "images"
+		}
+	}
 }

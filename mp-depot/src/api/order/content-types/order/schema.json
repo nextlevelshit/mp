@@ -1,106 +1,106 @@
 {
-  "kind": "collectionType",
-  "collectionName": "orders",
-  "info": {
-    "singularName": "order",
-    "pluralName": "orders",
-    "displayName": "Order",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["created_at", "updated_at", "created_by", "updated_by", "createdAt", "updatedAt"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "Date": {
-      "type": "date"
-    },
-    "customer": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::customer.customer"
-    },
-    "invoice": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "files"
-      ]
-    },
-    "deliveryNote": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
-    "products": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::product.product"
-    },
-    "hash": {
-      "type": "text",
-      "unique": true,
-      "private": true
-    },
-    "email": {
-      "type": "string"
-    },
-    "address": {
-      "type": "text"
-    },
-    "invoiceAddress": {
-      "type": "text"
-    },
-    "delivery": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::delivery.delivery"
-    },
-    "payment": {
-      "type": "relation",
-      "relation": "oneToOne",
-      "target": "api::payment.payment"
-    },
-    "VAT": {
-      "type": "decimal"
-    },
-    "subtotal": {
-      "type": "decimal"
-    },
-    "total": {
-      "type": "decimal"
-    },
-    "uuid": {
-      "type": "string",
-      "unique": true
-    },
-    "cart": {
-      "displayName": "cart",
-      "type": "component",
-      "repeatable": true,
-      "component": "products.cart"
-    },
-    "paymentAuthorised": {
-      "type": "boolean",
-      "default": false
-    },
-    "paymentStatus": {
-      "type": "string"
-    },
-    "emailSent": {
-      "type": "boolean",
-      "default": false
-    },
-    "acceptedTermsAndConditionsAt": {
-      "type": "datetime"
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "orders",
+	"info": {
+		"singularName": "order",
+		"pluralName": "orders",
+		"displayName": "Order",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": [
+			"created_at",
+			"updated_at",
+			"created_by",
+			"updated_by",
+			"createdAt",
+			"updatedAt"
+		],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"Date": {
+			"type": "date"
+		},
+		"customer": {
+			"type": "relation",
+			"relation": "oneToOne",
+			"target": "api::customer.customer"
+		},
+		"invoice": {
+			"type": "media",
+			"multiple": false,
+			"required": false,
+			"allowedTypes": ["files"]
+		},
+		"deliveryNote": {
+			"type": "media",
+			"multiple": false,
+			"required": false,
+			"allowedTypes": ["images", "files", "videos", "audios"]
+		},
+		"products": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "api::product.product"
+		},
+		"hash": {
+			"type": "text",
+			"unique": true,
+			"private": true
+		},
+		"email": {
+			"type": "string"
+		},
+		"address": {
+			"type": "text"
+		},
+		"invoiceAddress": {
+			"type": "text"
+		},
+		"delivery": {
+			"type": "relation",
+			"relation": "oneToOne",
+			"target": "api::delivery.delivery"
+		},
+		"payment": {
+			"type": "relation",
+			"relation": "oneToOne",
+			"target": "api::payment.payment"
+		},
+		"VAT": {
+			"type": "decimal"
+		},
+		"subtotal": {
+			"type": "decimal"
+		},
+		"total": {
+			"type": "decimal"
+		},
+		"uuid": {
+			"type": "string",
+			"unique": true
+		},
+		"cart": {
+			"displayName": "cart",
+			"type": "component",
+			"repeatable": true,
+			"component": "products.cart"
+		},
+		"paymentAuthorised": {
+			"type": "boolean",
+			"default": false
+		},
+		"paymentStatus": {
+			"type": "string"
+		},
+		"emailSent": {
+			"type": "boolean",
+			"default": false
+		},
+		"acceptedTermsAndConditionsAt": {
+			"type": "datetime"
+		}
+	}
 }

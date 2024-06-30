@@ -1,14 +1,24 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["vite.config.*","env.d.ts", "src/**/*", "src/**/*.vue", "node_modules"],
-  "exclude": ["src/**/__tests__/*"],
-  "compilerOptions": {
-    "noImplicitAny": false,
-    "composite": true,
-    "baseUrl": ".",
-    "allowJs": true,
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  }
+	"extends": "@vue/tsconfig/tsconfig.dom.json",
+	"include": [
+		"vite.config.*",
+		"env.d.ts",
+		"src/**/*",
+		"src/**/*.vue",
+		"node_modules"
+	],
+	"exclude": [
+		"src/**/__tests__/*"
+	],
+	"compilerOptions": {
+		"noImplicitAny": false,
+		"composite": true,
+		"baseUrl": ".",
+		"allowJs": true,
+		"paths": {
+			"@/*": [
+				"./src/*"
+			]
+		}
+	}
 }

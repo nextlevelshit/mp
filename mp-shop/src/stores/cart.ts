@@ -10,6 +10,7 @@ const verbose = debug("app:v:cart-store");
 const calculateCount = (products: CartProduct[] | null) =>
 	products ? products.reduce((sum, { count }) => sum + count, 0) : 0;
 
+// @ts-ignore
 export const cart = reactive({
 	uuid: "",
 	products: [] as CartProduct[] | null,

@@ -1,31 +1,42 @@
 {
-  "kind": "collectionType",
-  "collectionName": "product_pages",
-  "info": {
-    "singularName": "product-page",
-    "pluralName": "product-pages",
-    "displayName": "Product Pages",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["createdAt", "updatedAt", "created_at", "updated_at", "created_by", "updated_by", "published_at", "publishedAt", "published_by", "publishedBy"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "name": {
-      "type": "string",
-      "required": true,
-      "default": "name"
-    },
-    "price": {
-      "type": "decimal"
-    },
-    "products": {
-      "type": "relation",
-      "relation": "oneToMany",
-      "target": "api::product.product",
-      "mappedBy": "pages"
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "product_pages",
+	"info": {
+		"singularName": "product-page",
+		"pluralName": "product-pages",
+		"displayName": "Product Pages",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": [
+			"createdAt",
+			"updatedAt",
+			"created_at",
+			"updated_at",
+			"created_by",
+			"updated_by",
+			"published_at",
+			"publishedAt",
+			"published_by",
+			"publishedBy"
+		],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true,
+			"default": "name"
+		},
+		"price": {
+			"type": "decimal"
+		},
+		"products": {
+			"type": "relation",
+			"relation": "oneToMany",
+			"target": "api::product.product",
+			"mappedBy": "pages"
+		}
+	}
 }

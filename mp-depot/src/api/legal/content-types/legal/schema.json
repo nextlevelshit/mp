@@ -1,35 +1,35 @@
 {
-  "kind": "singleType",
-  "collectionName": "legals",
-  "info": {
-    "singularName": "legal",
-    "pluralName": "legals",
-    "displayName": "Legal",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["created_at", "updated_at", "created_by", "updated_by"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "imprint": {
-      "type": "richtext"
-    },
-    "contact": {
-      "type": "richtext"
-    },
-    "terms": {
-      "type": "richtext"
-    },
-    "delivery": {
-      "type": "richtext"
-    },
-    "payment": {
-      "type": "richtext"
-    },
-    "privacy": {
-      "type": "richtext"
-    }
-  }
+	"kind": "singleType",
+	"collectionName": "legals",
+	"info": {
+		"singularName": "legal",
+		"pluralName": "legals",
+		"displayName": "Legal",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": ["created_at", "updated_at", "created_by", "updated_by"],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"imprint": {
+			"type": "richtext"
+		},
+		"contact": {
+			"type": "richtext"
+		},
+		"terms": {
+			"type": "richtext"
+		},
+		"delivery": {
+			"type": "richtext"
+		},
+		"payment": {
+			"type": "richtext"
+		},
+		"privacy": {
+			"type": "richtext"
+		}
+	}
 }

@@ -1,26 +1,33 @@
 {
-  "kind": "collectionType",
-  "collectionName": "payments",
-  "info": {
-    "singularName": "payment",
-    "pluralName": "payments",
-    "displayName": "Payment",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["created_at", "updated_at", "created_by", "updated_by", "createdAt", "updatedAt"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "name": {
-      "type": "string"
-    },
-    "price": {
-      "type": "decimal"
-    },
-    "description": {
-      "type": "text"
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "payments",
+	"info": {
+		"singularName": "payment",
+		"pluralName": "payments",
+		"displayName": "Payment",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": [
+			"created_at",
+			"updated_at",
+			"created_by",
+			"updated_by",
+			"createdAt",
+			"updatedAt"
+		],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"name": {
+			"type": "string"
+		},
+		"price": {
+			"type": "decimal"
+		},
+		"description": {
+			"type": "text"
+		}
+	}
 }

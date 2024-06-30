@@ -14,7 +14,7 @@
 			class="p-12 flex items-center justify-center rounded-sm shadow-2xl group-active:shadow-none"
 		>
 			<img
-				:src="product.image.url"
+				:src="product.images.images[0].url"
 				:alt="product.name"
 				class="lg:w-full object-cover max-h-64 lg:max-h-fit"
 			/>

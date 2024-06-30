@@ -1,71 +1,78 @@
 {
-  "kind": "collectionType",
-  "collectionName": "products",
-  "info": {
-    "singularName": "product",
-    "pluralName": "products",
-    "displayName": "Product",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["createdAt", "createdBy", "updatedAt", "updatedBy", "created_at", "updated_at", "created_by", "published_at", "published_by", "publishedAt", "publishedBy"],
-    "draftAndPublish": true
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "name": {
-      "type": "string"
-    },
-    "description": {
-      "type": "text"
-    },
-    "price": {
-      "type": "decimal"
-    },
-    "cover": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::product-cover.product-cover",
-      "inversedBy": "products"
-    },
-    "pattern": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::product-pattern.product-pattern",
-      "inversedBy": "products"
-    },
-    "pages": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::product-page.product-page",
-      "inversedBy": "products"
-    },
-    "ruling": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::product-ruling.product-ruling",
-      "inversedBy": "products"
-    },
-    "image": {
-      "type": "media",
-      "multiple": false,
-      "required": false,
-      "allowedTypes": [
-        "images",
-        "files",
-        "videos",
-        "audios"
-      ]
-    },
-    "slug": {
-      "type": "uid",
-      "targetField": "name"
-    },
-    "images": {
-      "type": "relation",
-      "relation": "manyToOne",
-      "target": "api::product-image.product-image",
-      "inversedBy": "products"
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "products",
+	"info": {
+		"singularName": "product",
+		"pluralName": "products",
+		"displayName": "Product",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": [
+			"createdAt",
+			"createdBy",
+			"updatedAt",
+			"updatedBy",
+			"created_at",
+			"updated_at",
+			"created_by",
+			"published_at",
+			"published_by",
+			"publishedAt",
+			"publishedBy"
+		],
+		"draftAndPublish": true
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"name": {
+			"type": "string"
+		},
+		"description": {
+			"type": "text"
+		},
+		"price": {
+			"type": "decimal"
+		},
+		"cover": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::product-cover.product-cover",
+			"inversedBy": "products"
+		},
+		"pattern": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::product-pattern.product-pattern",
+			"inversedBy": "products"
+		},
+		"pages": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::product-page.product-page",
+			"inversedBy": "products"
+		},
+		"ruling": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::product-ruling.product-ruling",
+			"inversedBy": "products"
+		},
+		"image": {
+			"type": "media",
+			"multiple": false,
+			"required": false,
+			"allowedTypes": ["images", "files", "videos", "audios"]
+		},
+		"slug": {
+			"type": "uid",
+			"targetField": "name"
+		},
+		"images": {
+			"type": "relation",
+			"relation": "manyToOne",
+			"target": "api::product-image.product-image",
+			"inversedBy": "products"
+		}
+	}
 }

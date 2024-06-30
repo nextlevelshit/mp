@@ -59,7 +59,7 @@
 		</div>
 	</main>
 </template>
-<script>
+<script lang="ts">
 import debug from "debug";
 import { shopApi } from "@/services/ShopApi";
 import ProductCard from "@/components/ProductCard.vue";
@@ -71,6 +71,9 @@ import { trackEvent } from "@/util/trackEvent";
 import SelectionBox from "@/components/SelectionBox.vue";
 import Carousel from "@/components/Carousel.vue";
 import { SwiperSlide } from "swiper/vue";
+import type { PropType } from "vue";
+import type { Product } from "@/types";
+import type { ProductShared, ProductCoverShared } from "@/shared";
 
 const logger = debug("app:i:product-list-view");
 const verbose = debug("app:v:product-list-view");
@@ -85,8 +88,8 @@ export default {
 	},
 	data() {
 		return {
-			list: null,
-			productCovers: null,
+			list: null as PropType<ProductShared[] | null>,
+			productCovers: Object as PropType<any | any[]>,
 			hasScrolled50: false,
 			hasScrolled100: false
 		};
@@ -103,21 +106,26 @@ export default {
 		window.addEventListener("scroll", this.trackScrolling);
 
 		try {
-			this.list = await shopApi.getProducts(parseInt(this.cover));
+			const { data, meta } = await shopApi.getProducts(
+				this.cover ? parseInt(this.cover) : 0
+			);
+			logger({ data, meta });
+			this.list = data;
 		} catch (error) {
 			logger("Error fetching products", error);
 		}
 
 		try {
 			const productCovers = await shopApi.getProductCovers();
-			this.productCovers = productCovers.map((cover) => ({
+			const a = productCovers.data.map((cover) => ({
 				id: cover.id,
 				label: cover.name,
 				alt: `${cover.name} – ${cover.binding}`,
 				iconUrl: cover.icon?.url,
 				url: `/notebooks/${cover.id}`,
-				isActive: parseInt(this.cover) === cover.id
+				isActive: this.cover && parseInt(this.cover) === cover.id
 			}));
+			logger({ a });
 		} catch (error) {
 			logger("Error fetching product covers", error);
 		}

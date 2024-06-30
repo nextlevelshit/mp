@@ -1,27 +1,34 @@
 {
-  "kind": "collectionType",
-  "collectionName": "deliveries",
-  "info": {
-    "singularName": "delivery",
-    "pluralName": "deliveries",
-    "displayName": "Delivery",
-    "description": ""
-  },
-  "options": {
-    "privateAttributes": ["created_at", "updated_at", "created_by", "updated_by", "createdAt", "updatedAt"],
-    "draftAndPublish": false
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "name": {
-      "type": "string",
-      "required": true
-    },
-    "price": {
-      "type": "decimal"
-    },
-    "description": {
-      "type": "text"
-    }
-  }
+	"kind": "collectionType",
+	"collectionName": "deliveries",
+	"info": {
+		"singularName": "delivery",
+		"pluralName": "deliveries",
+		"displayName": "Delivery",
+		"description": ""
+	},
+	"options": {
+		"privateAttributes": [
+			"created_at",
+			"updated_at",
+			"created_by",
+			"updated_by",
+			"createdAt",
+			"updatedAt"
+		],
+		"draftAndPublish": false
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"name": {
+			"type": "string",
+			"required": true
+		},
+		"price": {
+			"type": "decimal"
+		},
+		"description": {
+			"type": "text"
+		}
+	}
 }

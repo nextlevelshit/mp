@@ -1,19 +1,19 @@
 {
-  "kind": "singleType",
-  "collectionName": "contents",
-  "info": {
-    "singularName": "content",
-    "pluralName": "contents",
-    "displayName": "Content"
-  },
-  "options": {
-    "privateAttributes": ["created_at", "updated_at", "created_by", "updated_by"],
-    "draftAndPublish": true
-  },
-  "pluginOptions": {},
-  "attributes": {
-    "production": {
-      "type": "blocks"
-    }
-  }
+	"kind": "singleType",
+	"collectionName": "contents",
+	"info": {
+		"singularName": "content",
+		"pluralName": "contents",
+		"displayName": "Content"
+	},
+	"options": {
+		"privateAttributes": ["created_at", "updated_at", "created_by", "updated_by"],
+		"draftAndPublish": true
+	},
+	"pluginOptions": {},
+	"attributes": {
+		"production": {
+			"type": "blocks"
+		}
+	}
 }
