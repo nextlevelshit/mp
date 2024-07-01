@@ -1,5 +1,5 @@
 TEX = pandoc
-FLAGS = --pdf-engine=lualatex
+FLAGS = --pdf-engine=xelatex
 
 # Use the values of src, template, and output passed as arguments
 $(output) : $(src)

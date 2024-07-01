@@ -34,14 +34,14 @@ export const cart = reactive({
 			});
 	},
 	overwrite(order: Order) {
-		this.products = order.cartProducts;
+		this.products = order.cart as CartProduct[] | null;
 		this.productsCount = calculateCount(this.products);
 		this.total = order.delivery?.price
 			? Math.round(order.total + order.delivery.price)
 			: order.total;
-		this.subtotal = order.subtotal;
-		this.VAT = order.VAT;
-		this.uuid = order.uuid;
+		this.subtotal = order.subtotal ?? 0;
+		this.VAT = order.VAT ?? 0;
+		this.uuid = order.uuid ?? 0;
 		this.emailAddress = order.email ?? "";
 		localStorage.setItem(localStorageLabelCartUuid, String(order.uuid));
 	}

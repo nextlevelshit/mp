@@ -16,6 +16,11 @@ export default defineConfig({
     },
     server: {
         port: 9999,
+		proxy: {
+			"/umami": {
+				target: "/umami",
+			}
+		}
     },
 	// // TODO: Should not be necessary
 	// define: {

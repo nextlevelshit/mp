@@ -25,7 +25,7 @@
 							class="py-6 gap-6 flex items-center justify-between"
 						>
 							<img
-								:src="position.product.image.url"
+								:src="position.product.images?.images[0].url"
 								:alt="position.product.name"
 								class="w-12 object-cover"
 							/>

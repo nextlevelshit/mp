@@ -113,7 +113,7 @@ class FilterReplaceLowercaseI(logging.Filter):
 # Setup logger
 logging.basicConfig(
 	level=logging.DEBUG,
-	format='[%(asctime)s.%(msecs)03d] %(name)s:%(levelname).1s: %(message)s',
+	format='%(asctime)s.%(msecs)03dZ %(name)s:%(levelname).1s: %(message)s',
 	datefmt='%Y-%m-%d %H:%M:%S'
 )
 
