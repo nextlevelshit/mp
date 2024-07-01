@@ -12,8 +12,8 @@ services:
         deploy:
             resources:
                 limits:
-                    cpus: "4.0"
-                    memory: 8gb
+                    cpus: "7.0"
+                    memory: 30gb
 
 #    mp-postamt:
 ##        container_name: postamt-dev
