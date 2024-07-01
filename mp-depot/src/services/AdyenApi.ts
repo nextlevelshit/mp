@@ -1,11 +1,5 @@
 import { Client, Config, CheckoutAPI } from "@adyen/api-library";
-import {
-	adyenApiKey,
-	adyenEnvironment,
-	adyenMerchantAccount,
-	adyenClientKey,
-	adyenHmacKey
-} from "../../config/constants";
+import { adyenApiKey, adyenEnvironment, adyenMerchantAccount, adyenClientKey, adyenHmacKey } from "../../config/constants";
 import { PaymentCompletionDetails } from "@adyen/api-library/lib/src/typings/checkout/paymentCompletionDetails";
 import HmacValidator from "@adyen/api-library/lib/src/utils/hmacValidator";
 import { NotificationRequestItem } from "@adyen/api-library/lib/src/typings/notification/notificationRequestItem";
@@ -18,12 +12,7 @@ class AdyenApi {
 	private readonly clientKey: string;
 	private readonly hmacKey: string;
 
-	constructor(
-		apiKey: string,
-		clientKey: string,
-		hmacKey: string,
-		environment: AdyenEnvironment
-	) {
+	constructor(apiKey: string, clientKey: string, hmacKey: string, environment: AdyenEnvironment) {
 		const config = new Config();
 		config.apiKey = apiKey;
 
@@ -111,25 +100,16 @@ class AdyenApi {
 
 		if (eventCode === EventCodeEnum.Authorisation) {
 			// Update order
-			strapi.log.error(
-				"adyen-api: consumeEvent() for EventCodeEnum.Authorisation NOT IMPLEMENTED"
-			);
+			strapi.log.error("adyen-api: consumeEvent() for EventCodeEnum.Authorisation NOT IMPLEMENTED");
 			return { message: "success" };
 		} else {
-			strapi.log.error(
-				"adyen-api: consumeEvent() for any other event NOT IMPLEMENTED"
-			);
+			strapi.log.error("adyen-api: consumeEvent() for any other event NOT IMPLEMENTED");
 			return { message: "failed" };
 		}
 	}
 }
 
-export const adyenApi = new AdyenApi(
-	adyenApiKey,
-	adyenClientKey,
-	adyenHmacKey,
-	adyenEnvironment
-);
+export const adyenApi = new AdyenApi(adyenApiKey, adyenClientKey, adyenHmacKey, adyenEnvironment);
 
 export type AdyenApiOptions = {
 	apiKey: string;
