@@ -1,12 +1,12 @@
 #!/bin/bash
 
 # Configuration variables
-METHOD="GET"
+METHOD="PUT"
 BASE_URL="https://localhost:8443"
-API_URL="/api/product"
+API_URL="/api/order/a00ad9d9-fa7b-4989-a37c-5ef5051325fe/generate-delivery-note"
 BEARER_TOKEN="b5739bfdb5267e51533de07dc3726aecfa8063fd5fe3d903bdef7d9f614cd99e5ee8fe227587edb29df6be2a2bf8849cd713d1e8a82b3ff2d27244a10deb849559d573e4662de0ad5844e32afbfed5f82b22d7cbd57a01b5fcc7ca251abf0bf2a5d2a050745d81f0c47a9358d58f0f9b44b66d8649f7e9f5df10b9a2fcce58bd"
-NUM_JOBS=100
-TOTAL_REQUESTS=10000
+NUM_JOBS=2
+TOTAL_REQUESTS=10
 
 # Create a temporary file to store results
 RESULTS_FILE=$(mktemp)

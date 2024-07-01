@@ -7,8 +7,6 @@ for i in {1..100}; do curl --request PUT \
     --header 'cache-control: no-cache' \
     --header 'pragma: no-cache' \
     --data '{
-        "delivery": null,
-        "payment": null,
         "cart": [
                 {
                     "count": 10,
