@@ -17,10 +17,7 @@ export default factories.createCoreService("api::product.product", ({ strapi }) 
 		strapi.log.verbose("Querying products with merged params:");
 		strapi.log.verbose(JSON.stringify({ params }));
 
-		const response = await strapi.entityService.findPage(
-			"api::product.product",
-			params
-		);
+		const response = await strapi.entityService.findPage("api::product.product", params);
 		const resultsUnsafe = response.results;
 		const results = resultsUnsafe.map((product) => {
 			return {
@@ -33,10 +30,7 @@ export default factories.createCoreService("api::product.product", ({ strapi }) 
 	},
 
 	findOne: async (id: number) => {
-		const product = await strapi.entityService.findOne<
-			"api::product.product",
-			ProductParams
-		>("api::product.product", id, productDefaultParams);
+		const product = await strapi.entityService.findOne<"api::product.product", ProductParams>("api::product.product", id, productDefaultParams);
 		return {
 			...product,
 			totalProductPrice: calculateTotalProductPrice(product)
@@ -45,11 +39,7 @@ export default factories.createCoreService("api::product.product", ({ strapi }) 
 }));
 
 export const calculateTotalProductPrice = (product: Product): number => {
-	return (
-		(product?.cover?.price ?? 0) +
-		(product?.pages?.price ?? 0) +
-		(product?.ruling?.price ?? 0)
-	);
+	return (product?.cover?.price ?? 0) + (product?.pages?.price ?? 0) + (product?.ruling?.price ?? 0);
 };
 
 export interface ProductParams {

@@ -17,50 +17,41 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		const body = { data: { uuid: generateUuid() } };
 		strapi.log.verbose(JSON.stringify({ body }));
 		const order = await strapi.service("api::order.order").create(body);
-		return await sanitize.contentAPI.output(
-			order,
-			strapi.getModel("api::order.order")
-		);
+		return await sanitize.contentAPI.output(order, strapi.getModel("api::order.order"));
+	},
+
+	update: async (ctx) => {
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
+		strapi.log.verbose("app:v:order-controller: Updating", { uuid });
+		const order = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
+		const body = await sanitize.contentAPI.input(ctx.request.body, strapi.getModel("api::order.order"));
+		strapi.log.verbose("app:v:order-controller: Sanitized body:", { body });
+		return await strapi.service("api::order.order").update(order.id, body);
 	},
 
 	// Get an order by uuid
 	findOne: async (ctx) => {
-		const { uuid } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
 		strapi.log.verbose(JSON.stringify({ uuid }));
-		const orderUnsafe = (await strapi
-			.service("api::order.order")
-			.findOneByUuid(uuid)) as Order;
-		return (await sanitize.contentAPI.output(
-			orderUnsafe,
-			strapi.getModel("api::order.order")
-		)) as Order;
+		const orderUnsafe = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
+		return (await sanitize.contentAPI.output(orderUnsafe, strapi.getModel("api::order.order"))) as Order;
 	},
 
 	addProduct: async (ctx) => {
-		const { uuid, productId } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
+		const { uuid, productId } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
 		const count = parseInt(ctx.query.count as string) || 1;
 		const product = parseInt(productId as string);
 
 		strapi.log.verbose("app:v:order-controller: Removing product from cart", { uuid, product, count });
 
-		const order = (await strapi
-			.service("api::order.order")
-			.findOneByUuid(uuid)) as Order;
+		const order = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
 
 		if (!order) {
 			return ctx.notFound("Order not found");
 		}
 
 		const updatedCart = order.cart || [];
-		const existingProductIndex = updatedCart.findIndex(
-			(item) => item.product.id === product
-		);
+		const existingProductIndex = updatedCart.findIndex((item) => item.product.id === product);
 
 		if (existingProductIndex !== -1) {
 			updatedCart[existingProductIndex].count += count;
@@ -74,34 +65,24 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			data: { cart: updatedCart }
 		});
 
-		return await sanitize.contentAPI.output(
-			orderUnsafe,
-			strapi.getModel("api::order.order")
-		);
+		return await sanitize.contentAPI.output(orderUnsafe, strapi.getModel("api::order.order"));
 	},
 
 	removeProduct: async (ctx) => {
-		const { uuid, productId } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
+		const { uuid, productId } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
 		const count = parseInt(ctx.query.count as string) || 1;
 		const product = parseInt(productId as string);
 
 		strapi.log.verbose("app:v:order-controller: Removing product from cart", { uuid, product, count });
 
-		const order = (await strapi
-			.service("api::order.order")
-			.findOneByUuid(uuid)) as Order;
+		const order = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
 
 		if (!order) {
 			return ctx.notFound("Order not found");
 		}
 
 		const updatedCart = order.cart || [];
-		const existingProductIndex = updatedCart.findIndex(
-			(item) => item.product.id === product
-		);
+		const existingProductIndex = updatedCart.findIndex((item) => item.product.id === product);
 
 		if (existingProductIndex !== -1) {
 			const currentCount = updatedCart[existingProductIndex].count;
@@ -120,83 +101,58 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			data: { cart: updatedCart }
 		});
 
-		return await sanitize.contentAPI.output(
-			orderUnsafe,
-			strapi.getModel("api::order.order")
-		);
+		return await sanitize.contentAPI.output(orderUnsafe, strapi.getModel("api::order.order"));
 	},
 
 	checkout: async (ctx) => {
-		const { uuid } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
-		const { returnUrl } = await sanitize.contentAPI.query(
-			ctx.query,
-			strapi.getModel("api::order.order")
-		);
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
+		const { returnUrl } = await sanitize.contentAPI.query(ctx.query, strapi.getModel("api::order.order"));
 		strapi.log.verbose("app:v:order-controller: Checking out order", { uuid, returnUrl });
-		const orderUnsafe = (await strapi
-			.service("api::order.order")
-			.findOneByUuid(uuid)) as Order;
-		const adyenSession = await adyenApi.createSessionOrThrow(
-			returnUrl as string,
-			orderUnsafe
-		);
+		const orderUnsafe = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
+		const adyenSession = await adyenApi.createSessionOrThrow(returnUrl as string, orderUnsafe);
 		return { session: adyenSession, clientKey: adyenApi.getClientKey() };
 	},
 
 	redirect: async (ctx) => {
-		const { uuid } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
-		strapi.log.verbose("app:v:order-controller: Redirecting", {uuid});
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
+		strapi.log.verbose("app:v:order-controller: Redirecting", { uuid });
 		return await strapi.service("api::order.order").redirect(uuid);
 	},
 
 	generateInvoice: async (ctx) => {
-		const { uuid } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
-		strapi.log.verbose("app:v:order-controller: generating invoice", {uuid});
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
+		strapi.log.verbose("app:v:order-controller: generating invoice", { uuid });
 		return await strapi.service("api::order.order").generateInvoice(uuid);
 	},
 
 	generateDeliveryNote: async (ctx) => {
-		const { uuid } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
-		strapi.log.info("app:i:order-controller: generating delivery note for", {uuid});
-		const orderUnsafe = (await strapi
-			.service("api::order.order")
-			.findOneByUuid(uuid)) as Order;
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
+		strapi.log.info("app:i:order-controller: generating delivery note for", { uuid });
+		const orderUnsafe = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
 
 		if (!orderUnsafe.paymentAuthorised) {
 			return ctx.locked("Payment not authorised, cannot generate delivery note");
 		}
+		strapi.log.info("app:i:order-controller: – generating delivery note pdf");
 
 		const pdfBody = deliveryNotePdfBody(orderUnsafe);
 		const deliveryNoteBlob = await inkassoApi.generateDeliveryNote(pdfBody);
 
-		strapi.log.info("app:i:order-controller: – generating delivery note pdf");
+		strapi.log.info("app:i:order-controller: ✔ generating delivery note pdf");
 
 		if (!deliveryNoteBlob) {
 			return ctx.internalServerError("Could not generate delivery note");
 		}
-		strapi.log.info("app:i:order-controller: ✔ generating delivery note pdf");
 
 		// return deliveryNoteBlob;
 		const formData = new FormData();
 		formData.append("files.deliveryNote", deliveryNoteBlob, "Lieferschein generiert mit InkassoApi v1");
 		formData.append("data", {
-		  fileInfo: {
-		    name: "Lieferschein Name",
-		    caption: "Lieferschein Caption",
-		    alternativeText: "Lieferschein Alternative Text",
-		  },
+			fileInfo: {
+				name: "Lieferschein Name",
+				caption: "Lieferschein Caption",
+				alternativeText: "Lieferschein Alternative Text"
+			}
 		});
 		formData.append("data", "{}");
 		formData.append("ref", "api::order.order");
@@ -207,36 +163,25 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		strapi.log.info("app:i:order-controller: – uploading delivery note pdf");
 		// strapi.log.verbose(`app:v:order-controller: ${JSON.stringify({formData})}`);
 
-		await strapi.plugins.upload.services.upload.upload(formData);
+		// await strapi.plugins.upload.services.upload.upload(formData);
 		strapi.log.info("app:i:order-controller: ✔ uploading delivery note pdf");
 
-		const updatedOrderUnsafe = await strapi
-			.service("api::order.order")
-			.findOne(orderUnsafe.id);
+		const updatedOrderUnsafe = await strapi.service("api::order.order").findOne(orderUnsafe.id);
 
-		return await sanitize.contentAPI.output(
-			updatedOrderUnsafe,
-			strapi.getModel("api::order.order")
-		);
+		return await sanitize.contentAPI.output(updatedOrderUnsafe, strapi.getModel("api::order.order"));
 	},
 
 	sendInvoice: async (ctx) => {
-		const { uuid } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
-		strapi.log.info("app:i:order-controller: sending invoice for", {uuid});
-		strapi.log.verbose("app:v:order-controller:", {ctx});
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
+		strapi.log.info("app:i:order-controller: sending invoice for", { uuid });
+		strapi.log.verbose("app:v:order-controller:", { ctx });
 		return await strapi.service("api::order.order").sendInvoice();
 	},
 
 	finalize: async (ctx) => {
-		const { uuid } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::order.order")
-		);
-		strapi.log.info("order-api: finalizing order", {uuid});
-		strapi.log.verbose("app:v:order-api:", {ctx});
+		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
+		strapi.log.info("order-api: finalizing order", { uuid });
+		strapi.log.verbose("app:v:order-api:", { ctx });
 		return await strapi.service("api::order.order").finalize();
 	},
 
@@ -251,8 +196,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 }));
 
 const invoicePdfBody = (order: Order): PdfBody => {
-	const { id, invoiceAddress, cart, Date, email, address, VAT, subtotal, total, uuid } =
-		order;
+	const { id, invoiceAddress, cart, Date, email, address, VAT, subtotal, total, uuid } = order;
 
 	return {
 		subject: "RECHNUNG",
@@ -271,9 +215,7 @@ const invoicePdfBody = (order: Order): PdfBody => {
 				description: cartProduct.product.name,
 				price: {
 					per_unit: calculateTotalProductPrice(cartProduct.product) || 0,
-					total:
-						(calculateTotalProductPrice(cartProduct.product) || 0) *
-						cartProduct.count
+					total: (calculateTotalProductPrice(cartProduct.product) || 0) * cartProduct.count
 				},
 				count: cartProduct.count,
 				nr: `${cartProduct.id}`
@@ -309,9 +251,7 @@ const deliveryNotePdfBody = (order: Order): PdfBody => {
 				description: cartProduct.product.name,
 				price: {
 					per_unit: calculateTotalProductPrice(cartProduct.product) || 0,
-					total:
-						(calculateTotalProductPrice(cartProduct.product) || 0) *
-						cartProduct.count
+					total: (calculateTotalProductPrice(cartProduct.product) || 0) * cartProduct.count
 				},
 				count: cartProduct.count,
 				nr: `${cartProduct.id}`

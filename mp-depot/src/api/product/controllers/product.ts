@@ -8,15 +8,9 @@ import { Result } from "@strapi/types/dist/modules/entity-service/result";
 
 export default factories.createCoreController("api::product.product", ({ strapi }) => ({
 	findOne: async (ctx) => {
-		const { id } = await sanitize.contentAPI.query(
-			ctx.params,
-			strapi.getModel("api::product.product")
-		);
+		const { id } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::product.product"));
 		const productUnsafe = await strapi.service("api::product.product").findOne(id);
-		return (await sanitize.contentAPI.output(
-			productUnsafe,
-			strapi.getModel("api::product.product")
-		)) as Result<"api::product.product">;
+		return (await sanitize.contentAPI.output(productUnsafe, strapi.getModel("api::product.product"))) as Result<"api::product.product">;
 	},
 
 	find: async (ctx) => {
@@ -30,19 +24,13 @@ export default factories.createCoreController("api::product.product", ({ strapi 
 				})
 			]);
 
-			const lowestPriceRuling = allRulings.results.sort(
-				(a, b) => a.price - b.price
-			)[0].id;
-			const lowestPricePages = allPages.results.sort((a, b) => a.price - b.price)[0]
-				.id;
+			const lowestPriceRuling = allRulings.results.sort((a, b) => a.price - b.price)[0].id;
+			const lowestPricePages = allPages.results.sort((a, b) => a.price - b.price)[0].id;
 
 			strapi.log.verbose(JSON.stringify({ lowestPriceRuling }));
 			strapi.log.verbose(JSON.stringify({ lowestPricePages }));
 
-			const params = await sanitize.contentAPI.query(
-				ctx.query,
-				strapi.getModel("api::product.product")
-			);
+			const params = await sanitize.contentAPI.query(ctx.query, strapi.getModel("api::product.product"));
 			const response = await strapi.service("api::product.product").find({
 				...params,
 				ruling: lowestPriceRuling,

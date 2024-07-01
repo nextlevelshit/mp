@@ -8,14 +8,7 @@
 		"description": ""
 	},
 	"options": {
-		"privateAttributes": [
-			"created_at",
-			"updated_at",
-			"created_by",
-			"updated_by",
-			"createdAt",
-			"updatedAt"
-		],
+		"privateAttributes": ["created_at", "updated_at", "created_by", "updated_by", "createdAt", "updatedAt"],
 		"draftAndPublish": false
 	},
 	"pluginOptions": {},
