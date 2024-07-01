@@ -11,6 +11,7 @@
 		"src/**/__tests__/*"
 	],
 	"compilerOptions": {
+		"module": "ESNext",
 		"noImplicitAny": false,
 		"composite": true,
 		"baseUrl": ".",

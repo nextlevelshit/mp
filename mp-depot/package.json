@@ -2,7 +2,7 @@
   "name": "mp-depot",
   "version": "1.0.0",
   "scripts": {
-    "develop": "npm run strapi develop -- --bundler vite",
+    "develop": "DEBUG=strapi:*,app:* npm run strapi develop -- --bundler vite",
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi",

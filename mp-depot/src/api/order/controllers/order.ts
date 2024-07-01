@@ -47,7 +47,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		const count = parseInt(ctx.query.count as string) || 1;
 		const product = parseInt(productId as string);
 
-		strapi.log.verbose(JSON.stringify({ uuid, product, count }));
+		strapi.log.verbose("app:v:order-controller: Removing product from cart", { uuid, product, count });
 
 		const order = (await strapi
 			.service("api::order.order")
@@ -70,7 +70,6 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		}
 
 		strapi.log.verbose(JSON.stringify({ updatedCart }));
-
 		const orderUnsafe = await strapi.service("api::order.order").update(order.id, {
 			data: { cart: updatedCart }
 		});
@@ -89,7 +88,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		const count = parseInt(ctx.query.count as string) || 1;
 		const product = parseInt(productId as string);
 
-		strapi.log.verbose(JSON.stringify({ uuid, product, count }));
+		strapi.log.verbose("app:v:order-controller: Removing product from cart", { uuid, product, count });
 
 		const order = (await strapi
 			.service("api::order.order")
@@ -136,7 +135,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			ctx.query,
 			strapi.getModel("api::order.order")
 		);
-		strapi.log.verbose(JSON.stringify({ uuid, returnUrl }));
+		strapi.log.verbose("app:v:order-controller: Checking out order", { uuid, returnUrl });
 		const orderUnsafe = (await strapi
 			.service("api::order.order")
 			.findOneByUuid(uuid)) as Order;
@@ -152,7 +151,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			ctx.params,
 			strapi.getModel("api::order.order")
 		);
-		strapi.log.verbose(JSON.stringify({ uuid }));
+		strapi.log.verbose("app:v:order-controller: Redirecting", {uuid});
 		return await strapi.service("api::order.order").redirect(uuid);
 	},
 
@@ -161,7 +160,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			ctx.params,
 			strapi.getModel("api::order.order")
 		);
-		strapi.log.verbose(JSON.stringify({ uuid }));
+		strapi.log.verbose("app:v:order-controller: generating invoice", {uuid});
 		return await strapi.service("api::order.order").generateInvoice(uuid);
 	},
 
@@ -170,7 +169,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			ctx.params,
 			strapi.getModel("api::order.order")
 		);
-		strapi.log.info(`order-controller: generating delivery note for ${uuid}`);
+		strapi.log.info("app:i:order-controller: generating delivery note for", {uuid});
 		const orderUnsafe = (await strapi
 			.service("api::order.order")
 			.findOneByUuid(uuid)) as Order;
@@ -182,34 +181,34 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		const pdfBody = deliveryNotePdfBody(orderUnsafe);
 		const deliveryNoteBlob = await inkassoApi.generateDeliveryNote(pdfBody);
 
-		strapi.log.info("order-controller: generated delivery note pdf");
-		// strapi.log.debug(JSON.stringify(await deliveryNoteBlob.text()));
+		strapi.log.info("app:i:order-controller: – generating delivery note pdf");
 
 		if (!deliveryNoteBlob) {
 			return ctx.internalServerError("Could not generate delivery note");
 		}
-		//
-		// return deliveryNoteBlob;
+		strapi.log.info("app:i:order-controller: ✔ generating delivery note pdf");
 
-		const data = new FormData();
-		data.append("files.deliveryNote", deliveryNoteBlob);
-		// body.append("data", {
-		//   fileInfo: {
-		//     name: "Lieferschein Name",
-		//     caption: "Lieferschein Caption",
-		//     alternativeText: "Lieferschein Alternative Text",
-		//   },
-		// });
-		data.append("data", "{}");
-		data.append("ref", "api::order.order");
-		data.append("refId", orderUnsafe.id);
+		// return deliveryNoteBlob;
+		const formData = new FormData();
+		formData.append("files.deliveryNote", deliveryNoteBlob, "Lieferschein generiert mit InkassoApi v1");
+		formData.append("data", {
+		  fileInfo: {
+		    name: "Lieferschein Name",
+		    caption: "Lieferschein Caption",
+		    alternativeText: "Lieferschein Alternative Text",
+		  },
+		});
+		formData.append("data", "{}");
+		formData.append("ref", "api::order.order");
+
+		formData.append("refId", orderUnsafe.id);
 
 		// ctx.send({ message: "success" });
+		strapi.log.info("app:i:order-controller: – uploading delivery note pdf");
+		// strapi.log.verbose(`app:v:order-controller: ${JSON.stringify({formData})}`);
 
-		strapi.log.info("order-controller: uploading delivery note pdf");
-		strapi.log.debug(JSON.stringify({ data }));
-
-		await strapi.plugins.upload.services.upload.upload(data);
+		await strapi.plugins.upload.services.upload.upload(formData);
+		strapi.log.info("app:i:order-controller: ✔ uploading delivery note pdf");
 
 		const updatedOrderUnsafe = await strapi
 			.service("api::order.order")
@@ -226,8 +225,8 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			ctx.params,
 			strapi.getModel("api::order.order")
 		);
-		strapi.log.info(`order-controller: sending invoice for ${uuid}`);
-		strapi.log.verbose(JSON.stringify({ ctx }));
+		strapi.log.info("app:i:order-controller: sending invoice for", {uuid});
+		strapi.log.verbose("app:v:order-controller:", {ctx});
 		return await strapi.service("api::order.order").sendInvoice();
 	},
 
@@ -236,8 +235,8 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			ctx.params,
 			strapi.getModel("api::order.order")
 		);
-		strapi.log.info(`order-api: finalizing order ${uuid}`);
-		strapi.log.verbose(JSON.stringify({ ctx }));
+		strapi.log.info("order-api: finalizing order", {uuid});
+		strapi.log.verbose("app:v:order-api:", {ctx});
 		return await strapi.service("api::order.order").finalize();
 	},
 

@@ -1,4 +1,9 @@
-import type {ProductShared, OrderShared, ProductCoverShared, ProductPagesShared} from "@/shared";
+import type {
+	ProductShared,
+	OrderShared,
+	ProductCoverShared,
+	ProductPagesShared
+} from "@/shared";
 
 export interface MediaDataUnsafe {
 	id: number;
@@ -89,7 +94,7 @@ export type Order = OrderShared & {
 	VAT: number | null;
 	total: number;
 	email: string | null;
-	cart: CartProduct[] | null
+	cart: CartProduct[] | null;
 };
 
 export type OrderUpdateBody = Partial<Order>;

@@ -56,7 +56,7 @@ export default factories.createCoreController("api::product.product", ({ strapi 
 
 			return { data, meta: { pagination } };
 		} catch (error) {
-			strapi.log.verbose(error);
+			strapi.log.error(error);
 			return ctx.badRequest("Could not fetch products");
 		}
 	},

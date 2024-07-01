@@ -3,18 +3,19 @@ import { ID } from "@strapi/database/dist/types";
 import { vatIncludedDecimal, vatDecimal } from "../../../../config/constants";
 import { calculateTotalProductPrice } from "../../product/services/product";
 import { sanitize } from "@strapi/utils";
+import {Product, CartProduct} from "../../../../types";
 
 /**
  * This service is responsible for handling the order logic.
  */
-export default factories.createCoreService("api::order.order", ({ strapi }) => ({
+export default factories.createCoreService("api::order.order", ({strapi}) => ({
 	update: async (id: ID, params: Record<string, any>) => {
-		strapi.log.verbose(JSON.stringify({ params, ...orderDefaultParams }));
+		strapi.log.info("app:v:order-service: - Updating order", {...params, ...orderDefaultParams});
 		const orderUnsafe = await strapi.entityService.update("api::order.order", id, {
 			...params,
 			...orderDefaultParams
 		});
-		strapi.log.verbose(JSON.stringify({ orderUnsafe }));
+		strapi.log.info("app:v:order-service: ✔ Updating order", {orderUnsafe});
 		const cartProducts = orderUnsafe.cart;
 		const delivery = orderUnsafe.delivery;
 		const payment = orderUnsafe.payment;
@@ -22,7 +23,7 @@ export default factories.createCoreService("api::order.order", ({ strapi }) => (
 		let subtotal = -1;
 		let total = -1;
 		let VAT = -1;
-		strapi.log.verbose(JSON.stringify({ cartProducts }));
+		strapi.log.verbose(`app:v:order-service: `, {cartProducts});
 		if (cartProducts) {
 			const productsTotal = cartProducts.reduce(
 				(v, p) => v + (calculateTotalProductPrice(p.product) ?? 0) * p.count,
@@ -54,7 +55,7 @@ export default factories.createCoreService("api::order.order", ({ strapi }) => (
 				}
 			};
 		});
-		strapi.log.verbose(JSON.stringify({ cart }, null, 2));
+		strapi.log.verbose(`app:v:order-service: `, {cart});
 
 		return {
 			...order,
@@ -92,9 +93,9 @@ export default factories.createCoreService("api::order.order", ({ strapi }) => (
 			},
 			...orderDefaultParams
 		};
-		const { results } = await strapi.service("api::order.order").find(params);
+		const {results} = await strapi.service("api::order.order").find(params);
 		const order = results.pop();
-		const cart = order.cart.map((product) => {
+		const cart = order.cart.map((product: CartProduct) => {
 			return {
 				...product,
 				product: {

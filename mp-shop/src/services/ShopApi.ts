@@ -1,3 +1,4 @@
+import debug from "debug";
 import type {
 	Order,
 	OrderUpdateBody,
@@ -10,7 +11,6 @@ import type {
 	PaymentMethod,
 	DeliveryMethod
 } from "@/types";
-import debug from "debug";
 import { shopApiToken } from "@/config/constants";
 import type {
 	ProductPatternShared,

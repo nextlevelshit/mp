@@ -21,6 +21,7 @@ export type ProductCover = GetValues<
 	"api::product-cover.product-cover",
 	GetNonPopulatableKeys<"api::product-cover.product-cover"> | GetPopulatableKeys<"api::product-cover.product-cover">
 >;
+export type CartProduct = GetValues<"products.cart", GetNonPopulatableKeys<"products.cart"> | GetPopulatableKeys<"products.cart">>;
 
 export type PdfBody = {
 	subject: string;

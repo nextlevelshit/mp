@@ -22,6 +22,13 @@ export default defineConfig({
 			}
 		}
     },
+	build: {
+		rollupOptions: {
+			external: [
+				"/umami/script.js"
+			]
+		}
+	}
 	// // TODO: Should not be necessary
 	// define: {
 	// 	VITE_BASE_URL: JSON.stringify(process.env.VITE_BASE_URL),
