@@ -198,7 +198,7 @@ def generate_invoice():
 	logger = logging.getLogger('app:generate-invoice')
 	try:
 		details_json = request.json
-		logger.debug("Generating invoice")
+		logger.info("Generating invoice")
 		logger.debug(details_json)
 		template = Template.INVOICE
 		pdf_content = generate_pdf(template, details_json)
@@ -219,11 +219,10 @@ def generate_shipping():
 	logger = logging.getLogger('app:generate-shipping-note')
 	try:
 		details_json = request.json
-		logger.debug("Generating shipping note")
+		logger.info("Generating shipping note")
 		logger.debug(details_json)
 		template = Template.SHIPPING
 		pdf_content = generate_pdf(template, details_json)
-		logger.info(pdf_content)
 		if pdf_content:
 			logger.info(f"Sending shipping pdf: {pdf_content}")
 			return send_file(pdf_content, mimetype='application/pdf')
@@ -241,6 +240,8 @@ def generate_order_confirmation():
 	logger = logging.getLogger('app:generate-order-confirmation')
 	try:
 		details_json = request.json
+		logger.info("Generating order confirmation")
+		logger.debug(details_json)
 		template = Template.ORDER_CONFIRMATION
 		pdf_content = generate_pdf(template, details_json)
 		if pdf_content:

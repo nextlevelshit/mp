@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { factories } from "@strapi/strapi";
 import { sanitize } from "@strapi/utils";
 import { v4 as generateUuid } from "uuid";
@@ -5,14 +7,13 @@ import { vatDecimal } from "../../../../config/constants";
 import { adyenApi } from "../../../services/AdyenApi";
 import { PdfBody, Order, NotificationRequest } from "../../../../types";
 import { calculateTotalProductPrice } from "../../product/services/product";
-import FormData from "form-data";
 import { inkassoApi } from "../../../services/InkassoApi";
+// import FormData from "form-data";
 
 /**
  * A set of functions called "actions" for `order`
  */
 export default factories.createCoreController("api::order.order", ({ strapi }) => ({
-	// Create a new order
 	create: async (ctx) => {
 		const body = { data: { uuid: generateUuid() } };
 		strapi.log.verbose(JSON.stringify({ body }));
@@ -34,7 +35,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
 		strapi.log.verbose(JSON.stringify({ uuid }));
 		const orderUnsafe = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
-		return (await sanitize.contentAPI.output(orderUnsafe, strapi.getModel("api::order.order"))) as Order;
+		return await sanitize.contentAPI.output(orderUnsafe, strapi.getModel("api::order.order"));
 	},
 
 	addProduct: async (ctx) => {
@@ -121,68 +122,76 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 
 	generateInvoice: async (ctx) => {
 		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
-		strapi.log.verbose("app:v:order-controller: generating invoice", { uuid });
+		strapi.log.verbose(`app:v:order-controller: Generating invoice ID${uuid}`);
 		return await strapi.service("api::order.order").generateInvoice(uuid);
 	},
 
 	generateDeliveryNote: async (ctx) => {
 		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
-		strapi.log.info("app:i:order-controller: generating delivery note for", { uuid });
+		strapi.log.info(`app:i:order-controller: Started delivery note generation`);
 		const orderUnsafe = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
 
 		if (!orderUnsafe.paymentAuthorised) {
 			return ctx.locked("Payment not authorised, cannot generate delivery note");
 		}
-		strapi.log.info("app:i:order-controller: – generating delivery note pdf");
+		strapi.log.info("app:i:order-controller: – Generating delivery note pdf");
 
 		const pdfBody = deliveryNotePdfBody(orderUnsafe);
 		const deliveryNoteBlob = await inkassoApi.generateDeliveryNote(pdfBody);
-
-		strapi.log.info("app:i:order-controller: ✔ generating delivery note pdf");
 
 		if (!deliveryNoteBlob) {
 			return ctx.internalServerError("Could not generate delivery note");
 		}
 
-		// return deliveryNoteBlob;
-		const formData = new FormData();
-		formData.append("files.deliveryNote", deliveryNoteBlob, "Lieferschein generiert mit InkassoApi v1");
-		formData.append("data", {
-			fileInfo: {
-				name: "Lieferschein Name",
-				caption: "Lieferschein Caption",
-				alternativeText: "Lieferschein Alternative Text"
+		// Save blob to a temp folder
+		const tempFolder = path.join(__dirname, "temp");
+		if (!fs.existsSync(tempFolder)) {
+			fs.mkdirSync(tempFolder);
+		}
+		const deliveryNotePath = path.join(tempFolder, "Lieferschein.pdf");
+		fs.writeFileSync(deliveryNotePath, Buffer.from(deliveryNoteBlob));
+
+		const uploadData = {
+			data: {
+				ref: "api::order.order",
+				refId: orderUnsafe.id,
+				field: "deliveryNote",
+			},
+			files: {
+				path: deliveryNotePath,
+				name: "Lieferschein.pdf",
+				caption: "Caption",
+				alternativeText: "alternative",
+				type: "application/pdf",
+				size: fs.statSync(deliveryNotePath).size
 			}
-		});
-		formData.append("data", "{}");
-		formData.append("ref", "api::order.order");
+		};
 
-		formData.append("refId", orderUnsafe.id);
+		try {
+			await strapi.plugins.upload.services.upload.upload(uploadData);
+			strapi.log.info("app:i:order-controller: ✔ Uploading delivery note pdf");
 
-		// ctx.send({ message: "success" });
-		strapi.log.info("app:i:order-controller: – uploading delivery note pdf");
-		// strapi.log.verbose(`app:v:order-controller: ${JSON.stringify({formData})}`);
-
-		// await strapi.plugins.upload.services.upload.upload(formData);
-		strapi.log.info("app:i:order-controller: ✔ uploading delivery note pdf");
-
-		const updatedOrderUnsafe = await strapi.service("api::order.order").findOne(orderUnsafe.id);
-
-		return await sanitize.contentAPI.output(updatedOrderUnsafe, strapi.getModel("api::order.order"));
+			const updatedOrderUnsafe = await strapi.service("api::order.order").findOne(orderUnsafe.id);
+			return await sanitize.contentAPI.output(updatedOrderUnsafe, strapi.getModel("api::order.order"));
+		} catch (error) {
+			strapi.log.error("app:e:order-controller: Error uploading delivery note pdf", { error });
+			return ctx.internalServerError("Could not upload delivery note");
+		}
 	},
 
 	sendInvoice: async (ctx) => {
 		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
-		strapi.log.info("app:i:order-controller: sending invoice for", { uuid });
+		strapi.log.info("app:i:order-controller: Sending invoice for", { uuid });
 		strapi.log.verbose("app:v:order-controller:", { ctx });
 		return await strapi.service("api::order.order").sendInvoice();
 	},
 
 	finalize: async (ctx) => {
 		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
-		strapi.log.info("order-api: finalizing order", { uuid });
-		strapi.log.verbose("app:v:order-api:", { ctx });
-		return await strapi.service("api::order.order").finalize();
+		strapi.log.info(`app:i:order-controller: ✔ Finalizing order ID${uuid}`);
+		await strapi.service("api::order.order").finalize(uuid);
+		strapi.log.info(`app:i:order-controller: ✔ Finalizing order ID${uuid}`);
+		return ctx.noContent();
 	},
 
 	webhook: async (ctx) => {
@@ -190,7 +199,7 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			return adyenApi.handleWebhook(ctx.request.body as NotificationRequest);
 		} catch (error) {
 			strapi.log.error(`adyen-api: ${JSON.stringify({ error })}`);
-			ctx.internalServerError();
+			return ctx.internalServerError();
 		}
 	}
 }));

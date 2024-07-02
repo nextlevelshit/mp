@@ -1,8 +1,10 @@
+import type { Response } from "node-fetch";
 import { inkassoAddress } from "../../config/constants";
 import { PdfBody } from "../../types";
 
 const logger = strapi.log.info;
 const verbose = strapi.log.verbose;
+const debug = strapi.log.verbose;
 
 class InkassoApi {
 	baseUrl: string;
@@ -30,14 +32,17 @@ class InkassoApi {
 	}
 
 	private async postRequest(endpoint: string, body: Record<string, any>) {
-		const response = await strapi.fetch(`${this.baseUrl}${endpoint}`, {
+		const response = (await strapi.fetch(`${this.baseUrl}${endpoint}`, {
 			method: "POST",
 			headers: this.headers,
 			body: JSON.stringify(body)
-		});
+		})) as Response;
 		// const blob = await response.blob();
-		strapi.log.debug(JSON.stringify({ response }));
-		return await response.blob();
+		// debug("app:d:inkasso-api:", await response.blob());
+		// debug("app:d:inkasso-api:", await response.arrayBuffer());
+		// debug("app:d:inkasso-api:", Buffer.from(await response.arrayBuffer()));
+		// return await response.arrayBuffer();
+		return await response.arrayBuffer();
 	}
 }
 
