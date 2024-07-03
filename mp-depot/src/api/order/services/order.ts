@@ -1,9 +1,12 @@
+import path from "path";
+import fs from "fs";
 import { factories } from "@strapi/strapi";
+import { sanitize } from "@strapi/utils";
 import { ID } from "@strapi/database/dist/types";
 import { vatIncludedDecimal, vatDecimal } from "../../../../config/constants";
 import { calculateTotalProductPrice } from "../../product/services/product";
-import { sanitize } from "@strapi/utils";
-import { CartProduct } from "../../../../types";
+import { CartProduct, Order, PdfBody } from "../../../../types";
+import { inkassoApi } from "../../../services/InkassoApi";
 
 /**
  * This service is responsible for handling the order logic.
@@ -114,26 +117,43 @@ export default factories.createCoreService("api::order.order", ({ strapi }) => (
 		return await sanitize.contentAPI.output(oderUnsafe, strapi.getModel("api::order.order"));
 	},
 
-	generateInvoice: async (uuid: string) => {
-		// Implement the logic to generate an invoice for an order
-		const oderUnsafe = await strapi.service("api::order.order").findOneByUuid(uuid);
-		return await sanitize.contentAPI.output(oderUnsafe, strapi.getModel("api::order.order"));
-	},
+	uploadPdf: async (orderUnsafe: Order, field: string, name = "Upload") => {
+		strapi.log.verbose("app:v:order-service: – Generating delivery note pdf");
+		const pdfBody = deliveryNotePdfBody(orderUnsafe);
+		const deliveryNoteBlob = await inkassoApi.generateDeliveryNote(pdfBody);
+		strapi.log.verbose("app:v:order-service: ✔ Generating delivery note pdf");
 
-	generateDeliveryNote: async (uuid: string) => {
-		// Implement the logic to generate a delivery note for an order
-		const oderUnsafe = await strapi.service("api::order.order").findOneByUuid(uuid);
-		return await sanitize.contentAPI.output(oderUnsafe, strapi.getModel("api::order.order"));
+		// Save blob to a temp folder
+		const tempFolder = path.join(__dirname, "temp");
+		if (!fs.existsSync(tempFolder)) {
+			fs.mkdirSync(tempFolder);
+		}
+		const deliveryNotePath = path.join(tempFolder, `${name}.pdf`);
+		fs.writeFileSync(deliveryNotePath, Buffer.from(deliveryNoteBlob));
+
+		const uploadData = {
+			data: {
+				ref: "api::order.order",
+				refId: orderUnsafe.id,
+				field
+			},
+			files: {
+				path: deliveryNotePath,
+				name: `${name} ${pdfBody.date} ${pdfBody.to.name || pdfBody.to.address[0]}`,
+				type: "application/pdf",
+				size: fs.statSync(deliveryNotePath).size
+			}
+		};
+
+		strapi.log.verbose("app:v:order-service: - Uploading delivery note pdf");
+		await strapi.plugins.upload.services.upload.upload(uploadData);
+		strapi.log.verbose("app:v:order-service: ✔ Uploading delivery note pdf");
+
+		return await strapi.service("api::order.order").findOne(orderUnsafe.id);
 	},
 
 	sendInvoice: async (uuid: string) => {
 		// Implement the logic to send an invoice for an order
-		const oderUnsafe = await strapi.service("api::order.order").findOneByUuid(uuid);
-		return await sanitize.contentAPI.output(oderUnsafe, strapi.getModel("api::order.order"));
-	},
-
-	finalize: async (uuid: string) => {
-		// Implement the logic to finalize an order
 		const oderUnsafe = await strapi.service("api::order.order").findOneByUuid(uuid);
 		return await sanitize.contentAPI.output(oderUnsafe, strapi.getModel("api::order.order"));
 	}
@@ -159,4 +179,76 @@ const orderDefaultParams = {
 			}
 		}
 	}
+};
+
+const invoicePdfBody = (order: Order): PdfBody => {
+	const { id, invoiceAddress, cart, Date, VAT, subtotal, total, uuid } = order;
+
+	return {
+		subject: "RECHNUNG",
+		date: Date.toLocaleString(),
+		to: {
+			name: "",
+			address: invoiceAddress ? invoiceAddress.split("\n") : []
+		},
+		nr: {
+			customer: `${id}`,
+			order: uuid,
+			invoice: "123"
+		},
+		service:
+			cart.map((cartProduct) => ({
+				description: cartProduct.product.name,
+				price: {
+					per_unit: calculateTotalProductPrice(cartProduct.product) || 0,
+					total: (calculateTotalProductPrice(cartProduct.product) || 0) * cartProduct.count
+				},
+				count: cartProduct.count,
+				nr: `${cartProduct.id}`
+			})) || [],
+		currency: "\\euro",
+		body: "Thank you for your purchase!",
+		total,
+		subtotal,
+		VAT: {
+			amount: VAT,
+			rate: vatDecimal * 100
+		}
+	};
+};
+
+const deliveryNotePdfBody = (order: Order): PdfBody => {
+	const { id, cart, Date, address, VAT, subtotal, total, uuid } = order;
+
+	return {
+		subject: "LIEFERSCHEIN",
+		date: Date.toLocaleString(),
+		to: {
+			name: "",
+			address: address ? address.split("\n") : []
+		},
+		nr: {
+			customer: `${id}`,
+			order: uuid,
+			shipping: "123"
+		},
+		service:
+			cart.map((cartProduct) => ({
+				description: cartProduct.product.name,
+				price: {
+					per_unit: calculateTotalProductPrice(cartProduct.product) || 0,
+					total: (calculateTotalProductPrice(cartProduct.product) || 0) * cartProduct.count
+				},
+				count: cartProduct.count,
+				nr: `${cartProduct.id}`
+			})) || [],
+		currency: "\\euro",
+		body: "Thank you for your purchase!",
+		total,
+		subtotal,
+		VAT: {
+			amount: VAT,
+			rate: vatDecimal * 100
+		}
+	};
 };

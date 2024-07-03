@@ -8,19 +8,40 @@ export default ({ env }) => ({
 				title: "MUELLERPTINTS. Paperwork",
 				description: "API Documentation for MUELLERPRINTS. Paperwork",
 				termsOfService: false,
-				contact: false,
-				license: false,
+				contact: {
+					name: "Michael W. Czechowski",
+					email: "mail@dailysh.it",
+					url: "https://dailysh.it"
+				},
+				license: "Copyright (C) 2024 Michael W. Czechowski",
 				externalDocs: false
 			},
 			"x-strapi-config": {
 				plugins: ["upload"],
 				path: "/documentation",
-				mutateDocumentation: (generatedDocumentationDraft: any) => {
-					generatedDocumentationDraft.paths[
-						"/order/{uuid}" // must be an existing path
-					].get.parameters[0].schema.type = "string";
+				mutateDocumentation: (draft: any) => {
+					draft.paths["/order/{uuid}"].get.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}"].put.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/generate-delivery-note"].put.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/generate-invoice"].put.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/add-product/{productId}"].put.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/remove-product/{productId}"].put.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/checkout"].post.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/checkout/redirect"].get.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/send-invoice"].put.parameters[0].schema.type = "string";
+					draft.paths["/order/{uuid}/finalize"].put.parameters[0].schema.type = "string";
 
-					generatedDocumentationDraft.components.schemas["NotificationRequest"] = {
+					delete draft.paths["/order"].post.requestBody;
+					delete draft.paths["/order/{uuid}"].put.requestBody;
+					delete draft.paths["/order/{uuid}/generate-delivery-note"].put.requestBody;
+					delete draft.paths["/order/{uuid}/generate-invoice"].put.requestBody;
+					delete draft.paths["/order/{uuid}/add-product/{productId}"].put.requestBody;
+					delete draft.paths["/order/{uuid}/remove-product/{productId}"].put.requestBody;
+					delete draft.paths["/order/{uuid}/checkout"].post.requestBody;
+					delete draft.paths["/order/{uuid}/send-invoice"].put.requestBody;
+					delete draft.paths["/order/{uuid}/finalize"].put.requestBody;
+
+					draft.components.schemas["NotificationRequest"] = {
 						type: "object",
 						required: ["live", "notificationItems"],
 						properties: {
@@ -38,7 +59,7 @@ export default ({ env }) => ({
 						}
 					};
 
-					generatedDocumentationDraft.components.schemas["NotificationItem"] = {
+					draft.components.schemas["NotificationItem"] = {
 						type: "object",
 						required: ["NotificationRequestItem"],
 						properties: {
@@ -48,7 +69,7 @@ export default ({ env }) => ({
 						}
 					};
 
-					generatedDocumentationDraft.components.schemas["NotificationRequestItem"] = {
+					draft.components.schemas["NotificationRequestItem"] = {
 						type: "object",
 						required: ["amount", "pspReference", "eventCode", "eventDate", "merchantAccountCode", "merchantReference", "success"],
 						properties: {
@@ -151,7 +172,7 @@ export default ({ env }) => ({
 						}
 					};
 
-					generatedDocumentationDraft.components.schemas["Amount"] = {
+					draft.components.schemas["Amount"] = {
 						type: "object",
 						required: ["currency", "value"],
 						properties: {
@@ -166,7 +187,7 @@ export default ({ env }) => ({
 						}
 					};
 
-					generatedDocumentationDraft.components.schemas["WebhookResponse"] = {
+					draft.components.schemas["WebhookResponse"] = {
 						type: "object",
 						required: [],
 						properties: {
@@ -177,9 +198,7 @@ export default ({ env }) => ({
 						}
 					};
 
-					generatedDocumentationDraft.paths[
-						"/order/webhook" // must be an existing path
-					].post.requestBody = {
+					draft.paths["/order/webhook"].post.requestBody = {
 						required: true,
 						content: {
 							"application/json": {
@@ -190,7 +209,7 @@ export default ({ env }) => ({
 						}
 					};
 
-					generatedDocumentationDraft.paths["/order/webhook"].post.responses["200"].content["application/json"].schema["$ref"] =
+					draft.paths["/order/webhook"].post.responses["200"].content["application/json"].schema["$ref"] =
 						"#/components/schemas/WebhookResponse";
 				}
 			},

@@ -2,11 +2,11 @@
   "name": "mp-depot",
   "version": "1.0.0",
   "scripts": {
-    "develop": "DEBUG=strapi:*,app:* npm run strapi develop -- --bundler vite",
+    "develop": "DEBUG=strapi:*,app:* npm run strapi develop -- --debug --bundler vite",
     "start": "strapi start",
     "build": "strapi build",
     "strapi": "strapi",
-    "lint:fix": "prettier --write \"{src,types,config}/**/*.{js,jsx,ts,tsx,json,yaml}\"",
+    "lint:fix": "prettier --write \"{src,types,config}/**/*.{js,jsx,ts,tsx}\"",
     "generate:types": "strapi ts:generate-types",
     "import": "npm run strapi import -- -f database/export.tar.gz --force",
     "export": "npm run strapi export -- --no-encrypt --file database/export_$(date +'%Y%m%d%H%M%S')"

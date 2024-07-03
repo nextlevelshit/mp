@@ -58,7 +58,7 @@ export default {
 		},
 		{
 			method: "GET",
-			path: "/order/:uuid/redirect",
+			path: "/order/:uuid/checkout/redirect",
 			handler: "order.redirect",
 			config: {
 				policies: []

@@ -629,7 +629,7 @@
       }
     }
   },
-  "/order/{uuid}/redirect": {
+  "/order/{uuid}/checkout/redirect": {
     "get": {
       "responses": {
         "200": {
@@ -708,7 +708,7 @@
           }
         }
       ],
-      "operationId": "get/order/{uuid}/redirect"
+      "operationId": "get/order/{uuid}/checkout/redirect"
     }
   },
   "/order/{uuid}/generate-invoice": {

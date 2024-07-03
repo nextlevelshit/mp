@@ -5,10 +5,14 @@
     "title": "MUELLERPTINTS. Paperwork",
     "description": "API Documentation for MUELLERPRINTS. Paperwork",
     "termsOfService": false,
-    "contact": false,
-    "license": false,
+    "contact": {
+      "name": "Michael W. Czechowski",
+      "email": "mail@dailysh.it",
+      "url": "https://dailysh.it"
+    },
+    "license": "Copyright (C) 2024 Michael W. Czechowski",
     "externalDocs": false,
-    "x-generation-date": "2024-07-03T00:16:54.334Z"
+    "x-generation-date": "2024-07-03T02:11:13.266Z"
   },
   "x-strapi-config": {
     "plugins": [
@@ -21222,17 +21226,7 @@
           "Order"
         ],
         "parameters": [],
-        "operationId": "post/order",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "post/order"
       }
     },
     "/order/webhook": {
@@ -21471,21 +21465,11 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
-        "operationId": "put/order/{uuid}",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "put/order/{uuid}"
       }
     },
     "/order/{uuid}/add-product/{productId}": {
@@ -21563,7 +21547,7 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           },
           {
@@ -21577,17 +21561,7 @@
             }
           }
         ],
-        "operationId": "put/order/{uuid}/add-product/{productId}",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "put/order/{uuid}/add-product/{productId}"
       }
     },
     "/order/{uuid}/remove-product/{productId}": {
@@ -21665,7 +21639,7 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           },
           {
@@ -21679,17 +21653,7 @@
             }
           }
         ],
-        "operationId": "put/order/{uuid}/remove-product/{productId}",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "put/order/{uuid}/remove-product/{productId}"
       }
     },
     "/order/{uuid}/checkout": {
@@ -21767,24 +21731,14 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
-        "operationId": "post/order/{uuid}/checkout",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "post/order/{uuid}/checkout"
       }
     },
-    "/order/{uuid}/redirect": {
+    "/order/{uuid}/checkout/redirect": {
       "get": {
         "responses": {
           "200": {
@@ -21859,11 +21813,11 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
-        "operationId": "get/order/{uuid}/redirect"
+        "operationId": "get/order/{uuid}/checkout/redirect"
       }
     },
     "/order/{uuid}/generate-invoice": {
@@ -21941,21 +21895,11 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
-        "operationId": "put/order/{uuid}/generate-invoice",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "put/order/{uuid}/generate-invoice"
       }
     },
     "/order/{uuid}/generate-delivery-note": {
@@ -22033,21 +21977,11 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
-        "operationId": "put/order/{uuid}/generate-delivery-note",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "put/order/{uuid}/generate-delivery-note"
       }
     },
     "/order/{uuid}/send-invoice": {
@@ -22125,21 +22059,11 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
-        "operationId": "put/order/{uuid}/send-invoice",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "put/order/{uuid}/send-invoice"
       }
     },
     "/order/{uuid}/finalize": {
@@ -22217,21 +22141,11 @@
             "deprecated": false,
             "required": true,
             "schema": {
-              "type": "number"
+              "type": "string"
             }
           }
         ],
-        "operationId": "put/order/{uuid}/finalize",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/OrderRequest"
-              }
-            }
-          }
-        }
+        "operationId": "put/order/{uuid}/finalize"
       }
     },
     "/payments": {

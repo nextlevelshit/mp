@@ -1,14 +1,8 @@
-import fs from "fs";
-import path from "path";
 import { factories } from "@strapi/strapi";
 import { sanitize } from "@strapi/utils";
 import { v4 as generateUuid } from "uuid";
-import { vatDecimal } from "../../../../config/constants";
 import { adyenApi } from "../../../services/AdyenApi";
-import { PdfBody, Order, NotificationRequest } from "../../../../types";
-import { calculateTotalProductPrice } from "../../product/services/product";
-import { inkassoApi } from "../../../services/InkassoApi";
-// import FormData from "form-data";
+import { Order, NotificationRequest } from "../../../../types";
 
 /**
  * A set of functions called "actions" for `order`
@@ -16,7 +10,7 @@ import { inkassoApi } from "../../../services/InkassoApi";
 export default factories.createCoreController("api::order.order", ({ strapi }) => ({
 	create: async (ctx) => {
 		const body = { data: { uuid: generateUuid() } };
-		strapi.log.verbose(JSON.stringify({ body }));
+		strapi.log.verbose("Creating new order", { body });
 		const order = await strapi.service("api::order.order").create(body);
 		return await sanitize.contentAPI.output(order, strapi.getModel("api::order.order"));
 	},
@@ -128,42 +122,9 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		if (!orderUnsafe.paymentAuthorised) {
 			return ctx.locked("Payment not authorised, cannot generate invoice");
 		}
-		strapi.log.info("app:i:order-controller: – Generating invoice pdf");
-
-		const pdfBody = invoicePdfBody(orderUnsafe);
-		const invoiceBlob = await inkassoApi.generateInvoice(pdfBody);
-
-		if (!invoiceBlob) {
-			return ctx.internalServerError("Could not generate invoice");
-		}
-
-		// Save blob to a temp folder
-		const tempFolder = path.join(__dirname, "temp");
-		if (!fs.existsSync(tempFolder)) {
-			fs.mkdirSync(tempFolder);
-		}
-		const invoicePath = path.join(tempFolder, "Rechnung.pdf");
-		fs.writeFileSync(invoicePath, Buffer.from(invoiceBlob));
-
-		const uploadData = {
-			data: {
-				ref: "api::order.order",
-				refId: orderUnsafe.id,
-				field: "invoice"
-			},
-			files: {
-				path: invoicePath,
-				name: `Rechnung ${pdfBody.date} ${pdfBody.to.name || pdfBody.to.address[0]}.pdf`,
-				type: "application/pdf",
-				size: fs.statSync(invoicePath).size
-			}
-		};
 
 		try {
-			await strapi.plugins.upload.services.upload.upload(uploadData);
-			strapi.log.info("app:i:order-controller: ✔ Uploading invoice pdf");
-
-			const updatedOrderUnsafe = await strapi.service("api::order.order").findOne(orderUnsafe.id);
+			const updatedOrderUnsafe = await strapi.service("api::order.order").uploadPdf(orderUnsafe, "invoice", "Rechnung");
 			return await sanitize.contentAPI.output(updatedOrderUnsafe, strapi.getModel("api::order.order"));
 		} catch (error) {
 			strapi.log.error("app:e:order-controller: Error uploading delivery note pdf", { error });
@@ -179,42 +140,9 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		if (!orderUnsafe.paymentAuthorised) {
 			return ctx.locked("Payment not authorised, cannot generate delivery note");
 		}
-		strapi.log.info("app:i:order-controller: – Generating delivery note pdf");
-
-		const pdfBody = deliveryNotePdfBody(orderUnsafe);
-		const deliveryNoteBlob = await inkassoApi.generateDeliveryNote(pdfBody);
-
-		if (!deliveryNoteBlob) {
-			return ctx.internalServerError("Could not generate delivery note");
-		}
-
-		// Save blob to a temp folder
-		const tempFolder = path.join(__dirname, "temp");
-		if (!fs.existsSync(tempFolder)) {
-			fs.mkdirSync(tempFolder);
-		}
-		const deliveryNotePath = path.join(tempFolder, "Lieferschein.pdf");
-		fs.writeFileSync(deliveryNotePath, Buffer.from(deliveryNoteBlob));
-
-		const uploadData = {
-			data: {
-				ref: "api::order.order",
-				refId: orderUnsafe.id,
-				field: "deliveryNote"
-			},
-			files: {
-				path: deliveryNotePath,
-				name: `Lieferschein ${pdfBody.date} ${pdfBody.to.name || pdfBody.to.address[0]}`,
-				type: "application/pdf",
-				size: fs.statSync(deliveryNotePath).size
-			}
-		};
 
 		try {
-			await strapi.plugins.upload.services.upload.upload(uploadData);
-			strapi.log.info("app:i:order-controller: ✔ Uploading delivery note pdf");
-
-			const updatedOrderUnsafe = await strapi.service("api::order.order").findOne(orderUnsafe.id);
+			const updatedOrderUnsafe = await strapi.service("api::order.order").uploadPdf(orderUnsafe, "deliveryNote", "Lieferschein");
 			return await sanitize.contentAPI.output(updatedOrderUnsafe, strapi.getModel("api::order.order"));
 		} catch (error) {
 			strapi.log.error("app:e:order-controller: Error uploading delivery note pdf", { error });
@@ -229,12 +157,19 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		return await strapi.service("api::order.order").sendInvoice();
 	},
 
-	finalize: async (ctx) => {
+	finalize: async (ctx, next) => {
 		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
-		strapi.log.info(`app:i:order-controller: ✔ Finalizing order ID${uuid}`);
-		await strapi.service("api::order.order").finalize(uuid);
-		strapi.log.info(`app:i:order-controller: ✔ Finalizing order ID${uuid}`);
-		return ctx.noContent();
+		strapi.log.info(`app:i:order-controller: - Finalizing order ${uuid}`);
+
+		await Promise.all([
+			strapi.controller("api::order.order").generateDeliveryNote(ctx, next),
+			strapi.controller("api::order.order").generateInvoice(ctx, next)
+		]);
+
+		strapi.log.info(`app:i:order-controller: ✔ Finalizing order ${uuid}`);
+
+		const orderUnsafe = await strapi.service("api::order.order").findOneByUuid(uuid);
+		return await sanitize.contentAPI.output(orderUnsafe, strapi.getModel("api::order.order"));
 	},
 
 	webhook: async (ctx) => {
@@ -246,75 +181,3 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 		}
 	}
 }));
-
-const invoicePdfBody = (order: Order): PdfBody => {
-	const { id, invoiceAddress, cart, Date, email, address, VAT, subtotal, total, uuid } = order;
-
-	return {
-		subject: "RECHNUNG",
-		date: Date.toLocaleString(),
-		to: {
-			name: "",
-			address: invoiceAddress ? invoiceAddress.split("\n") : []
-		},
-		nr: {
-			customer: `${id}`,
-			order: uuid,
-			invoice: "123"
-		},
-		service:
-			cart.map((cartProduct) => ({
-				description: cartProduct.product.name,
-				price: {
-					per_unit: calculateTotalProductPrice(cartProduct.product) || 0,
-					total: (calculateTotalProductPrice(cartProduct.product) || 0) * cartProduct.count
-				},
-				count: cartProduct.count,
-				nr: `${cartProduct.id}`
-			})) || [],
-		currency: "\\euro",
-		body: "Thank you for your purchase!",
-		total,
-		subtotal,
-		VAT: {
-			amount: VAT,
-			rate: vatDecimal * 100
-		}
-	};
-};
-
-const deliveryNotePdfBody = (order: Order): PdfBody => {
-	const { id, cart, Date, email, address, VAT, subtotal, total, uuid } = order;
-
-	return {
-		subject: "LIEFERSCHEIN",
-		date: Date.toLocaleString(),
-		to: {
-			name: "",
-			address: address ? address.split("\n") : []
-		},
-		nr: {
-			customer: `${id}`,
-			order: uuid,
-			shipping: "123"
-		},
-		service:
-			cart.map((cartProduct) => ({
-				description: cartProduct.product.name,
-				price: {
-					per_unit: calculateTotalProductPrice(cartProduct.product) || 0,
-					total: (calculateTotalProductPrice(cartProduct.product) || 0) * cartProduct.count
-				},
-				count: cartProduct.count,
-				nr: `${cartProduct.id}`
-			})) || [],
-		currency: "\\euro",
-		body: "Thank you for your purchase!",
-		total,
-		subtotal,
-		VAT: {
-			amount: VAT,
-			rate: vatDecimal * 100
-		}
-	};
-};
