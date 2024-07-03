@@ -37,11 +37,6 @@ class InkassoApi {
 			headers: this.headers,
 			body: JSON.stringify(body)
 		})) as Response;
-		// const blob = await response.blob();
-		// debug("app:d:inkasso-api:", await response.blob());
-		// debug("app:d:inkasso-api:", await response.arrayBuffer());
-		// debug("app:d:inkasso-api:", Buffer.from(await response.arrayBuffer()));
-		// return await response.arrayBuffer();
 		return await response.arrayBuffer();
 	}
 }

@@ -122,8 +122,53 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 
 	generateInvoice: async (ctx) => {
 		const { uuid } = await sanitize.contentAPI.query(ctx.params, strapi.getModel("api::order.order"));
-		strapi.log.verbose(`app:v:order-controller: Generating invoice ID${uuid}`);
-		return await strapi.service("api::order.order").generateInvoice(uuid);
+		strapi.log.info(`app:i:order-controller: Started invoice generation`);
+		const orderUnsafe = (await strapi.service("api::order.order").findOneByUuid(uuid)) as Order;
+
+		if (!orderUnsafe.paymentAuthorised) {
+			return ctx.locked("Payment not authorised, cannot generate invoice");
+		}
+		strapi.log.info("app:i:order-controller: – Generating invoice pdf");
+
+		const pdfBody = invoicePdfBody(orderUnsafe);
+		const invoiceBlob = await inkassoApi.generateInvoice(pdfBody);
+
+		if (!invoiceBlob) {
+			return ctx.internalServerError("Could not generate invoice");
+		}
+
+		// Save blob to a temp folder
+		const tempFolder = path.join(__dirname, "temp");
+		if (!fs.existsSync(tempFolder)) {
+			fs.mkdirSync(tempFolder);
+		}
+		const invoicePath = path.join(tempFolder, "Rechnung.pdf");
+		fs.writeFileSync(invoicePath, Buffer.from(invoiceBlob));
+
+		const uploadData = {
+			data: {
+				ref: "api::order.order",
+				refId: orderUnsafe.id,
+				field: "invoice"
+			},
+			files: {
+				path: invoicePath,
+				name: `Rechnung ${pdfBody.date} ${pdfBody.to.name || pdfBody.to.address[0]}.pdf`,
+				type: "application/pdf",
+				size: fs.statSync(invoicePath).size
+			}
+		};
+
+		try {
+			await strapi.plugins.upload.services.upload.upload(uploadData);
+			strapi.log.info("app:i:order-controller: ✔ Uploading invoice pdf");
+
+			const updatedOrderUnsafe = await strapi.service("api::order.order").findOne(orderUnsafe.id);
+			return await sanitize.contentAPI.output(updatedOrderUnsafe, strapi.getModel("api::order.order"));
+		} catch (error) {
+			strapi.log.error("app:e:order-controller: Error uploading delivery note pdf", { error });
+			return ctx.internalServerError("Could not upload delivery note");
+		}
 	},
 
 	generateDeliveryNote: async (ctx) => {
@@ -155,13 +200,11 @@ export default factories.createCoreController("api::order.order", ({ strapi }) =
 			data: {
 				ref: "api::order.order",
 				refId: orderUnsafe.id,
-				field: "deliveryNote",
+				field: "deliveryNote"
 			},
 			files: {
 				path: deliveryNotePath,
-				name: "Lieferschein.pdf",
-				caption: "Caption",
-				alternativeText: "alternative",
+				name: `Lieferschein ${pdfBody.date} ${pdfBody.to.name || pdfBody.to.address[0]}`,
 				type: "application/pdf",
 				size: fs.statSync(deliveryNotePath).size
 			}

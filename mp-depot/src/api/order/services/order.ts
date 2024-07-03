@@ -141,6 +141,7 @@ export default factories.createCoreService("api::order.order", ({ strapi }) => (
 
 const orderDefaultParams = {
 	populate: {
+		invoice: true,
 		deliveryNote: true,
 		delivery: true,
 		payment: true,
